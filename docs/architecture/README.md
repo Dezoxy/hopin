@@ -55,7 +55,10 @@ New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-titl
 
 ## Written documentation
 
-Only [overview/](overview/) exists and is imported into the model by `!docs`. Requirements, security, data, reliability, observability and risks currently live in [the plan](../hopin-plan.md), Parts A, C and G. Each moves into its own folder here, such as `reliability/` or `security/`, when its plan step produces real content. Empty concern documents are not created ahead of time.
+- [overview/](overview/) is imported into the model by `!docs`.
+- [requirements/constraints.md](requirements/constraints.md) lists the regulatory constraints C-01 to C-09 from the [S002 memo](../compliance/s002-regulatory-memo.md).
+
+The rest of the requirements, plus security, data, reliability, observability and risks, currently live in [the plan](../hopin-plan.md), Parts A, C and G. Each moves into its own folder here, such as `reliability/` or `security/`, when its plan step produces real content. Empty concern documents are not created ahead of time.
 
 ## Not documented here
 

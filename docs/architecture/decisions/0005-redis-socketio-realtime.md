@@ -38,6 +38,8 @@ Negative / accepted trade-offs:
 
 - Redis is not backed up. Losing it drops live positions until drivers reconnect, and loses queued jobs.
 
+- Budapest requires automatic selection by road distance and traffic ([C-04](../requirements/constraints.md)). Redis GEO can only pre-filter candidates; the final choice needs road ETAs, for example from a routing matrix API.
+
 ## Risks
 
 - Queued jobs lost on a Redis failure; jobs must be idempotent and re-derivable from the database.
