@@ -19,7 +19,7 @@ PORT      ?= 8080
 
 STRUCTURIZR := docker run --rm -v "$(CURDIR)/$(ARCH_DIR):/w:ro"
 
-.PHONY: help validate inspect check view export pdf clean
+.PHONY: help validate inspect check view export pdf clean docs
 .DEFAULT_GOAL := help
 
 ## help        list the targets
@@ -56,6 +56,10 @@ export:
 ## pdf         the Documentation tab and every view as one PDF, named <project>-architecture-<date>-<edition>.pdf
 pdf:
 	STRUCTURIZR_IMAGE=$(STRUCTURIZR_IMAGE) PANDOC_IMAGE=$(PANDOC_IMAGE) ARCH_DIR=$(ARCH_DIR) scripts/architecture-pdf.sh
+
+## docs        check documentation consistency: links, indexes, ADRs, view register, cited IDs
+docs:
+	python3 scripts/check_docs_consistency.py
 
 ## clean       delete the generated folder (exports and PDFs; all gitignored)
 clean:

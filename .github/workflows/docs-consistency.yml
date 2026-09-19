@@ -1,0 +1,35 @@
+name: Docs / Consistency
+
+# The mechanical half of the /docs-sync audit, plus Structurizr validation of
+# the architecture model. Runs on every pull request and on main. Read-only.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: docs consistency
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check documentation against the tree
+        run: make docs
+
+  model:
+    name: architecture model
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      # Same pinned image as local runs (Makefile STRUCTURIZR_IMAGE).
+      - name: Validate and inspect the Structurizr workspace
+        run: make check

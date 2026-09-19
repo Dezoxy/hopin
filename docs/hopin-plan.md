@@ -3,7 +3,7 @@
 > **Status:** v0.1 — initial plan, 2026-09-19
 > **Source of vision:** [hopin-pre-plan.md](./hopin-pre-plan.md)
 > **How to use this file:** this is the single living plan. Every step in Part D has an ID (`S001`…). When we start a step, we add a `### S0xx` section under Part E with details, decisions and results, and flip its status in the table. Nothing gets deleted; superseded decisions are struck through with a note.
-> **Architecture:** diagrams and decision records live in [architecture/](./architecture/README.md) (Structurizr model + ADRs). This plan owns scope, requirements, roadmap and risks until a concern moves into its own architecture document.
+> **Architecture:** requirements, security, data, integration, deployment, reliability, observability, risks and decisions live in [architecture/](./architecture/README.md). This plan owns the product scope, the domain model until S005, the step list, open decisions and its own changelog.
 
 ---
 
@@ -93,16 +93,7 @@ Every transition is written to `ride_events` (append-only) with actor, timestamp
 
 ### A7. Non-functional requirements
 
-| Area | Target for MVP | Why |
-|---|---|---|
-| Match latency | Offer sent to first driver < 2 s after request | Core UX promise |
-| Location freshness | Driver position ≤ 3 s old on passenger screen | "Live" must feel live |
-| Availability | 99.5 % monthly for API (≈ 3.6 h downtime) | Solo-run, single region, be honest |
-| RPO / RTO | RPO 5 min (PITR), RTO 4 h same-region, 24 h cross-cloud | See Part C5 |
-| Data residency | All personal data at rest in EU (AWS eu-central-1, Azure West Europe) | GDPR |
-| PCI | SAQ-A scope only; card data never touches our servers | Stripe Elements / native sheets |
-| Accessibility | WCAG 2.1 AA on web, platform a11y basics on mobile | Public-facing consumer app |
-| Cost ceiling | Idle infra ≤ ~150 EUR/month before real traffic | Solo developer budget |
+Moved to [quality attributes](./architecture/requirements/quality-attributes.md) (QA-01 to QA-11), which now own the targets. Summary: offer in < 2 s, positions ≤ 3 s old, 99.5 % availability, RPO 5 min / RTO 4 h in-region, EU residency, PCI SAQ-A, WCAG 2.1 AA, idle cost ≤ ~150 EUR/month.
 
 ### A8. Regulatory summary (from S002, 2026-09-19)
 
@@ -196,10 +187,13 @@ hopin/
 │   │   └── bootstrap/    state backends, OIDC providers
 │   └── docker/           docker-compose for local Postgres/PostGIS + Redis
 ├── docs/
+│   ├── README.md         docs index
 │   ├── hopin-pre-plan.md
 │   ├── hopin-plan.md     ← this file
-│   ├── architecture/     Structurizr model, ADRs (decisions/), overview; see its README
-│   └── runbooks/         deploy, restore, incident, break-glass
+│   ├── architecture/     model, ADRs, requirements and concern docs; see its README
+│   ├── compliance/       regulatory research and the DPIA
+│   └── runbooks/         deploy, restore, incident, break-glass (from S087)
+├── scripts/              docs consistency check, architecture PDF tooling
 └── .github/workflows/
 ```
 
@@ -238,106 +232,45 @@ REST under `/v1`, OpenAPI-documented, JWT (Cognito) bearer auth. Full contract i
 - `share/:token` — public, returns minimal live position for the trip-share page
 - `webhooks/stripe`
 
-Realtime (Socket.IO namespaces):
-- `/passenger` — join `ride:<id>` room; receives `ride.state`, `driver.position`, `ride.eta`.
-- `/driver` — emits `location` every 3 s while online; receives `offer.new`, `offer.expired`, `ride.state`.
-- `/admin` — receives aggregated `ops.snapshot` every 5 s.
-
+Realtime events are owned by the [event catalog](./architecture/integration/event-catalog.md).
 ---
 
 ## Part C — Platform, security, backup
 
+Each topic below is owned by a document in the architecture knowledge base. The headings stay so older links keep working.
+
 ### C1. Environments and accounts
 
-| Env | AWS account | Purpose | Data |
-|---|---|---|---|
-| `dev` | hopin-dev | Everything deploys here on merge to `main` | Synthetic only |
-| `staging` | hopin-staging | Release candidates, store TestFlight/internal builds point here | Synthetic + beta testers |
-| `prod` | hopin-prod | Real users | Real |
-| — | hopin-management | AWS Organization root, IAM Identity Center, billing, org CloudTrail | None |
-
-Azure: one tenant, one subscription `hopin-secondary`, resource groups `rg-hopin-backup-weu` and `rg-hopin-vault-weu`. Region West Europe (Netherlands) or Germany West Central; pick in S012 based on Key Vault/Blob immutability feature availability.
+Owned by [environments](./architecture/deployment/environments.md).
 
 ### C2. Security model
 
-- **Identity:** IAM Identity Center with MFA for humans; no IAM users. GitHub Actions assume roles via OIDC scoped per environment. Azure: Entra ID, PIM-style just-in-time not needed at solo scale but MFA is mandatory.
-- **Secrets:** AWS Secrets Manager is the runtime source of truth (DB creds, Stripe keys, Mapbox tokens, Cognito app secrets). ECS tasks read them at start via task-definition secrets. Rotation: DB creds automatic (Secrets Manager rotation Lambda), third-party keys manual with a calendar reminder.
-- **Azure Key Vault role:** escrow copies of root-level credentials (AWS break-glass user, Stripe restricted key, Terraform state KMS key material export policy), plus the encryption key for off-cloud database dumps. Purge protection and soft-delete on; access only to the owner identity and the backup pipeline's federated identity.
-- **Encryption:** KMS customer-managed keys for RDS, S3, EBS, CloudWatch logs, Secrets Manager. TLS 1.2+ everywhere, ACM certificates.
-- **Network:** private subnets for ECS, RDS, Redis; only ALB and NAT in public subnets; VPC endpoints for S3, ECR, Secrets Manager, CloudWatch so tasks never traverse NAT for AWS APIs.
-- **Edge:** CloudFront for web builds; AWS WAF (managed core rule set) on both CloudFront and the API load balancer, rate limits on `/quotes` and `/rides` at the load balancer and on sign-in at the Cognito user pool (OTP is Cognito's, not the API's); Shield Standard.
-- **App security:** zod validation on every boundary, idempotency keys on ride and payment creation, Stripe webhook signature verification, presigned S3 uploads with content-type and size limits, driver documents never publicly readable.
-- **Supply chain:** Dependabot, `pnpm audit` in CI, Trivy image scan in CI and ECR scan on push, secret scanning on the repo.
-- **Detection:** CloudTrail org trail, GuardDuty, Security Hub CIS benchmark, AWS Config rules for "no public S3", "RDS encrypted", "no 0.0.0.0/0 on SSH". Azure Defender for Storage and Key Vault at the basic tier.
+Owned by [security architecture](./architecture/security/security-architecture.md), [trust boundaries](./architecture/security/trust-boundaries.md) and [data classification](./architecture/security/data-classification.md).
 
 ### C3. Data protection and GDPR
 
-- Retention: raw `driver_locations` 90 days, then aggregated; `ride_events` 2 years (dispute window + tax); invoices per Hungarian law (8 years) but stored in the invoicing provider.
-- Passenger self-service: export my data (async job → S3 presigned link, 24 h), delete my account (soft delete, PII scrubbed after 30 days, financial records kept pseudonymised).
-- DPIA document lives in `docs/compliance/`. DPAs with every processor listed in A8.
-- Trip-share links: expire 2 h after ride completion, revocable by the passenger.
+Retention and handling rules are owned by [data classification](./architecture/security/data-classification.md); the DPIA outline is in the [S002 memo](./compliance/s002-regulatory-memo.md#dpia-outline-to-be-written-in-s100); the DPIA itself is plan step S100.
 
 ### C4. Multi-cloud strategy (what Azure actually does)
 
-Decision: **AWS runs everything users touch. Azure is the "not-AWS" safety net.** This gives a real, defensible reason to use both clouds without doubling the platform.
-
-| Concern | AWS (primary) | Azure (secondary) |
-|---|---|---|
-| Compute, DB, cache, edge | ✔ all of it | — |
-| Runtime secrets | Secrets Manager + KMS | Key Vault: escrow + dump encryption key |
-| Backups, same provider | AWS Backup vault (Vault Lock), PITR, cross-region copy to eu-west-1 | — |
-| Backups, different provider | — | Nightly encrypted `pg_dump` + S3 driver-document sync into Azure Blob with immutability policy (WORM) and versioning |
-| Disaster recovery target | Restore in eu-west-1 from AWS Backup (RTO 4 h) | Documented cold-restore path: Azure Database for PostgreSQL + Container Apps from the dump (RTO 24 h). Built as a **tested runbook and Terraform module, not a running environment** |
-| Monitoring of the backup itself | CloudWatch alarm if nightly job fails | Azure Monitor alert if no new blob in 26 h |
-
-Why this shape: a single-vendor account compromise, billing lockout, or region-wide incident is the realistic catastrophic scenario for a solo operator. Off-provider, immutable backups plus escrowed secrets are what get you back. A live Azure standby would double IaC surface, identity surface and cost for a benefit we can't operate alone yet. Revisit after launch (S110).
+Owned by [ADR 1](./architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [backup strategy](./architecture/reliability/backup-strategy.md) and [disaster recovery](./architecture/reliability/disaster-recovery.md). Rule of thumb: AWS runs everything users touch; Azure holds immutable backups, escrowed keys and a cold-restore path, first drilled in S096.
 
 ### C5. Backup and restore
 
-| What | Method | Frequency | Retention | Where |
-|---|---|---|---|---|
-| RDS | Automated snapshots + PITR | Continuous / daily | 35 days PITR, 90 days snapshots | eu-central-1 + copy eu-west-1 |
-| RDS logical dump | `pg_dump` in a scheduled ECS task, encrypted with a Key Vault-held key | Nightly | 30 daily, 12 monthly | S3 → Azure Blob (immutable) |
-| Driver documents (S3) | Versioning + replication rule | Continuous | Indefinite while driver active | eu-central-1 + Azure Blob sync nightly |
-| Redis | Not backed up (rebuildable hot index) | — | — | — |
-| Terraform state | S3 versioning + Key Vault escrow of the state KMS key | Continuous | 1 year of versions | S3 |
-| Secrets | Secrets Manager (versions) + Key Vault escrow | On change | — | Both |
-| Restore drill | Full restore into a scratch account, run smoke tests, destroy | Quarterly | — | Runbook in `docs/runbooks/restore.md` |
+Owned by [backup strategy](./architecture/reliability/backup-strategy.md) and [disaster recovery](./architecture/reliability/disaster-recovery.md).
 
 ### C6. Observability
 
-- **Logs:** structured JSON (pino) → CloudWatch Logs, 30-day retention dev, 90-day prod; PII fields redacted at the logger.
-- **Metrics:** ECS/ALB/RDS/Redis defaults plus custom: `match_latency_ms`, `offers_per_ride`, `ws_connected_drivers`, `quote_to_request_rate`, `payment_capture_failures`.
-- **Traces:** OpenTelemetry SDK in NestJS → X-Ray; trace id propagated into logs.
-- **Apps:** Sentry for crashes and performance; EAS Update rollout monitored against crash-free rate.
-- **Alerts (page-worthy):** API 5xx rate > 2 % for 5 min, match latency p95 > 5 s, websocket driver count drops > 50 % in 5 min, RDS free storage < 15 %, nightly backup missing, Stripe webhook failures > 0 in 10 min.
-- **Status page:** simple hosted page (e.g. a static page on CloudFront updated by hand at MVP).
+Owned by [observability architecture](./architecture/observability/observability-architecture.md).
 
 ### C7. CI/CD
 
-- PR: lint, typecheck, unit tests, integration tests (Testcontainers), Trivy, `terraform plan` for touched envs.
-- Merge to `main`: build images → push ECR → deploy `dev` → run smoke tests.
-- Tag `v*-rc`: deploy `staging`, EAS build for internal track / TestFlight.
-- Tag `v*`: manual approval gate → deploy `prod` (rolling, ECS circuit breaker on) → EAS Submit to stores → EAS Update to production channel only after store build is live.
-- Rollback: ECS previous task definition (one command, in runbook); EAS Update republish previous.
+Owned by [deployment architecture, Delivery](./architecture/deployment/deployment-architecture.md#delivery).
 
 ### C8. Rough monthly cost (prod, idle-to-light traffic, EUR)
 
-| Item | Estimate |
-|---|---|
-| ECS Fargate (2 × 0.5 vCPU / 1 GB) | ~35 |
-| RDS PostgreSQL db.t4g.small Multi-AZ | ~60 |
-| ElastiCache cache.t4g.micro | ~15 |
-| NAT Gateway (1) | ~35 |
-| ALB | ~20 |
-| CloudFront, S3, Route 53, CloudWatch | ~10 |
-| AWS Backup + cross-region copy | ~5 |
-| Azure Blob (cool, ~50 GB) + Key Vault | ~5 |
-| Sentry (dev tier), Mapbox, Expo (free tiers at MVP) | 0–30 |
-| SMS OTP (SNS, HU) | usage-based, ~0.05 per message |
-| **Total** | **~190–220** |
+Owned by [deployment architecture, Cost](./architecture/deployment/deployment-architecture.md#cost): about 190–220 EUR/month, above the QA-08 target; levers reviewed in S102.
 
-Dev environment: single-AZ RDS, no NAT (VPC endpoints only), Fargate Spot, scale-to-zero overnight via scheduled scaling → ~50. Above the 150 ceiling in A7 for prod; the levers are NAT removal (endpoints only) and single-AZ RDS until real traffic. Revisit in S102.
 
 ---
 
@@ -575,16 +508,7 @@ These shape business logic, so they are yours, not mine. Answer inline here and 
 
 ## Part G — Risks
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| ~~Hungarian taxi regulation makes "upfront fare" or independent drivers illegal in the form we planned~~ Confirmed by S002: fare is meter-only and Budapest dispatch needs 100 M HUF equity | Entry-model change | Part F question 7, S111 |
-| SMS OTP cost or deliverability in HU | Login friction, cost | Budget alert on SNS; fallback to email OTP; consider WhatsApp later |
-| App Store rejects driver background location | Launch delay | Follow Apple/Google guidance from day one (S065, S105), record a demo video |
-| Solo on-call | Outages linger | Keep architecture boring, alarms actionable, runbooks short; scale-to-zero dev to save money for prod HA |
-| Mapbox ETA quality in target city | Bad quotes, disputes | Compare against Google in S029; quote includes tolerance; final fare may adjust within ±10 % (subject to S002) |
-| Multi-cloud scope creep | Never-ending infra | C4 hard rule: Azure only for backup/escrow/DR until S110 |
-| Payment disputes / fraud | Money loss | Stripe Radar, 3DS where required, ride_events as evidence, cancellation fee caps |
-
+Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-001 to RISK-010). The top risk today is RISK-001: the Budapest dispatch rules block launching Hopin as its own operator; see Part F question 7.
 ---
 
 ## Part H — Changelog of this plan
@@ -594,3 +518,4 @@ These shape business logic, so they are yours, not mine. Answer inline here and 
 | 2026-09-19 | v0.1 — initial plan from pre-plan; stack and cloud decisions recorded; 110 steps defined |
 | 2026-09-19 | v0.2 — architecture knowledge base added under `docs/architecture/`. Corrections: admin is a Next.js static export, since server components would need a server runtime the plan never hosted (B2, S073). WAF sits on the load balancer and the Cognito pool as well as CloudFront, because the API bypasses CloudFront and sign-in codes are Cognito's (C2, S086). |
 | 2026-09-19 | v0.3 — S002 regulatory memo. Fare becomes a meter-based estimate; surge, promo codes and passenger fees are not allowed in Budapest; matching must use road distance; driver alarm and fare-check features added; Phase 10 (S111–S116) added; Part F question 7 on the market-entry model. |
+| 2026-09-19 | v0.4 — Architecture knowledge base completed from the architect-base template: principles, quality attributes, assumptions, security, data, integration, deployment, reliability, observability, risks, roadmap, plus a Security view. Parts A7, B5 (realtime), C and G moved there; the plan keeps pointers. docs-sync skill and consistency check added from homelab. |
