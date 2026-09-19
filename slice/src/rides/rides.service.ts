@@ -95,13 +95,16 @@ export class RidesService {
     });
   }
 
-  eventsFor(tenantId: string, rideId: string): Promise<Array<{ type: string; actor: string }>> {
+  eventsFor(
+    tenantId: string,
+    rideId: string,
+  ): Promise<Array<{ id: number; type: string; actor: string; at: string }>> {
     return withTenant(this.pool, tenantId, async (c) => {
-      const res = await c.query<{ type: string; actor: string }>(
-        'SELECT type, actor FROM ride_events WHERE ride_id = $1 ORDER BY id',
+      const res = await c.query<{ id: string; type: string; actor: string; created_at: Date }>(
+        'SELECT id, type, actor, created_at FROM ride_events WHERE ride_id = $1 ORDER BY id',
         [rideId],
       );
-      return res.rows;
+      return res.rows.map((r) => ({ id: Number(r.id), type: r.type, actor: r.actor, at: r.created_at.toISOString() }));
     });
   }
 

@@ -22,6 +22,7 @@ hopin = softwareSystem "Hopin" "Ride-hailing for short city trips: booking, matc
             payments = component "Payments" "Authorises 1.3 times the estimate at match, refunds, and records the capture outcome reported by the payment workflow." "NestJS module" "Layer Services"
             webhooks = component "Stripe Webhooks" "Verifies signatures and applies payment events idempotently." "NestJS controller" "Layer Services"
             outbox = component "Outbox Relay" "Reads committed outbox entries; starts payment workflows and queues other jobs, at least once." "NestJS worker, BullMQ producer" "Layer Services"
+            assist = component "AI Assist" "Builds a minimised case file under the staff member's tenant, asks the model for a draft and rejects drafts with unknown citations or payment promises. Read and draft only." "NestJS module, Anthropic SDK" "Layer Services"
             compliance = component "Regulatory Adapters" "Real-time feed to BKK, fee invoices to the invoicing provider. Interfaces not yet known." "NestJS module" "Layer Services"
         }
         identity = container "Identity" "Phone-number sign-in with one-time codes; issues JWTs with passenger, driver, admin or partner group and a tenant claim." "Amazon Cognito user pool" "Layer Services"
@@ -120,6 +121,14 @@ hopin.api.outbox -> expoPush "Sends notifications through" "HTTPS/JSON" "Layer S
 hopin.api.compliance -> hopin.cache "Takes feed and invoice jobs from" "BullMQ" "Layer Services"
 hopin.api.compliance -> bkk "Streams taxi position and meter start/stop to" "Not yet known (S112)" "Layer Services"
 hopin.api.compliance -> invoicing "Issues Hopin fee invoices through" "Provider API (S047)" "Layer Services"
+
+// AI Assist (ADR 14, ADR 15)
+hopin.adminWeb -> hopin.api.assist "Asks for dispute reply drafts through" "HTTPS/JSON" "Layer Clients"
+hopin.api.assist -> hopin.api.tenancy "Opens tenant-scoped transactions through" "In-process" "Layer Services"
+hopin.api.assist -> hopin.db "Reads one ride and its events from" "SQL, row-level security" "Layer Services"
+hopin.api.assist -> bedrock "Sends a minimised case file and receives a draft from" "HTTPS, task IAM role, EU region" "Layer Services"
+hopin.api.assist -> hopin.monitoring "Logs draft outcomes, never complaint or draft text, to" "CloudWatch" "Layer Services"
+operator -> openrouter "Compares candidate models on synthetic cases through" "Evaluation harness, HTTPS" "Person"
 
 // ── Authorities, meter and monitoring ───────────────────────────────────────
 taxiMeter -> hopin.driverApp "Provides the final meter amount to" "Not yet known (S113)"

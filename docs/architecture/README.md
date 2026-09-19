@@ -19,7 +19,7 @@ Hopin, a ride-hailing app for short city trips.
 | Audience | Read in this order |
 |---|---|
 | Stakeholder | [Executive summary](../executive-summary.md), [Overview](overview/architecture-overview.md), Context, RideRequest, Authorities, DriverAlarm, [risks](risks/architecture-risks.md), [transition plan](roadmap/transition-plan.md) |
-| CTO / reviewer | Context, Security, PartnerIsolation, LocationData, ProductionCore, OffProviderRecovery, AccountRecovery, [ADR 1](decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [quality attributes](requirements/quality-attributes.md), [risks](risks/architecture-risks.md) |
+| CTO / reviewer | Context, Security, PartnerIsolation, LocationData, AiAssist, ProductionCore, OffProviderRecovery, AccountRecovery, [ADR 1](decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [quality attributes](requirements/quality-attributes.md), [risks](risks/architecture-risks.md) |
 | Engineer | Clients, Backend, ApiRideFlow, ApiPayments, PaymentCapture, Security, RideRequest, ProductionCore, Delivery, all ADRs, [principles](principles/architecture-principles.md), [integration](integration/integration-architecture.md) |
 | Operator | ProductionCore, AlertPath, DriverAlarm, RedisLost, AwsBackups, AzureRecovery, OffProviderRecovery, RegionRecovery, AccountRecovery, [availability](reliability/availability.md), [disaster recovery](reliability/disaster-recovery.md), [observability](observability/observability-architecture.md) |
 
@@ -54,6 +54,8 @@ Budgets come from the architecture-views skill. Visual check means the view was 
 | Authorities | Stakeholder, CTO | Which authorities and regulated devices touch the system, and how? | API, driver app, taxi meter, BKK, invoicing provider, NAV | Stripe, identity | Regulatory interfaces decided (S047, S112, S113) | Passed |
 | Delivery | Engineer, operator | How does a change reach production, and with which identity? | GitHub Actions, image registry, Terraform state, API tasks | Staging and dev; mobile builds (EAS) | Pipeline or deploy identity changes | Passed |
 | RegionRecovery | CTO, operator | What runs in eu-west-1 after eu-central-1 is lost? | Recovery environment for the region scenario | Documents bucket; DNS switch | DR design changes | Passed |
+| AiAssist | CTO, engineer, DPO | Where does AI help staff, and what keeps real data away from evaluation models? | Staff, Admin Web, AI Assist, tenancy, database, Monitoring, Bedrock, OpenRouter | The three design-only use cases (see [ADR 14](decisions/0014-ai-assists-staff-read-and-draft-only.md)); Identity | AI use cases or model providers change ([ADR 15](decisions/0015-bedrock-for-data-openrouter-for-evaluation.md)) | Passed; the Bedrock label touches the system boundary but stays readable |
+| DisputeAssist | Stakeholder, CTO, engineer | How does a complaint become a draft reply that a human approves? | Seven numbered steps, happy path | The rejected-draft path (no draft, staff write it); the draft checks inside AI Assist | Draft checks or case-file rules change | Passed after switching to top-to-bottom |
 | AccountRecovery | CTO, operator | What runs on Azure after the AWS account is lost, and what is missing? | Recovery environment for the account scenario, including the identity gap | DNS; third-party key rotation | DR design changes ([RISK-017](risks/architecture-risks.md)) | Passed |
 
 Not modelled yet: CDN and web hosting, client devices, and mobile app delivery through EAS. The BKK feed, taxi meter and invoicing provider are modelled with their interfaces marked not yet known.
@@ -75,6 +77,8 @@ Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes
 - [0011 Hopin and each partner are joint controllers for partner rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending lawyer)
 - [0012 Capture the meter amount with an outbox-started Step Functions workflow](decisions/0012-payment-capture-workflow.md) (Accepted)
 - [0013 The operator reads partner data only through time-boxed partner grants](decisions/0013-operator-access-by-partner-grant.md) (Accepted)
+- [0014 AI assists staff with read-and-draft tasks only](decisions/0014-ai-assists-staff-read-and-draft-only.md) (Accepted)
+- [0015 Real data goes only to Amazon Bedrock in the EU; OpenRouter is for synthetic evaluation only](decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) (Proposed, pending RISK-020)
 
 New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
 

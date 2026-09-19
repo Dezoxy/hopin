@@ -13,6 +13,8 @@ Retention periods are targets; the retention for dispatch order records waits on
 | Payment references (Stripe IDs, amounts) | Confidential, financial | Hopin Database | 8 years | Accounting duty |
 | Meter receipt photos | Personal, financial evidence | Document Store (S3) | 1 year, or until a dispute closes | Only when the typed amount exceeds the tariff check by 15 % ([T-09](threat-model.md#tb-2-edge-to-private-network)) |
 | Payment workflow history (ride ID, amounts, states) | Confidential, financial | AWS Step Functions | 90 days | [ADR 12](../decisions/0012-payment-capture-workflow.md) |
+| AI case files and drafts (complaint text, ride events, draft reply) | Personal | Sent to Amazon Bedrock in an EU region, not stored by Hopin until staff send the reply | Request only; the sent reply follows the ride's 2 years | Roles instead of IDs, no contact details ([T-31](threat-model.md#tb-7-hopin-to-model-providers)); logs keep outcome and event IDs only |
+| AI evaluation cases | Public, synthetic | This repository (`slice/eval/cases.json`) | Indefinite | Must never contain real data ([T-29](threat-model.md#tb-7-hopin-to-model-providers)) |
 | Card numbers, CVC | **Never stored** | — | — | Stripe SDK only ([QA-06](../requirements/quality-attributes.md)) |
 | Ratings and comments | Personal | Hopin Database | Life of account | |
 | Trip-share token | Secret | Hopin Database | Until expiry (2 h after the ride) or revoked | |

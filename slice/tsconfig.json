@@ -12,7 +12,15 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "sourceMap": true,
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest"
+    ]
   },
-  "include": ["src", "test", "load"]
+  "include": [
+    "src",
+    "test",
+    "load",
+    "eval"
+  ]
 }

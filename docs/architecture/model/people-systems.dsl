@@ -18,3 +18,8 @@ taxiMeter = softwareSystem "Certified Taxi Meter" "Computes the legal fare in th
 invoicing = softwareSystem "Invoicing Provider" "Issues and reports Hopin's fee invoices to drivers; Számlázz.hu or Billingo, to be chosen." "External"
 nav = softwareSystem "NAV" "Hungarian tax authority: receives invoice and receipt data." "External"
 sentry = softwareSystem "Sentry" "Crash and performance reports from the apps and API, EU region." "External"
+
+// AI model providers (ADR 15). Bedrock is the data plane; OpenRouter is used
+// only by the evaluation harness with synthetic cases.
+bedrock = softwareSystem "Amazon Bedrock" "Runs Claude in an EU region for staff-facing drafts, under AWS's processor terms." "External"
+openrouter = softwareSystem "OpenRouter" "Routes synthetic evaluation cases to candidate models; never receives real data." "External"
