@@ -12,7 +12,8 @@
     "dev": "tsx src/main.ts",
     "test": "jest --runInBand",
     "test:unit": "jest --runInBand src/domain",
-    "load": "tsx load/run.ts"
+    "load": "tsx load/run.ts",
+    "test:coverage": "jest --runInBand --coverage"
   },
   "engines": {
     "node": ">=22"

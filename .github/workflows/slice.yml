@@ -57,4 +57,4 @@ jobs:
           cache-dependency-path: slice/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: pnpm test -- --coverage
+      - run: pnpm test:coverage
