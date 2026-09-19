@@ -60,5 +60,5 @@ Resource ownership is checked in the API, not only the role: a passenger can rea
 
 ## Open items
 
-- Threat model: done in [threat-model.md](threat-model.md) (plan step S099); 26 threats, each mapped to a planned control or a tracked risk.
+- Threat model: done in [threat-model.md](threat-model.md) (plan step S099); 31 threats, each mapped to a planned control or a tracked risk.
 - OWASP ASVS level 1 review: plan step S098.

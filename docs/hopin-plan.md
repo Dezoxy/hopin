@@ -1,6 +1,6 @@
 # Hopin — Master Plan
 
-> **Status:** reference architecture case study (since v0.7, 2026-09-19). Hopin will not be built or operated. The build steps in Phases 0–11 are **frozen** as the designed roadmap; active work is **Phase 12, the portfolio track**. History of the plan is in Part H.
+> **Status:** reference architecture case study (since v0.7, 2026-09-19). Hopin will not be built or operated. The build steps in Phases 0–11 are **frozen** as the designed roadmap; **Phase 12, the portfolio track**, is complete except the recorded walkthrough (S124). History of the plan is in Part H.
 > **Source of vision:** [hopin-pre-plan.md](./hopin-pre-plan.md)
 > **How to use this file:** this is the single living plan. Every step in Part D has an ID (`S001`…). When we start a step, we add a `### S0xx` section under Part E with details, decisions and results, and flip its status in the table. Nothing gets deleted; superseded decisions are struck through with a note.
 > **Architecture:** requirements, security, data, integration, deployment, reliability, observability, risks and decisions live in [architecture/](./architecture/README.md). This plan owns the product scope, the domain model until S005, the step list, open decisions and its own changelog.
@@ -462,7 +462,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 
 S117 and S118 were dropped with the portfolio reframe: the business case stays as a worked scenario, not a plan to execute.
 
-### Phase 12 — Portfolio track (active)
+### Phase 12 — Portfolio track (complete; S124 recording open)
 
 Artifacts that make the design defensible in an architect interview. S099 moves here from Phase 8.
 
@@ -473,7 +473,7 @@ Artifacts that make the design defensible in an architect interview. S099 moves 
 | S121 | Executive summary | [Executive summary](./executive-summary.md): one-page decision memo with recommendation, three-scenario returns, protections, top risks and three gates (lawyer, letter of intent, restore drill) | done | S099, S120 |
 | S122 | Payment-capture saga | [ADR 12](./architecture/decisions/0012-payment-capture-workflow.md) Accepted: outbox-started Step Functions workflow per ride, 1.3× hold, 3 retries in 24 h, partner carries failed fares up to a cap, batch fallback on Azure; views and event catalog updated | done | — |
 | S123 | Thin running slice | [slice/](../slice/README.md) with 29 tests and two load runs; QA-01 p95 22 ms and QA-02 p95 2.38 s (max 2.57 s) at 2.5 s reporting locally ([evidence](./architecture/evidence/s123-slice-results.md)); a shutdown race found and fixed | done | S122 |
-| S124 | Walkthrough | Recorded English walkthrough of ADRs 1, 9 and 10, turned into a blog post or meetup talk | todo | S121 |
+| S124 | Walkthrough | Recorded English walkthrough following the ten-minute review, scripted as track 4 of the talk tracks; then a blog post or meetup talk | todo, founder | S132 |
 | S125 | Model depth and view expansion | API components, authorities, monitoring, delivery and two recovery environments in the model; 25 views, each rendered and visually checked, registered with audience and omissions | done | S122 |
 | S126 | Speaker notes | A section per view with question, three points, likely challenge and answer, evidence links; enforced by `make docs` | done | S125 |
 | S127 | Talk tracks | Three-minute, fifteen-minute and deep-dive tracks built from the views; slides deferred to a design-library pass per architect-base `presentation.md` | done | S126 |
@@ -481,6 +481,8 @@ Artifacts that make the design defensible in an architect interview. S099 moves 
 | S129 | Visible diagrams and PDF edition | Four views redrawn as Mermaid in the root README (Context, PartnerIsolation, AccountRecovery, DisputeAssist), logged in the [presentation ledger](./architecture/presentation/README.md); architecture PDF published as [release architecture-dd0b063](https://github.com/Dezoxy/hopin/releases/tag/architecture-dd0b063): overview plus all 28 views, 34 pages | done | S128 |
 | S130 | Design findings | [Design findings](./architecture/evidence/design-findings.md): twelve problems caught by legal reading, modelling, costing, the slice, review and vendor documentation, with what changed and what is still unfound | done | S129 |
 | S131 | Full PDF edition | The PDF builder, improved in architect-base first, adds every ADR and the pages listed in `docs/architecture/pdf-sections.txt` (design findings, risk register); repository links print as plain text | done | S130 |
+| S132 | Ten-minute review | A curated reading path at the top of the README: executive summary, design findings, ADRs 9, 12 and 1 with their diagrams; a recording script as track 4 of the [talk tracks](./architecture/talks/talk-tracks.md) | done | S130 |
+| S133 | Retrospective and critic review | [Retrospective](./retrospective.md); an AI critic's five challenges checked and fixed: region-loss RPO aligned to 24 h, capture fallback selects by payment state, ADR 12 credits idempotency keys, cost-model precision stated, RISK-022 night outage | done | S132 |
 
 ---
 
@@ -564,3 +566,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.15 — S128 AI assist: read-and-draft only (ADR 14), two model planes (ADR 15, Accepted after checking AWS documentation: no cross-region routing on the Messages endpoint, Opus 5 in-region in eu-west-1 not eu-central-1, region allowlist fixed to exclude London and Zurich), AI Act classification, dispute-assistant prototype with an evaluation harness; 28 views. |
 | 2026-09-19 | v0.16 — S129 done: four views as Mermaid in the README, and the first published PDF edition (architecture-dd0b063). |
 | 2026-09-19 | v0.17 — S130 design findings page; S131 the PDF now carries all ADRs, the findings and the risk register. |
+| 2026-09-19 | v0.18 — Portfolio track complete: S132 ten-minute review and recording script, S133 retrospective with an AI critic's review and its fixes. Open by design: the recording (S124) and a human review. |

@@ -176,7 +176,7 @@ Say the points in your own words. If an answer here is not one you would defend,
   - The API is the only internet-facing backend, behind the load balancer and WAF.
   - Authentication is Cognito; authorisation is role plus resource ownership plus tenant, checked in the API.
   - Stripe's webhook is the only inbound call from a third party, drawn in red.
-- **Challenge:** "Where would you attack this?" **Answer:** The driver-typed meter amount and the operator console. The threat model has 26 threats; for those two I chose a tariff check with photo evidence, and partner-issued access grants ([ADR 13](../decisions/0013-operator-access-by-partner-grant.md)).
+- **Challenge:** "Where would you attack this?" **Answer:** The driver-typed meter amount and the operator console. The threat model has 31 threats; for those two I chose a tariff check with photo evidence, and partner-issued access grants ([ADR 13](../decisions/0013-operator-access-by-partner-grant.md)).
 - **Evidence:** [threat model](../security/threat-model.md), [security architecture](../security/security-architecture.md), [trust boundaries](../security/trust-boundaries.md).
 
 ### LocationData

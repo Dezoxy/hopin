@@ -2,7 +2,21 @@
 
 *Hop in. Get there.*
 
-**What this is:** an architecture case study, with one thin slice of running code for evidence. Short on time? Read the one-page [executive summary](docs/executive-summary.md), then the [design findings](docs/architecture/evidence/design-findings.md): twelve problems the process caught before any production code, and what changed. It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
+**What this is:** an architecture case study, with one thin slice of running code for evidence. Short on time? Follow the [ten-minute review](#ten-minute-review). It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
+
+## Ten-minute review
+
+For a hiring manager or reviewer with ten minutes, in this order:
+
+| Minutes | Read | What it shows |
+|---|---|---|
+| 2 | [Executive summary](docs/executive-summary.md) | The recommendation, the numbers and the gates, on one page |
+| 2 | [Design findings](docs/architecture/evidence/design-findings.md) | Twelve problems the process caught before production code, and what changed |
+| 2 | [ADR 9: shared database with row-level security](docs/architecture/decisions/0009-hybrid-multi-tenancy.md) and its [diagram](#the-architecture-in-four-diagrams) | Tenant isolation enforced by the database, and when a partner gets a silo |
+| 2 | [ADR 12: payment capture as a workflow named by the ride](docs/architecture/decisions/0012-payment-capture-workflow.md) | Exactly-once money movement without trusting the network |
+| 2 | [ADR 1: AWS primary, Azure only for recovery](docs/architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md) and the [recovery diagram](#the-architecture-in-four-diagrams) | A second cloud for the failure you actually fear, and the gap found by drawing it |
+
+Then, if there is time: the [retrospective](docs/retrospective.md), what I would do differently and what is still weak.
 
 ## The problem
 
@@ -125,7 +139,7 @@ sequenceDiagram
 | [ADR 9: shared database with row-level security, dedicated on demand](docs/architecture/decisions/0009-hybrid-multi-tenancy.md) | Isolation is enforced by the database; a silo is sold, not defaulted |
 | [ADR 10: one app, one partner per order](docs/architecture/decisions/0010-one-app-for-all-partners.md) | Never let the platform become the licensed party by accident |
 | [ADR 11: joint controllers, pending legal review](docs/architecture/decisions/0011-joint-controllers-with-partners.md) | Controller roles follow the law, not the contract; leave it Proposed until counsel confirms |
-| [ADR 12: payment capture as a workflow named by the ride](docs/architecture/decisions/0012-payment-capture-workflow.md) | Exactly-once effect comes from idempotency, not the network: name the workflow after the thing it must not do twice |
+| [ADR 12: payment capture as a workflow named by the ride](docs/architecture/decisions/0012-payment-capture-workflow.md) | Exactly-once effect comes from idempotency keys, not the network; naming the workflow after the ride also stops a second run from starting |
 | [ADR 13: operator access by partner grant](docs/architecture/decisions/0013-operator-access-by-partner-grant.md) | The platform operator is not a super-user; the data owner grants access, briefly and on the record |
 | [ADR 14: AI reads and drafts, humans decide](docs/architecture/decisions/0014-ai-assists-staff-read-and-draft-only.md) | Put AI where it saves writing, and keep it away from decisions about work and money; that choice also sets the AI Act risk class |
 | [ADR 15: Bedrock for real data, OpenRouter for evaluation](docs/architecture/decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) | Separate the playground from production in code, not in a policy document |
@@ -141,9 +155,10 @@ All fifteen ADRs, 28 model views and the reading paths per audience are in the [
 
 ## Status and what comes next
 
-The design is complete for the MVP scope. A thin running slice in [slice/](slice/README.md) measured the first quality attributes locally: a ride offer reaches a driver in 23 ms at p95 ([evidence](docs/architecture/evidence/s123-slice-results.md)). The build roadmap in the [plan](docs/hopin-plan.md) is frozen. Active work is the portfolio track, plan Phase 12:
+The design is complete for the MVP scope. A thin running slice in [slice/](slice/README.md) measured the first quality attributes locally: a ride offer reaches a driver in 23 ms at p95, without the road-ETA call the law requires, which is not measured yet ([evidence](docs/architecture/evidence/s123-slice-results.md)). The build roadmap in the [plan](docs/hopin-plan.md) is frozen, and the portfolio track, plan Phase 12, is complete. Two things remain open by design:
 
-- A written or spoken walkthrough of the key decisions
+- A recorded walkthrough, scripted in [track 4 of the talk tracks](docs/architecture/talks/talk-tracks.md#track-4-the-recorded-walkthrough).
+- A review by a human architect. So far the decisions have one author and one [AI review](docs/retrospective.md#review-by-an-ai-critic).
 
 ## Repository layout
 

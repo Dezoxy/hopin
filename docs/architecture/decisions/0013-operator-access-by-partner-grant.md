@@ -30,7 +30,7 @@ We will use option 2. By default the operator sees only aggregated, non-personal
 
 Positive:
 
-- A stolen operator session cannot read partner passengers without an active grant.
+- A stolen operator session in the application cannot read partner passengers without an active grant. The database owner and AWS administrator credentials still bypass row-level security; they are break-glass only, with MFA and CloudTrail ([T-21](../security/threat-model.md#tb-5-operator-privileged-access)).
 - A concrete selling point: partners control who sees their customers.
 
 Negative / accepted trade-offs:
