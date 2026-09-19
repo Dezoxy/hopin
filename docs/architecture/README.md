@@ -6,7 +6,7 @@ Hopin, a ride-hailing app for short city trips.
 
 ## Status
 
-**Target architecture for the MVP. Nothing is built or deployed.** All content is documented intent from [the plan](../hopin-plan.md) and the ADRs below. When code and infrastructure exist, they become the evidence and these documents must be checked against them.
+**Reference architecture for a portfolio case study. It will not be built or operated as a product.** Nothing is deployed. All content is documented intent from [the plan](../hopin-plan.md) and the ADRs below. When code and infrastructure exist, they become the evidence and these documents must be checked against them.
 
 ## Architecture model
 

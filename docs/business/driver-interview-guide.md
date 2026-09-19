@@ -1,5 +1,7 @@
 # Driver Interview Guide
 
+> **Scenario.** Since 2026-09-19 Hopin is a reference architecture case study, not a business being started. This interview guide is kept as the worked business scenario the architecture answers to; it will not be executed.
+
 Plan step S117. Five interviews with licensed Budapest taxi drivers before any more engineering. The goal is to learn how drivers work today, not to sell Hopin. Record answers in a private note, **not in this public repository**: interviews contain personal data.
 
 ## Before each interview
