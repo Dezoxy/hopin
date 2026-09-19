@@ -1,0 +1,134 @@
+name: Docs / Architecture PDF
+
+# Publishes the architecture Documentation tab and every view as one PDF on a
+# GitHub release, when an operator starts it on main. One release per edition:
+# the edition is the last commit to docs/architecture, and the tag is
+# architecture-<edition>. It runs `make pdf`, so the image pins at the top of
+# the Makefile apply here exactly as they do locally.
+#
+# On a pull request that changes this workflow, the PDF scripts or the
+# Makefile, only the build job runs, so the build is proven in CI before a
+# release depends on it. Nothing is published from a pull request.
+#
+# Release access follows repository access. In a public repository, the PDF is
+# public.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/architecture-pdf.yml"
+      - "scripts/**"
+      - "Makefile"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      pdf: ${{ steps.build.outputs.pdf }}
+      edition: ${{ steps.build.outputs.edition }}
+      project: ${{ steps.build.outputs.project }}
+    steps:
+      # A release must document main. "Run workflow" lets the operator pick a
+      # branch, so refuse anything else before doing any work.
+      - name: Refuse a branch other than main
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        shell: bash
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          echo "::error::Architecture PDFs are published from main only; this run was started on ${REF}." >&2
+          exit 1
+
+      # Full history: the edition is the last commit to docs/architecture, which
+      # a shallow clone may not contain.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # The same command as a local build: export PNG and JSON with the pinned
+      # Structurizr image, assemble, render with Pandoc and Eisvogel.
+      - name: Build the PDF
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          make pdf
+          generated=docs/architecture/generated
+          shopt -s nullglob
+          pdfs=("${generated}"/*.pdf)
+          if [[ "${#pdfs[@]}" -ne 1 ]]; then
+            echo "::error::expected one PDF in ${generated}, found ${#pdfs[@]}" >&2
+            exit 1
+          fi
+          pdf="$(basename "${pdfs[0]}")"
+          # payment-platform-architecture-2026-09-18-af49b21.pdf -> af49b21
+          edition="${pdf%.pdf}"
+          edition="${edition##*-}"
+          if [[ "${pdf}" == *-dirty.pdf || -z "${edition}" ]]; then
+            echo "::error::unexpected PDF name ${pdf}: a CI checkout should never be dirty" >&2
+            exit 1
+          fi
+          project="$(jq -r '.name // "Architecture"' "${generated}/workspace.json")"
+          mkdir -p "${RUNNER_TEMP}/pdf"
+          cp "${generated}/${pdf}" "${RUNNER_TEMP}/pdf/"
+          {
+            echo "pdf=${pdf}"
+            echo "edition=${edition}"
+            echo "project=${project}"
+          } >> "${GITHUB_OUTPUT}"
+          ls -la "${RUNNER_TEMP}/pdf"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: architecture-pdf
+          path: ${{ runner.temp }}/pdf/*.pdf
+          retention-days: 14
+
+  # Only this job can write, and only when an operator started the workflow on
+  # main. It publishes the PDF the build job produced; it builds nothing.
+  release:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: architecture-pdf
+          path: ${{ runner.temp }}/pdf
+
+      - name: Publish the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PDF: ${{ needs.build.outputs.pdf }}
+          EDITION: ${{ needs.build.outputs.edition }}
+          PROJECT: ${{ needs.build.outputs.project }}
+          MAIN_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          tag="architecture-${EDITION}"
+          # One release per edition: a second run for an unchanged model says
+          # so and publishes nothing.
+          if gh release view "${tag}" >/dev/null 2>&1; then
+            echo "::error::Release ${tag} already exists: the model has not changed since it was published." >&2
+            exit 1
+          fi
+          # The tag points at the edition commit: the model state the PDF shows.
+          edition_sha="$(gh api "repos/${GH_REPO}/commits/${EDITION}" --jq .sha)"
+          gh release create "${tag}" "${RUNNER_TEMP}/pdf/${PDF}" \
+            --target "${edition_sha}" \
+            --title "${PROJECT} architecture, edition ${EDITION}" \
+            --notes "Architecture documentation built from main at ${MAIN_SHA}. Edition ${EDITION} is the last commit to docs/architecture. Share it only with people who may read this repository."
+          echo "published ${tag}: ${PDF}"

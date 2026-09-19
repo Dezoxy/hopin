@@ -1,0 +1,8 @@
+.DS_Store
+._*
+
+# Structurizr: regenerated on every load while all views use autoLayout.
+# Authoring uses automatic layout; do not introduce maintained coordinates.
+docs/architecture/workspace.json
+docs/architecture/.structurizr/
+docs/architecture/generated/
