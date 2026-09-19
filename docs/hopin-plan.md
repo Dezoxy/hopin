@@ -287,11 +287,11 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 |---|---|---|---|---|
 | S001 | Finalize scope, non-goals and NFRs (this document, Parts A–C) | You've read and signed off on Part A and Part C4 | doing | — |
 | S002 | Regulatory and legal check for operating in Hungary | Written memo: licensing requirements, Budapest tariff rules, NAV invoicing obligation, invoicing provider shortlist, GDPR DPIA outline | doing | S001 |
-| S003 | Ride state machine and event catalogue | `packages/shared` contains the state machine as pure TS with exhaustive tests; A6 updated if it changed | todo | S001 |
+| S003 | Ride state machine and event catalogue | `packages/shared` contains the state machine as pure TS with exhaustive tests; A6 updated if it changed | todo | S001, S117 |
 | S004 | Fare model definition | Official tariff table versioned by city and effective date (C-02, C-03); estimate function with tests; no discounts or fees | todo | S002 |
 | S005 | Domain model and ERD | B4 refined, ERD in `docs/architecture/data/`, first Drizzle schema committed | todo | S003, S004 |
 | S006 | API and realtime contract | OpenAPI 3.1 file and Socket.IO event schema (zod) in `packages/shared`; reviewed against every journey in A5 | todo | S005 |
-| S007 | Design system and wireframes | Tokens (colour, type, spacing), key screens for all three surfaces in Figma/Stitch; exported to `packages/ui` | todo | S001 |
+| S007 | Design system and wireframes | Tokens (colour, type, spacing), key screens for all three surfaces in Figma/Stitch; exported to `packages/ui`; every UI string goes through i18n from day one (English for the pilot, Hungarian ready to add); white-label theming (partner name, colours, logo) as tokens | todo | S001 |
 | S008 | Domain name and DNS | Domain registered, hosted zone in Route 53, `dev.`/`staging.`/`api.`/`admin.`/`share.` subdomains planned | todo | — |
 | S009 | GitHub repository and conventions | Repo created, branch protection on `main`, conventional commits enforced, CODEOWNERS, PR template; ADR template already in `docs/architecture/templates/` | todo | — |
 | S010 | Monorepo scaffold | pnpm + Turborepo, shared tsconfig, ESLint/Prettier, `packages/shared` compiles, `pnpm test` runs in CI | todo | S009 |
@@ -452,6 +452,13 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S115 | DAC7 annual report | Yearly driver income report generated and filed with NAV (C-08) | todo | S045 |
 | S116 | BKK software certification | Dispatch software certified by BKK against the Budapest rules (C-06), if the entry model requires it | todo | S067, S074, S111 |
 
+### Phase 11 — Business validation (before S003)
+
+| ID | Step | Done when | Status | Depends |
+|---|---|---|---|---|
+| S117 | Driver interviews | Five licensed drivers interviewed with the [interview guide](./business/driver-interview-guide.md); anonymised findings note in `docs/business/`; A-08 re-checked | todo | — |
+| S118 | First partner conversation | Meeting with one dispatch company owner; pricing tested against the business case; letter of intent signed or reasons recorded; A-09 re-checked | todo | S117 |
+
 ---
 
 ## Part E — Step details
@@ -501,9 +508,9 @@ These shape business logic, so they are yours, not mine. Answer inline here and 
 2. **Launch city and service area (blocks S078, S108).** Which city, and roughly which districts for the soft launch?
 3. **Cancellation rules (blocks S046).** A passenger cancellation fee may be unlawful in Budapest (memo, open question 2). Wait for the lawyer before setting numbers.
 4. **Driver matching policy (S031).** Budapest requires automatic best-taxi selection by road distance and time. Do you also want a rating floor (e.g. ≥ 4.3), and how many offers before giving up?
-5. **Brand.** Colours/logo exist, or should S007 propose them?
+5. **Brand.** Colours/logo exist, or should S007 propose them? Name: "Hopin" has a trademark risk (RISK-014); backup name **Gurul**. Decide after the EU trademark search.
 6. **Azure region.** West Europe (Netherlands) vs Germany West Central. Default: Germany West Central for data-residency optics; West Europe if a required feature is missing there.
-7. **Market-entry model (blocks S111 and launch).** (A) own Budapest dispatch licence, needs 100 M HUF equity; (B) another Hungarian city with lighter rules; (C) technology provider to a licensed Budapest dispatch; (D) outside Hungary. Recommended: C, keeping B open. Details in [S002 memo](./compliance/s002-regulatory-memo.md).
+7. ~~**Market-entry model.**~~ **Answered 2026-09-19: C, white-label dispatch platform for licensed dispatch companies first, Hopin consumer brand second.** Pilot UI English only. See the [business case](./business/business-case.md). The lawyer review in S111 still applies.
 
 ---
 
@@ -521,3 +528,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.2 — architecture knowledge base added under `docs/architecture/`. Corrections: admin is a Next.js static export, since server components would need a server runtime the plan never hosted (B2, S073). WAF sits on the load balancer and the Cognito pool as well as CloudFront, because the API bypasses CloudFront and sign-in codes are Cognito's (C2, S086). |
 | 2026-09-19 | v0.3 — S002 regulatory memo. Fare becomes a meter-based estimate; surge, promo codes and passenger fees are not allowed in Budapest; matching must use road distance; driver alarm and fare-check features added; Phase 10 (S111–S116) added; Part F question 7 on the market-entry model. |
 | 2026-09-19 | v0.4 — Architecture knowledge base completed from the architect-base template: principles, quality attributes, assumptions, security, data, integration, deployment, reliability, observability, risks, roadmap, plus a Security view. Parts A7, B5 (realtime), C and G moved there; the plan keeps pointers. docs-sync skill and consistency check added from homelab. |
+| 2026-09-19 | v0.5 — Business case added: white-label dispatch platform first, Hopin brand second; Part F question 7 answered; Phase 11 (S117 driver interviews, S118 first partner conversation) gates S003; i18n and white-label theming added to S007; RISK-011 to RISK-014, A-08, A-09 and business metrics added. |

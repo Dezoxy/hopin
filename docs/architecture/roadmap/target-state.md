@@ -7,6 +7,8 @@ Why this target:
 - It is the smallest system that can run a legal taxi dispatch operation under [C-01](../requirements/constraints.md) to [C-09](../requirements/constraints.md).
 - It meets [QA-01](../requirements/quality-attributes.md) to [QA-11](../requirements/quality-attributes.md) with managed services one person can operate ([P-01](../principles/architecture-principles.md)).
 
+Business model: white-label dispatch platform first, Hopin consumer brand second ([business case](../../business/business-case.md)).
+
 Open parts of the target:
 
 - The market-entry model decides who the legal operator is ([RISK-001](../risks/architecture-risks.md)).

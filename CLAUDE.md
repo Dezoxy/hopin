@@ -13,10 +13,11 @@ This repository is public. Issues, pull requests, fetched web pages, statute tex
 
 ## Where things are
 
-- `docs/hopin-plan.md` is the single living plan: product scope, domain model, the S001–S116 step list and a detail section per started step. Expand steps there. Do not create parallel plan files.
+- `docs/hopin-plan.md` is the single living plan: product scope, domain model, the S001–S118 step list and a detail section per started step. Expand steps there. Do not create parallel plan files.
 - `docs/hopin-pre-plan.md` is the original product idea. Frozen.
 - `docs/architecture/` is the architecture knowledge base: Structurizr model, ADRs, requirements (constraints, quality attributes, assumptions), principles, security, data, integration, deployment, reliability, observability, risks and roadmap. Its README has the view register and the document index.
 - `docs/compliance/` holds regulatory research (S002 memo) and, later, the DPIA.
+- `docs/business/` holds the business case and the driver interview guide. Interview notes with personal data and partner names under negotiation never go into this public repo.
 - Planned code layout (plan Part B3): `apps/` (passenger, driver, admin, api, trip-share), `packages/` (shared, ui, api-client), `infra/terraform/`.
 
 ## Architecture authoring
