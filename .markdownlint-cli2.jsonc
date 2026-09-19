@@ -1,0 +1,5 @@
+{
+  // Which files markdownlint-cli2 checks; rules are in .markdownlint.json.
+  // Excludes rendered output and vendored ECC rules, which follow upstream style.
+  "globs": ["**/*.md", "!node_modules/**", "!docs/architecture/generated/**", "!.claude/rules/**"]
+}

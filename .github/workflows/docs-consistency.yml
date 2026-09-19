@@ -1,7 +1,8 @@
 name: Docs / Consistency
 
 # The mechanical half of the /docs-sync audit, plus Structurizr validation of
-# the architecture model. Runs on every pull request and on main. Read-only.
+# the architecture model, Markdown lint and secret scanning. Runs on every
+# pull request and on main. Read-only.
 on:
   pull_request:
   push:
@@ -33,3 +34,26 @@ jobs:
       # Same pinned image as local runs (Makefile STRUCTURIZR_IMAGE).
       - name: Validate and inspect the Structurizr workspace
         run: make check
+
+  markdown:
+    name: markdown lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Lint Markdown (config in .markdownlint.json)
+        uses: DavidAnson/markdownlint-cli2-action@v20
+
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # Full history: gitleaks scans every commit, not only the tree.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

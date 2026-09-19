@@ -11,7 +11,7 @@ Hopin, a ride-hailing app for short city trips.
 ## Architecture model
 
 - [workspace.dsl](workspace.dsl) is the entry point. Fragments live in [model/](model/).
-- `make view` opens it at http://localhost:8080/workspace/1. `make check` validates and inspects it. `make export` renders every view into `generated/`, which is gitignored.
+- `make view` opens it at <http://localhost:8080/workspace/1>. `make check` validates and inspects it. `make export` renders every view into `generated/`, which is gitignored.
 - [styles-shared.dsl](model/styles-shared.dsl) is copied unchanged from architect-base. Hopin's layer mapping is in [styles.dsl](model/styles.dsl).
 
 ## Reading paths
