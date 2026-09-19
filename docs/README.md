@@ -2,6 +2,7 @@
 
 | Document | What it is |
 |---|---|
+| [executive-summary.md](executive-summary.md) | One-page decision memo: the recommendation, costs and returns, top risks and gates (S121) |
 | [hopin-pre-plan.md](hopin-pre-plan.md) | The original product idea. Frozen. |
 | [hopin-plan.md](hopin-plan.md) | The master plan (build roadmap frozen; Phase 12 portfolio track active): product scope, stack, roadmap steps S001–S127, open decisions, changelog |
 | [architecture/talks/talk-tracks.md](architecture/talks/talk-tracks.md) | How to present the architecture: 3-minute, 15-minute and deep-dive tracks, with [speaker notes](architecture/talks/speaker-notes.md) per view |

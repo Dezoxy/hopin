@@ -2,7 +2,7 @@
 
 *Hop in. Get there.*
 
-**What this is:** an architecture case study. It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
+**What this is:** an architecture case study. Short on time? Read the one-page [executive summary](docs/executive-summary.md). It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
 
 ## The problem
 
@@ -30,7 +30,7 @@ All thirteen ADRs, 26 model views and the reading paths per audience are in the 
 
 ## Read by audience
 
-- **Executive:** [business case](docs/business/business-case.md), [three-year cost model](docs/business/three-year-cost-model.md), the Context view, the [risk register](docs/architecture/risks/architecture-risks.md).
+- **Executive:** start with the one-page [executive summary](docs/executive-summary.md), then the [business case](docs/business/business-case.md), [three-year cost model](docs/business/three-year-cost-model.md), the Context view, the [risk register](docs/architecture/risks/architecture-risks.md).
 - **Architect or CTO:** [quality attributes](docs/architecture/requirements/quality-attributes.md), [constraints](docs/architecture/requirements/constraints.md), the ADRs, the Security and deployment views.
 - **Engineer:** the [architecture README](docs/architecture/README.md) engineer path, [integration](docs/architecture/integration/integration-architecture.md) and the [event catalog](docs/architecture/integration/event-catalog.md).
 - **Operator:** [availability](docs/architecture/reliability/availability.md), [disaster recovery](docs/architecture/reliability/disaster-recovery.md), [observability](docs/architecture/observability/observability-architecture.md).
@@ -39,7 +39,6 @@ All thirteen ADRs, 26 model views and the reading paths per audience are in the 
 
 The design is complete for the MVP scope. The build roadmap in the [plan](docs/hopin-plan.md) is frozen. Active work is the portfolio track, plan Phase 12:
 
-- One-page executive summary
 - A thin, running slice with a load test, so at least one quality attribute is measured, not only targeted
 - A written or spoken walkthrough of the key decisions
 
