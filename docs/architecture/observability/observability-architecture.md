@@ -10,6 +10,19 @@ Target: [QA-10](../requirements/quality-attributes.md), page-worthy failures ale
 | App crashes | Sentry, EU region | 90 days | EAS Update rollouts watched against crash-free rate |
 | Audit | `ride_events`, `audit_log` in PostgreSQL | 2 years | [QA-11](../requirements/quality-attributes.md) |
 
+## Business metrics
+
+Reviewed weekly on one dashboard next to the technical signals. Targets come from the [business case](../../business/business-case.md).
+
+| Metric | Definition | Why it matters |
+|---|---|---|
+| Rides per day | Completed rides, per partner and for the consumer brand | Break-even needs about 260 a day ([business case](../../business/business-case.md#target-and-break-even)) |
+| Match rate | Requests that reach MATCHED ÷ all requests | Too few drivers online, or matching broken |
+| Cancellation rate | Cancelled rides ÷ requests, split by who cancelled | Driver or passenger experience problems |
+| Driver hours online | Sum of online time per driver per day | Supply; also whether drivers open Hopin first |
+| Active cars per partner | Cars with at least one ride in the month | White-label billing basis |
+| Revenue per ride | Hopin's share after Stripe fees | Unit economics ([QA-08](../requirements/quality-attributes.md)) |
+
 ## Page-worthy alerts
 
 | Alert | Threshold |
