@@ -2,6 +2,8 @@
 
 Objectives: [QA-04](../requirements/quality-attributes.md). **No restore has been performed yet**; every objective below is a target without evidence until plan step S096 records the first drill.
 
+Views: **RegionRecovery** and **AccountRecovery**.
+
 | Scenario | RPO | RTO | Path |
 |---|---|---|---|
 | Bad deploy or data corruption | 5 min | 1 h | PITR to a new instance, repoint the API |
@@ -14,8 +16,9 @@ Objectives: [QA-04](../requirements/quality-attributes.md). **No restore has bee
 2. Retrieve break-glass credentials and the dump key from Azure Key Vault.
 3. Apply the Azure cold-restore Terraform module.
 4. Decrypt and restore the latest dump.
-5. Deploy the API image, repoint DNS, rotate every third-party key.
-6. Reconcile payments against Stripe for the lost window.
+5. Stand up the replacement identity (Entra External ID). Users and partner staff re-enrol by SMS code against the phone numbers restored from the dump ([RISK-017](../risks/architecture-risks.md)).
+6. Deploy the API image, repoint DNS, rotate every third-party key.
+7. Reconcile payments against Stripe for the lost window.
 
 Step-by-step commands belong in `docs/runbooks/restore.md` (plan step S096), not here.
 

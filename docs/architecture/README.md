@@ -18,10 +18,10 @@ Hopin, a ride-hailing app for short city trips.
 
 | Audience | Read in this order |
 |---|---|
-| Stakeholder | [Overview](overview/architecture-overview.md), Context, RideRequest, [risks](risks/architecture-risks.md), [transition plan](roadmap/transition-plan.md) |
-| CTO / reviewer | Context, Security, ProductionCore, OffProviderRecovery, AwsBackups, [ADR 1](decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [quality attributes](requirements/quality-attributes.md), [risks](risks/architecture-risks.md) |
-| Engineer | Clients, Backend, Security, RideRequest, ProductionCore, all ADRs, [principles](principles/architecture-principles.md), [integration](integration/integration-architecture.md) |
-| Operator | ProductionCore, AwsBackups, AzureRecovery, OffProviderRecovery, [availability](reliability/availability.md), [disaster recovery](reliability/disaster-recovery.md), [observability](observability/observability-architecture.md) |
+| Stakeholder | [Overview](overview/architecture-overview.md), Context, RideRequest, Authorities, DriverAlarm, [risks](risks/architecture-risks.md), [transition plan](roadmap/transition-plan.md) |
+| CTO / reviewer | Context, Security, PartnerIsolation, LocationData, ProductionCore, OffProviderRecovery, AccountRecovery, [ADR 1](decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [quality attributes](requirements/quality-attributes.md), [risks](risks/architecture-risks.md) |
+| Engineer | Clients, Backend, ApiRideFlow, ApiMoneyAndCompliance, PaymentCapture, Security, RideRequest, ProductionCore, Delivery, all ADRs, [principles](principles/architecture-principles.md), [integration](integration/integration-architecture.md) |
+| Operator | ProductionCore, AlertPath, DriverAlarm, RedisLost, AwsBackups, AzureRecovery, OffProviderRecovery, RegionRecovery, AccountRecovery, [availability](reliability/availability.md), [disaster recovery](reliability/disaster-recovery.md), [observability](observability/observability-architecture.md) |
 
 ## View register
 
@@ -38,8 +38,26 @@ Budgets come from the architecture-views skill. Visual check means the view was 
 | ProductionCore | CTO, operator | Where does the live service run in AWS, and what fails together? | eu-central-1: load balancer, API tasks, database, cache, documents | Cognito, Secrets Manager, CDN and web hosting, client devices | Hosting, sizing or availability changes | Passed |
 | AwsBackups | CTO, operator | Which AWS backups exist, and in which regions? | Backup vault, what it protects, cross-region copy | Off-provider chain (see AzureRecovery) | Backup plan changes | Passed |
 | AzureRecovery | Operator | Where does the nightly off-provider copy run, and where do copies land? | Exporter task and the two Azure stores | Database and documents it reads (see ProductionCore) | Exporter placement or Azure layout changes | Passed |
+| ApiRideFlow | Engineer | Which components carry a ride from estimate to live tracking? | Two apps, four API components, database, cache | Mapbox (see Backend); tenancy (see PartnerConsole) | Ride flow components change | Passed |
+| ApiMoneyAndCompliance | Engineer | Which components do the asynchronous work? | Payments, webhooks, outbox, regulatory adapters; Stripe, BKK, invoicing; stores | Ride Lifecycle, whose outbox write is step 1 of PaymentCapture | Payment or regulatory integration changes | Passed; two crossings, labels readable |
+| PartnerConsole | Engineer, CTO | How does a partner's console reach its data, and only its data? | Admin Web, dispatch, tenancy, rides, realtime, Identity, database | Operator paths | Tenancy or console changes | Passed |
+| PartnerIsolation | CTO, engineer | How is a partner request kept inside that partner's data? | Five numbered steps | Writes; consumer brand requests | Tenancy mechanism changes ([ADR 9](decisions/0009-hybrid-multi-tenancy.md)) | Passed |
+| PaymentCapture | Engineer, CTO | How is the meter amount captured exactly once? | Seven steps from completion to confirmed capture | Meter above the authorisation; reconciler ([ADR 12](decisions/0012-payment-capture-saga-with-outbox.md)) | Capture flow changes | Passed |
+| PaymentCaptureDeclined | Engineer | What happens when the capture is declined? | Six steps to FAILED and a blocked account | Who carries the loss (open in ADR 12) | Retry or failure policy changes | Passed; step labels sit on the API border but stay readable |
+| DriverAlarm | Stakeholder, operator | What happens when a driver presses the alarm? | Six steps from alarm to partner dispatcher and operator page | The 112 call itself | Alarm handling changes ([C-06](requirements/constraints.md)) | Passed |
+| TripShare | Stakeholder, engineer | How does someone without an account follow a shared ride? | Five steps | Revocation | Share flow or token rules change | Passed |
+| PhoneOrder | Stakeholder, operator | How does a phone order become a ride? | Six steps | Caller call-back details | Dispatch console changes | Passed |
+| RedisLost | CTO, operator | What happens when the Redis node is lost? | Five steps, degraded then recovered | Socket reconnect storms | Redis role changes ([RISK-008](risks/architecture-risks.md)) | Passed |
+| LocationData | CTO, DPO | Where does personal location data go, and where does it leave the system? | Clients, API, stores, BKK, backup path | Retention periods (see data classification) | Location processing or recipients change ([C-09](requirements/constraints.md)) | Passed |
+| AlertPath | Operator | How does a failure become a page to the operator? | API, exporter, Monitoring, app crash reporting, operator | Individual alarm thresholds (see observability) | Alerting changes | Passed after switching to top-to-bottom |
+| Authorities | Stakeholder, CTO | Which authorities and regulated devices touch the system, and how? | API, driver app, taxi meter, BKK, invoicing provider, NAV | Stripe, identity | Regulatory interfaces decided (S047, S112, S113) | Passed |
+| Delivery | Engineer, operator | How does a change reach production, and with which identity? | GitHub Actions, image registry, Terraform state, API tasks | Staging and dev; mobile builds (EAS) | Pipeline or deploy identity changes | Passed |
+| RegionRecovery | CTO, operator | What runs in eu-west-1 after eu-central-1 is lost? | Recovery environment for the region scenario | Documents bucket; DNS switch | DR design changes | Passed |
+| AccountRecovery | CTO, operator | What runs on Azure after the AWS account is lost, and what is missing? | Recovery environment for the account scenario, including the identity gap | DNS; third-party key rotation | DR design changes ([RISK-017](risks/architecture-risks.md)) | Passed |
 
-Not modelled yet: CDN and web hosting, client devices, the CI/CD delivery path, observability, the BKK data feed and the taxi-meter integration. Add them when the matching plan steps start.
+Not modelled yet: CDN and web hosting, client devices, and mobile app delivery through EAS. The BKK feed, taxi meter and invoicing provider are modelled with their interfaces marked not yet known.
+
+Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes.md); the talk tracks are in [talks/talk-tracks.md](talks/talk-tracks.md).
 
 ## Key decisions
 
@@ -54,6 +72,7 @@ Not modelled yet: CDN and web hosting, client devices, the CI/CD delivery path, 
 - [0009 Use a shared database with row-level security, with a dedicated database on demand](decisions/0009-hybrid-multi-tenancy.md) (Accepted)
 - [0010 Ship one passenger app and one driver app for all partners](decisions/0010-one-app-for-all-partners.md) (Accepted)
 - [0011 Hopin and each partner are joint controllers for partner rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending lawyer)
+- [0012 Capture the meter amount through a transactional outbox and idempotent jobs](decisions/0012-payment-capture-saga-with-outbox.md) (Proposed)
 
 New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
 

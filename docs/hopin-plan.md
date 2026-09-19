@@ -471,9 +471,12 @@ Artifacts that make the design defensible in an architect interview. S099 moves 
 | S099 | Threat model | STRIDE on the Security view and the ride, payment and onboarding flows; each threat mapped to a control or an accepted risk in the risk register | todo | — |
 | S120 | Three-year cost model | Infrastructure, third-party services, people and growth scenarios over three years, including the dedicated-database path from ADR 9; compared with the business case revenue | todo | — |
 | S121 | Executive summary | One page a CFO can read: problem, decision, cost, risk, what is left open | todo | S099, S120 |
-| S122 | Payment-capture saga | ADR for capture after the meter reading: outbox, idempotent consumers, compensation, failure cases; dynamic view in the model; event catalog updated | todo | — |
+| S122 | Payment-capture saga | ADR for capture after the meter reading: outbox, idempotent consumers, compensation, failure cases; dynamic view in the model; event catalog updated. [ADR 12](./architecture/decisions/0012-payment-capture-saga-with-outbox.md) Proposed; waits on the founder's review | doing | — |
 | S123 | Thin running slice | Ride request → matching → event written through the outbox, running locally or in a free tier; load test measures QA-01 and QA-02; results recorded as evidence | todo | S122 |
 | S124 | Walkthrough | Recorded English walkthrough of ADRs 1, 9 and 10, turned into a blog post or meetup talk | todo | S121 |
+| S125 | Model depth and view expansion | API components, authorities, monitoring, delivery and two recovery environments in the model; 25 views, each rendered and visually checked, registered with audience and omissions | done | S122 |
+| S126 | Speaker notes | A section per view with question, three points, likely challenge and answer, evidence links; enforced by `make docs` | done | S125 |
+| S127 | Talk tracks | Three-minute, fifteen-minute and deep-dive tracks built from the views; slides deferred to a design-library pass per architect-base `presentation.md` | done | S126 |
 
 ---
 
@@ -547,3 +550,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.5 — Business case added: white-label dispatch platform first, Hopin brand second; Part F question 7 answered; Phase 11 (S117 driver interviews, S118 first partner conversation) gates S003; i18n and white-label theming added to S007; RISK-011 to RISK-014, A-08, A-09 and business metrics added. |
 | 2026-09-19 | v0.6 — White-label architecture: ADR 9 (hybrid multi-tenancy with RLS), ADR 10 (one app, one partner per order, no cross-partner matching without legal clearance), ADR 11 (joint controllers, pending lawyer). Partner dispatcher added to the model; QA-12, RISK-015, RISK-016 and S119 added; S005, S025, S026, S037, S073 and S111 updated. |
 | 2026-09-19 | v0.7 — Reframed as a reference architecture case study for an architect portfolio. Build roadmap frozen; S117 and S118 dropped; Phase 12 portfolio track added (S099 moved there, S120–S124). |
+| 2026-09-19 | v0.8 — Diagram portfolio: API components, authorities, monitoring, delivery and recovery environments; 16 new views (25 total); ADR 12 payment-capture saga (Proposed); RISK-017 identity lost with the AWS account; speaker notes and talk tracks; S125–S127 added. |

@@ -12,12 +12,24 @@ hopin = softwareSystem "Hopin" "Ride-hailing for short city trips: booking, matc
     }
 
     group "AWS eu-central-1" {
-        api = container "Hopin API" "Quotes, matching, ride lifecycle, realtime gateway, payments, Stripe webhooks and background jobs." "Node.js, NestJS, Socket.IO" "Layer Services,Internet-exposed"
-        identity = container "Identity" "Phone-number sign-in with one-time codes; issues JWTs with passenger, driver or admin group." "Amazon Cognito user pool" "Layer Services"
+        api = container "Hopin API" "Quotes, matching, ride lifecycle, realtime gateway, payments, Stripe webhooks and background jobs." "Node.js, NestJS, Socket.IO" "Layer Services,Internet-exposed" {
+            tenancy = component "Tenancy" "Validates the access token, resolves the tenant and opens tenant-scoped transactions for row-level security." "NestJS guard and interceptor" "Layer Services"
+            quotes = component "Quotes and Fares" "Checks the service area and estimates the fare from the official tariff." "NestJS module, PostGIS" "Layer Services"
+            matching = component "Matching" "Pre-filters online taxis by distance, ranks them by road ETA and sends offers with timeouts." "NestJS module, Redis GEO, Mapbox Matrix" "Layer Services"
+            rides = component "Ride Lifecycle" "Enforces the ride state machine; writes ride state, ride events and outbox entries in one transaction." "NestJS module" "Layer Services"
+            realtime = component "Realtime Gateway" "Socket.IO namespaces for passengers, drivers and dispatch consoles." "Socket.IO, Redis adapter" "Layer Services"
+            dispatch = component "Dispatch and Admin" "Partner dispatch console backend (phone orders, alarms) and platform administration." "NestJS module" "Layer Services"
+            payments = component "Payments" "Authorises the estimate, captures the meter amount and refunds; consumes capture jobs." "NestJS module, BullMQ worker" "Layer Services"
+            webhooks = component "Stripe Webhooks" "Verifies signatures and applies payment events idempotently." "NestJS controller" "Layer Services"
+            outbox = component "Outbox Relay" "Reads committed outbox entries and publishes them as jobs, at least once." "NestJS worker, BullMQ producer" "Layer Services"
+            compliance = component "Regulatory Adapters" "Real-time feed to BKK, fee invoices to the invoicing provider. Interfaces not yet known." "NestJS module" "Layer Services"
+        }
+        identity = container "Identity" "Phone-number sign-in with one-time codes; issues JWTs with passenger, driver, admin or partner group and a tenant claim." "Amazon Cognito user pool" "Layer Services"
         backupExporter = container "Backup Exporter" "Nightly: dumps the database, encrypts it and copies it with driver documents to Azure." "Scheduled container task, pg_dump" "Layer Services"
         db = container "Hopin Database" "System of record: users, drivers, rides, ride events, payments, ratings, fare configs, service areas." "PostgreSQL 16, PostGIS" "Layer Data,Database"
         cache = container "Realtime Cache" "Live driver positions (GEO index), socket pub/sub between API tasks, job queues." "Redis" "Layer Data,Database"
         docStore = container "Document Store" "Driver licence and vehicle documents, staged database dumps." "Amazon S3" "Layer Data,Storage"
+        monitoring = container "Monitoring" "Logs, metrics, traces and alarms; pages the operator." "Amazon CloudWatch, AWS X-Ray, SNS" "Layer Services"
         secrets = container "Secrets Store" "Database credentials, Stripe and Mapbox keys, Azure service credential." "AWS Secrets Manager" "Layer Data,Vault"
     }
 
@@ -65,3 +77,53 @@ hopin.backupExporter -> hopin.docStore "Stages encrypted dumps in and reads driv
 hopin.backupExporter -> hopin.secrets "Reads the Azure service credential from" "AWS SDK, task IAM role" "Layer Services"
 hopin.backupExporter -> hopin.escrowVault "Fetches the dump encryption key from" "HTTPS" "Layer Services"
 hopin.backupExporter -> hopin.offsiteBackup "Uploads encrypted dumps and document copies to" "HTTPS, write-only credential" "Layer Services"
+
+// ── Components of the Hopin API ─────────────────────────────────────────────
+// Clients
+hopin.passengerApp -> hopin.api.quotes "Requests fare estimates from" "HTTPS/JSON" "Layer Clients"
+hopin.passengerApp -> hopin.api.rides "Requests and cancels rides through" "HTTPS/JSON" "Layer Clients"
+hopin.passengerApp -> hopin.api.realtime "Receives ride state and driver position from" "Socket.IO over WSS" "Layer Clients"
+hopin.driverApp -> hopin.api.realtime "Streams location, receives offers and sends alarms through" "Socket.IO over WSS" "Layer Clients"
+hopin.driverApp -> hopin.api.rides "Reports arrival, start and completion with the meter amount to" "HTTPS/JSON" "Layer Clients"
+hopin.adminWeb -> hopin.api.dispatch "Takes phone orders and administers the platform through" "HTTPS/JSON" "Layer Clients"
+hopin.adminWeb -> hopin.api.realtime "Receives live rides and alarms from" "Socket.IO over WSS" "Layer Clients"
+hopin.tripSharePage -> hopin.api.rides "Polls a shared ride's position from" "HTTPS/JSON, share token" "Layer Clients"
+stripe -> hopin.api.webhooks "Sends signed payment events to" "HTTPS/JSON, signed" "Inbound across trust boundary"
+
+// Inside the API
+hopin.api.tenancy -> hopin.identity "Validates access tokens against" "OIDC/JWKS" "Layer Services"
+hopin.api.tenancy -> hopin.db "Sets the tenant for each transaction in" "SQL session setting" "Layer Services"
+hopin.api.quotes -> hopin.db "Reads tariffs and service areas from" "SQL, PostGIS" "Layer Services"
+hopin.api.quotes -> mapbox "Requests routes and distances from" "HTTPS/JSON" "Layer Services"
+hopin.api.matching -> hopin.cache "Finds nearby online taxis in" "Redis GEO" "Layer Services"
+hopin.api.matching -> mapbox "Ranks candidates by road ETA with" "Matrix API" "Layer Services"
+hopin.api.matching -> hopin.api.realtime "Sends ride offers through" "In-process" "Layer Services"
+hopin.api.rides -> hopin.api.matching "Asks for a driver for each new ride from" "In-process" "Layer Services"
+hopin.api.rides -> hopin.api.payments "Asks to authorise the estimate through" "In-process" "Layer Services"
+hopin.api.rides -> hopin.db "Writes ride state, ride events and outbox entries in one transaction to" "SQL" "Layer Services"
+hopin.api.realtime -> hopin.cache "Fans out events across API tasks through" "Redis pub/sub" "Layer Services"
+hopin.api.realtime -> hopin.api.matching "Passes driver positions and offer answers to" "In-process" "Layer Services"
+hopin.api.dispatch -> hopin.api.tenancy "Opens tenant-scoped transactions through" "In-process" "Layer Services"
+hopin.api.dispatch -> hopin.api.rides "Creates phone-order rides through" "In-process" "Layer Services"
+hopin.api.dispatch -> hopin.db "Reads tenant-scoped operations data from" "SQL, row-level security" "Layer Services"
+hopin.api.payments -> stripe "Authorises, captures and refunds through" "HTTPS/JSON, idempotency keys" "Layer Services"
+hopin.api.payments -> hopin.cache "Takes capture jobs from" "BullMQ" "Layer Services"
+hopin.api.payments -> hopin.db "Records payment state and outbox entries in" "SQL" "Layer Services"
+hopin.api.webhooks -> hopin.db "Applies confirmed payment events and outbox entries to" "SQL" "Layer Services"
+hopin.api.outbox -> hopin.db "Reads committed outbox entries from" "SQL" "Layer Services"
+hopin.api.outbox -> hopin.cache "Queues jobs for payments, notifications and feeds in" "BullMQ" "Layer Services"
+hopin.api.outbox -> expoPush "Sends notifications through" "HTTPS/JSON" "Layer Services"
+hopin.api.compliance -> hopin.cache "Takes feed and invoice jobs from" "BullMQ" "Layer Services"
+hopin.api.compliance -> bkk "Streams taxi position and meter start/stop to" "Not yet known (S112)" "Layer Services"
+hopin.api.compliance -> invoicing "Issues Hopin fee invoices through" "Provider API (S047)" "Layer Services"
+
+// ── Authorities, meter and monitoring ───────────────────────────────────────
+taxiMeter -> hopin.driverApp "Provides the final meter amount to" "Not yet known (S113)"
+taxiMeter -> nav "Reports receipt data to" "Online cash register"
+invoicing -> nav "Reports invoices to" "NAV Online Számla"
+hopin.api -> hopin.monitoring "Sends logs, metrics, traces and alarm events to" "CloudWatch agent, OpenTelemetry" "Layer Services"
+hopin.backupExporter -> hopin.monitoring "Reports nightly job results to" "CloudWatch" "Layer Services"
+hopin.passengerApp -> sentry "Reports crashes to" "Sentry SDK" "Layer Clients"
+hopin.driverApp -> sentry "Reports crashes to" "Sentry SDK" "Layer Clients"
+hopin.monitoring -> operator "Pages the operator" "SNS: SMS and email" "Layer Services"
+sentry -> operator "Alerts the operator about crash spikes" "Email"

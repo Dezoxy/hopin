@@ -16,3 +16,15 @@ Realtime events on Socket.IO. Schemas will live in `packages/shared` as zod defi
 | `/admin` | `driver.alarm` | Server → admin | driver, position, type | On alarm | Must reach the operator immediately |
 
 Stripe webhook events consumed (`payment_intent.*`, `charge.refunded`, `payout.*`, `account.updated`) are handled idempotently by event ID.
+
+## Outbox events
+
+Written in the same transaction as the state change they describe, then relayed as jobs at least once ([ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md)). Every consumer is idempotent by the key shown.
+
+| Event | Written when | Consumers | Idempotency key |
+|---|---|---|---|
+| `ride.completed` | Driver completes the ride with the meter amount | Payments (capture), notifications | Ride ID |
+| `payment.captured` | Stripe webhook confirms the capture | Notifications (ride summary), invoicing (Hopin fee) | Stripe event ID |
+| `payment.failed` | Last capture retry declined | Notifications (update card), account block | Ride ID |
+| `alarm.raised` | Driver presses the alarm | Monitoring page, partner console | Alarm ID |
+| `taxi.meter` | Meter starts or stops | BKK real-time feed (S112) | Ride ID plus event time |

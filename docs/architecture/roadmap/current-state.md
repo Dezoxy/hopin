@@ -4,7 +4,7 @@ As of 2026-09-19 Hopin is a **reference architecture case study**, not a product
 
 What exists:
 
-- The master plan, [docs/hopin-plan.md](../../hopin-plan.md), with steps S001–S124.
+- The master plan, [docs/hopin-plan.md](../../hopin-plan.md), with steps S001–S127.
 - This architecture knowledge base: target model, ADRs 1–8, constraints, requirements and concern documents.
 - The S002 regulatory memo, [docs/compliance/s002-regulatory-memo.md](../../compliance/s002-regulatory-memo.md).
 - A business case: white-label dispatch platform first, Hopin brand second ([business case](../../business/business-case.md)).
