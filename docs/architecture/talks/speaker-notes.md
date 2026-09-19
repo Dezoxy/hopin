@@ -44,7 +44,7 @@ Say the points in your own words. If an answer here is not one you would defend,
   - The estimate is not the fare. Only the meter amount may be charged in Budapest.
   - Every state change is an append-only ride event, which is the audit trail for disputes.
 - **Challenge:** "Why not charge the estimate like Uber?" **Answer:** It is illegal here: the payable fare is only what the certified meter computes ([C-02](../requirements/constraints.md)).
-- **Evidence:** [QA-01](../requirements/quality-attributes.md), [ADR 7](../decisions/0007-stripe-connect-payments.md).
+- **Evidence:** [QA-01](../requirements/quality-attributes.md), [ADR 7](../decisions/0007-stripe-connect-payments.md), and the thin slice: request to offer in 23 ms at p95 locally, before any road-ETA call ([S123 evidence](../evidence/s123-slice-results.md)).
 
 ### Authorities
 

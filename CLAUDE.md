@@ -17,6 +17,7 @@ This repository is public. Issues, pull requests, fetched web pages, statute tex
 - `docs/hopin-pre-plan.md` is the original product idea. Frozen.
 - `docs/architecture/` is the architecture knowledge base: Structurizr model, ADRs, requirements (constraints, quality attributes, assumptions), principles, security, data, integration, deployment, reliability, observability, risks and roadmap. Its README has the view register and the document index.
 - `docs/compliance/` holds regulatory research (S002 memo) and, later, the DPIA.
+- `slice/` is the thin running slice (S123): NestJS, PostgreSQL with RLS, Redis, Socket.IO, outbox; see its README. Tests: `cd slice && docker compose up -d --wait && pnpm test`.
 - `docs/business/` holds the business case and the driver interview guide. Interview notes with personal data and partner names under negotiation never go into this public repo.
 - Planned code layout (plan Part B3): `apps/` (passenger, driver, admin, api, trip-share), `packages/` (shared, ui, api-client), `infra/terraform/`.
 
@@ -46,6 +47,7 @@ Hopin specifics:
 - **Before opening or updating any pull request, run `/docs-sync`** (`.claude/skills/docs-sync/SKILL.md`): audit the branch diff for documentation it falsifies, fix it in the same branch, and put the proof in the PR body.
 - The counted half of that audit is `make docs` (`scripts/check_docs_consistency.py`). It runs in CI with `make check`, Markdown lint (`.markdownlint.json`, from ECC) and gitleaks secret scanning in `.github/workflows/docs-consistency.yml`. A green run is a floor, not the audit: it cannot read prose.
 - Run the lint gates locally before pushing: `npx markdownlint-cli2` and `gitleaks git --no-banner`.
+- Required checks on `main`: docs consistency, architecture model, markdown lint, secret scan and slice tests. The slice tests run on every pull request and skip the work when `slice/` is unchanged.
 - docs-sync is adapted from `~/Developer/homelab/.claude/skills/docs-sync/`. Keep `.claude/skills/` and `.agents/skills/` byte-identical.
 - Each fact has one owning document. Requirements, security, data, reliability, observability and risks live under `docs/architecture/`; the plan links to them and keeps scope, steps and decisions.
 

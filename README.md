@@ -2,7 +2,7 @@
 
 *Hop in. Get there.*
 
-**What this is:** an architecture case study. Short on time? Read the one-page [executive summary](docs/executive-summary.md). It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
+**What this is:** an architecture case study, with one thin slice of running code for evidence. Short on time? Read the one-page [executive summary](docs/executive-summary.md). It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
 
 ## The problem
 
@@ -37,9 +37,8 @@ All thirteen ADRs, 26 model views and the reading paths per audience are in the 
 
 ## Status and what comes next
 
-The design is complete for the MVP scope. The build roadmap in the [plan](docs/hopin-plan.md) is frozen. Active work is the portfolio track, plan Phase 12:
+The design is complete for the MVP scope. A thin running slice in [slice/](slice/README.md) measured the first quality attributes locally: a ride offer reaches a driver in 23 ms at p95 ([evidence](docs/architecture/evidence/s123-slice-results.md)). The build roadmap in the [plan](docs/hopin-plan.md) is frozen. Active work is the portfolio track, plan Phase 12:
 
-- A thin, running slice with a load test, so at least one quality attribute is measured, not only targeted
 - A written or spoken walkthrough of the key decisions
 
 ## Repository layout
@@ -49,6 +48,7 @@ The design is complete for the MVP scope. The build roadmap in the [plan](docs/h
 .claude/            Claude Code skills and ECC language rules
 .github/workflows/  docs consistency and architecture PDF workflows
 docs/               plan, architecture knowledge base, business case, compliance research
+slice/              thin running slice of the API (NestJS, PostgreSQL, Redis) and its load test
 scripts/            docs consistency check, architecture PDF tooling
 AGENTS.md           agent instructions (identical to CLAUDE.md)
 CLAUDE.md           agent instructions
@@ -62,4 +62,4 @@ make docs     # documentation consistency
 make check    # Structurizr model validate + inspect (needs Docker)
 ```
 
-Both run in CI on every pull request, alongside Markdown lint and secret scanning. `main` accepts changes only through pull requests.
+Both run in CI on every pull request, alongside Markdown lint and secret scanning. The slice has its own tests (`cd slice && pnpm test`), a required check that runs its suite whenever `slice/` changes. `main` accepts changes only through pull requests.

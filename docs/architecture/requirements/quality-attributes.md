@@ -1,11 +1,11 @@
 # Quality Attributes
 
-Each attribute is measurable and has an architectural consequence. Decisions and risks refer to these IDs. All are **targets**: nothing is built, so no value has been measured yet.
+Each attribute is measurable and has an architectural consequence. Decisions and risks refer to these IDs. All are **targets**. A thin running slice measured QA-01, QA-02, QA-09 and QA-12 locally on 2026-09-19 ([evidence](../evidence/s123-slice-results.md)); nothing has been measured in a deployed environment.
 
 | ID | Attribute | Target | Architectural consequence | Validated by |
 |---|---|---|---|---|
-| QA-01 | Match latency | First offer sent < 2 s after a ride request (p95) | Redis GEO pre-filter plus road-ETA ranking ([ADR 5](../decisions/0005-redis-socketio-realtime.md), [C-04](constraints.md)) | Load test (plan S092) |
-| QA-02 | Location freshness | Driver position ≤ 3 s old on the passenger screen; ≤ 5 s at ≤ 20 m from the car device | Socket.IO fan-out through Redis; 3 s emit interval ([C-05](constraints.md)) | Load test (S092) |
+| QA-01 | Match latency | First offer sent < 2 s after a ride request (p95) | Redis GEO pre-filter plus road-ETA ranking ([ADR 5](../decisions/0005-redis-socketio-realtime.md), [C-04](constraints.md)) | Load test (plan S092). Local slice: p95 23 ms without a road-ETA call ([evidence](../evidence/s123-slice-results.md)) |
+| QA-02 | Location freshness | Driver position ≤ 3 s old on the passenger screen; ≤ 5 s at ≤ 20 m from the car device | Socket.IO fan-out through Redis; drivers report every 2.5 s, chosen after the first measurement ([C-05](constraints.md)) | Load test (S092). Local slice at 2.5 s: p95 2.38 s, max 2.57 s ([evidence](../evidence/s123-slice-results.md)) |
 | QA-03 | Availability | API 99.5 % monthly (about 3.6 h downtime) | Single region, Multi-AZ database, two API tasks; no multi-region ([availability.md](../reliability/availability.md)) | CloudWatch SLO dashboard |
 | QA-04 | Recoverability | RPO 5 min, RTO 4 h after region loss; RPO 24 h, RTO 24 h after losing the AWS account | PITR, cross-region copy, nightly off-provider dump ([disaster-recovery.md](../reliability/disaster-recovery.md)) | Quarterly restore drill (S096) |
 | QA-05 | Data residency | All personal data at rest in EU regions | AWS eu-central-1 and eu-west-1; Azure EU region; EU processors only ([P-04](../principles/architecture-principles.md)) | Processor register in the DPIA (S100) |

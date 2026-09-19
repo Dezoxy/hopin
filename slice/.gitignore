@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+load/results/
+.env
+load/api.log
+load/api.pid
+load/api-usage.txt
