@@ -15,6 +15,7 @@ Each attribute is measurable and has an architectural consequence. Decisions and
 | QA-09 | Charge correctness | 0 duplicate charges; every capture equals the taxi-meter amount | Idempotency keys; capture from meter data ([C-02](constraints.md)) | Nightly Stripe reconciliation (S044) |
 | QA-10 | Detection | A page-worthy failure alerts the operator within 5 min | Alarms in [observability-architecture.md](../observability/observability-architecture.md) | Alert test during drills |
 | QA-11 | Auditability | Every ride state change and admin action traceable for 2 years | Append-only `ride_events` and `audit_log` | Dispute and refund walkthrough |
+| QA-12 | Tenant isolation | 0 reads or writes across partners | Row-level security on every partner-owned table; tenant set per transaction ([ADR 9](../decisions/0009-hybrid-multi-tenancy.md)) | Automated cross-tenant tests in CI on every schema change |
 
 ## Scenario example
 

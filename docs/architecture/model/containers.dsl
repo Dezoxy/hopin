@@ -5,9 +5,9 @@
 hopin = softwareSystem "Hopin" "Ride-hailing for short city trips: booking, matching, live tracking, payment and ratings." {
 
     group "Client devices (untrusted)" {
-        passengerApp = container "Passenger App" "Books rides, shows fare and live driver, pays, shares and rates trips." "React Native, Expo (iOS, Android, Web)" "Layer Clients,Mobile App"
+        passengerApp = container "Passenger App" "Books rides, shows the fare estimate and live driver, pays, shares and rates trips." "React Native, Expo (iOS, Android, Web)" "Layer Clients,Mobile App"
         driverApp = container "Driver App" "Onboards drivers, streams location while online, accepts offers and runs the ride." "React Native, Expo (iOS, Android)" "Layer Clients,Mobile App"
-        adminWeb = container "Admin Web" "Driver approval, live operations, ride lookup, refunds, fare and service-area settings." "Next.js static export" "Layer Clients,Web UI"
+        adminWeb = container "Admin Web" "Platform administration for the operator; a partner-scoped dispatch console for partner staff (phone orders, live map, alarms)." "Next.js static export" "Layer Clients,Web UI"
         tripSharePage = container "Trip-share Page" "Shows a shared ride's live position to anyone holding the link." "Static web page" "Layer Clients,Web UI"
     }
 
@@ -31,13 +31,14 @@ hopin = softwareSystem "Hopin" "Ride-hailing for short city trips: booking, matc
 passenger -> hopin.passengerApp "Books, tracks, pays for and rates rides with" "Phone or web browser" "Person"
 driver -> hopin.driverApp "Goes online, accepts and completes rides with" "Phone" "Person"
 operator -> hopin.adminWeb "Approves drivers and runs operations with" "Web browser" "Person"
+partnerDispatcher -> hopin.adminWeb "Takes phone orders and handles alarms for one partner with" "Web browser" "Person"
 tripViewer -> hopin.tripSharePage "Follows a shared ride on" "Web browser, shared link" "Person"
 operator -> hopin.offsiteBackup "Restores the service from, after losing AWS" "Azure portal / CLI" "Person"
 
 // Clients
 hopin.passengerApp -> hopin.identity "Signs passengers in with" "SMS one-time code" "Layer Clients"
 hopin.driverApp -> hopin.identity "Signs drivers in with" "SMS one-time code" "Layer Clients"
-hopin.adminWeb -> hopin.identity "Signs the operator in with" "SMS one-time code + admin group" "Layer Clients"
+hopin.adminWeb -> hopin.identity "Signs the operator and partner staff in with" "SMS one-time code + admin or partner group" "Layer Clients"
 hopin.passengerApp -> hopin.api "Requests quotes and rides, receives ride state and driver position from" "HTTPS/JSON + Socket.IO over WSS" "Layer Clients"
 hopin.driverApp -> hopin.api "Streams location and ride actions to, receives ride offers from" "HTTPS/JSON + Socket.IO over WSS" "Layer Clients"
 hopin.adminWeb -> hopin.api "Reads operations data and sends admin actions to" "HTTPS/JSON + Socket.IO over WSS" "Layer Clients"

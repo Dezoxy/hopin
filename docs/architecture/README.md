@@ -29,8 +29,8 @@ Budgets come from the architecture-views skill. Visual check means the view was 
 
 | Key | Audience | Question | Scope and selection | Omitted on purpose | Update when | Visual check |
 |---|---|---|---|---|---|---|
-| Context | Everyone | Who uses Hopin and which outside services does it rely on? | System; three main user types and three external services | Trip-share viewer (see Clients); invoicing provider (not chosen) | Users or external services change | Passed |
-| Clients | Engineer | Which apps exist, who uses each, and how do they reach the API? | Four people, four clients, the API | Sign-in to Identity (see Backend); Mapbox and Stripe calls from the passenger app (see Context) | A client or its API path changes | Passed |
+| Context | Everyone | Who uses Hopin and which outside services does it rely on? | System; three main user types and three external services | Trip-share viewer and partner dispatcher (see Clients); invoicing provider (not chosen) | Users or external services change | Passed |
+| Clients | Engineer | Which apps exist, who uses each, and how do they reach the API? | Five people, four clients, the API | Sign-in to Identity (see Backend); Mapbox and Stripe calls from the passenger app (see Context) | A client or its API path changes | Passed |
 | Backend | Engineer | What does the API depend on to do its work? | API, Identity, data stores, secrets, external services | Backup Exporter (see OffProviderRecovery); push delivery to devices | API dependencies change | Passed |
 | Security | CTO, engineer | What is internet-facing, where do users authenticate, and where are secrets? | Three web and app clients, API, Identity, Secrets Store, database, Stripe | Driver app (same path as passenger app); Azure boundary (see OffProviderRecovery) | Exposure, identity or secret handling changes | Passed |
 | OffProviderRecovery | CTO, operator | How do data and keys leave AWS so the service survives losing it? | Exporter, what it reads, Azure stores, operator restore | AWS Backup (see AwsBackups) | Backup chain or restore path changes | Passed |
@@ -51,6 +51,9 @@ Not modelled yet: CDN and web hosting, client devices, the CI/CD delivery path, 
 - [0006 Use Amazon Cognito with SMS codes](decisions/0006-cognito-phone-otp.md) (Proposed)
 - [0007 Use Stripe and Stripe Connect](decisions/0007-stripe-connect-payments.md) (Proposed)
 - [0008 Manage infrastructure with Terraform](decisions/0008-terraform-for-both-clouds.md) (Proposed)
+- [0009 Use a shared database with row-level security, with a dedicated database on demand](decisions/0009-hybrid-multi-tenancy.md) (Accepted)
+- [0010 Ship one passenger app and one driver app for all partners](decisions/0010-one-app-for-all-partners.md) (Accepted)
+- [0011 Hopin and each partner are joint controllers for partner rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending lawyer)
 
 New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
 

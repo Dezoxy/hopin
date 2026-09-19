@@ -289,7 +289,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S002 | Regulatory and legal check for operating in Hungary | Written memo: licensing requirements, Budapest tariff rules, NAV invoicing obligation, invoicing provider shortlist, GDPR DPIA outline | doing | S001 |
 | S003 | Ride state machine and event catalogue | `packages/shared` contains the state machine as pure TS with exhaustive tests; A6 updated if it changed | todo | S001, S117 |
 | S004 | Fare model definition | Official tariff table versioned by city and effective date (C-02, C-03); estimate function with tests; no discounts or fees | todo | S002 |
-| S005 | Domain model and ERD | B4 refined, ERD in `docs/architecture/data/`, first Drizzle schema committed | todo | S003, S004 |
+| S005 | Domain model and ERD | B4 refined with `tenants` (partners) and `tenant_id` on partner-owned tables ([ADR 9](./architecture/decisions/0009-hybrid-multi-tenancy.md)), ERD in `docs/architecture/data/`, first Drizzle schema committed | todo | S003, S004 |
 | S006 | API and realtime contract | OpenAPI 3.1 file and Socket.IO event schema (zod) in `packages/shared`; reviewed against every journey in A5 | todo | S005 |
 | S007 | Design system and wireframes | Tokens (colour, type, spacing), key screens for all three surfaces in Figma/Stitch; exported to `packages/ui`; every UI string goes through i18n from day one (English for the pilot, Hungarian ready to add); white-label theming (partner name, colours, logo) as tokens | todo | S001 |
 | S008 | Domain name and DNS | Domain registered, hosted zone in Route 53, `dev.`/`staging.`/`api.`/`admin.`/`share.` subdomains planned | todo | — |
@@ -319,8 +319,8 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 |---|---|---|---|---|
 | S023 | NestJS skeleton | Config module (validated env), health/ready endpoints, pino logging with PII redaction, OpenTelemetry wired | todo | S010, S022 |
 | S024 | Database layer and migrations | Drizzle configured with PostGIS types, migration pipeline runs in CI against Testcontainers | todo | S023 |
-| S025 | Schema v1 | All B4 tables migrated, seed data for dev, ERD regenerated | todo | S005, S024 |
-| S026 | Authentication | Cognito user pools (phone OTP via SNS), groups passenger/driver/admin, JWT guard + role decorator in Nest, e2e test for each role | todo | S017, S023 |
+| S025 | Schema v1 | All B4 tables migrated with row-level security policies; cross-tenant tests in CI (QA-12); seed data with two tenants; ERD regenerated | todo | S005, S024 |
+| S026 | Authentication | Cognito user pools (phone OTP via SNS), groups passenger/driver/admin/partner, tenant claim in the JWT, JWT guard + role decorator in Nest, e2e test for each role | todo | S017, S023 |
 | S027 | Users and profiles | `me` endpoints, device registration, passenger profile creation on first login | todo | S025, S026 |
 | S028 | Driver onboarding API | Document upload via presigned S3 (type/size limits), vehicle registration, status transitions pending→approved | todo | S027 |
 | S029 | Maps services | Mapbox proxy for geocoding/autocomplete and directions with caching; server-side only tokens | todo | S023 |
@@ -331,7 +331,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S034 | Push notifications | Expo Push service integration, templates for every ride event, retry and token cleanup | todo | S027, S032 |
 | S035 | Trip sharing | `share` endpoint issues token, public `share/:token` returns position + ETA, expiry and revoke | todo | S033 |
 | S036 | Ratings | Both-direction ratings with one-per-ride constraint, rolling averages on profiles | todo | S032 |
-| S037 | Admin API | Driver approval, ride search, refund trigger, fare config CRUD (versioned), service area CRUD, user block; every call audited | todo | S028, S032 |
+| S037 | Admin API | Tenant-scoped for partner staff; driver approval, ride search, refund trigger, fare config CRUD (versioned), service area CRUD, user block; every call audited | todo | S028, S032 |
 | S038 | Hardening | Rate limiting (Redis), idempotency keys, zod on all inputs, error envelope, request ids in responses | todo | S032 |
 | S039 | Test suite | Unit + integration (Testcontainers) ≥ 80 % coverage; contract tests generated from OpenAPI | todo | S038 |
 | S040 | Container image | Multi-stage Dockerfile, non-root, distroless runtime, Trivy clean, image < 200 MB | todo | S023 |
@@ -387,7 +387,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 
 | ID | Step | Done when | Status | Depends |
 |---|---|---|---|---|
-| S073 | Admin scaffold | Next.js as a static export (client-side data from the API), Cognito admin-group auth, layout, data tables | todo | S026, S010 |
+| S073 | Admin scaffold | Next.js as a static export (client-side data from the API), Cognito admin and partner auth, partner dispatch console (phone orders, live map, alarms), tenant theming, data tables | todo | S026, S010 |
 | S074 | Live operations map | Online drivers and active rides on a map, refreshed via `/admin` socket namespace | todo | S033, S073 |
 | S075 | Driver verification queue | Document viewer (presigned), approve/reject with reason, notification to driver | todo | S028, S073 |
 | S076 | Rides | Search/filter, ride detail with event timeline on map, refund action | todo | S037, S046, S073 |
@@ -445,7 +445,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 
 | ID | Step | Done when | Status | Depends |
 |---|---|---|---|---|
-| S111 | Market-entry decision and lawyer review | Part F question 7 answered; a Hungarian lawyer has answered the memo's open questions; A8 and constraints updated | todo | S002 |
+| S111 | Market-entry decision and lawyer review | Part F question 7 answered; a Hungarian lawyer has answered the memo's open questions, plus: joint controllership ([ADR 11](./architecture/decisions/0011-joint-controllers-with-partners.md)) and one app without cross-partner matching ([ADR 10](./architecture/decisions/0010-one-app-for-all-partners.md)); A8 and constraints updated | todo | S002 |
 | S112 | BKK real-time data feed | Taxi position and meter start/stop sent to BKK in real time (C-05); accepted by BKK in a test | todo | S033, S111 |
 | S113 | Meter amount capture | Chosen way to get the meter amount into Hopin (meter integration or driver entry checked against route and tariff) working end to end | todo | S043, S111 |
 | S114 | Phone-order intake | Phone orders recorded in the same order register as app orders (C-06) | todo | S032 |
@@ -458,6 +458,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 |---|---|---|---|---|
 | S117 | Driver interviews | Five licensed drivers interviewed with the [interview guide](./business/driver-interview-guide.md); anonymised findings note in `docs/business/`; A-08 re-checked | todo | — |
 | S118 | First partner conversation | Meeting with one dispatch company owner; pricing tested against the business case; letter of intent signed or reasons recorded; A-09 re-checked | todo | S117 |
+| S119 | Dedicated tenant database | A partner can be moved to its own database with the same schema and routed by configuration; tested once end to end. Start only when a partner contract requires it ([ADR 9](./architecture/decisions/0009-hybrid-multi-tenancy.md)) | todo | S025, S118 |
 
 ---
 
@@ -529,3 +530,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.3 — S002 regulatory memo. Fare becomes a meter-based estimate; surge, promo codes and passenger fees are not allowed in Budapest; matching must use road distance; driver alarm and fare-check features added; Phase 10 (S111–S116) added; Part F question 7 on the market-entry model. |
 | 2026-09-19 | v0.4 — Architecture knowledge base completed from the architect-base template: principles, quality attributes, assumptions, security, data, integration, deployment, reliability, observability, risks, roadmap, plus a Security view. Parts A7, B5 (realtime), C and G moved there; the plan keeps pointers. docs-sync skill and consistency check added from homelab. |
 | 2026-09-19 | v0.5 — Business case added: white-label dispatch platform first, Hopin brand second; Part F question 7 answered; Phase 11 (S117 driver interviews, S118 first partner conversation) gates S003; i18n and white-label theming added to S007; RISK-011 to RISK-014, A-08, A-09 and business metrics added. |
+| 2026-09-19 | v0.6 — White-label architecture: ADR 9 (hybrid multi-tenancy with RLS), ADR 10 (one app, one partner per order, no cross-partner matching without legal clearance), ADR 11 (joint controllers, pending lawyer). Partner dispatcher added to the model; QA-12, RISK-015, RISK-016 and S119 added; S005, S025, S026, S037, S073 and S111 updated. |

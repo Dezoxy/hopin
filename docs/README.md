@@ -3,7 +3,7 @@
 | Document | What it is |
 |---|---|
 | [hopin-pre-plan.md](hopin-pre-plan.md) | The original product idea. Frozen. |
-| [hopin-plan.md](hopin-plan.md) | The master plan: product scope, stack, roadmap steps S001–S118, open decisions, changelog |
+| [hopin-plan.md](hopin-plan.md) | The master plan: product scope, stack, roadmap steps S001–S119, open decisions, changelog |
 | [architecture/README.md](architecture/README.md) | Architecture knowledge base: model and views, ADRs, requirements, security, data, integration, deployment, reliability, observability, risks, roadmap |
 | [business/business-case.md](business/business-case.md) | White-label first, Hopin brand second: revenue models, unit economics, break-even, one-month goal |
 | [business/driver-interview-guide.md](business/driver-interview-guide.md) | Script for the five driver interviews (S117) |

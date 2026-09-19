@@ -11,7 +11,7 @@ systemContext hopin "Context" "Hopin (planned): who uses it and which outside se
 // Sign-in arrows (every client -> Identity) crossed all API arrows in the
 // automatic layout; Identity moved to the Backend view.
 container hopin "Clients" "Hopin (planned): which apps exist, who uses each one, and how do they reach the API?" {
-    include passenger driver operator tripViewer
+    include passenger driver operator partnerDispatcher tripViewer
     include hopin.passengerApp hopin.driverApp hopin.adminWeb hopin.tripSharePage
     include hopin.api
     autoLayout lr
