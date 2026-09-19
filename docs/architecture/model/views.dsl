@@ -29,6 +29,14 @@ container hopin "OffProviderRecovery" "Hopin (planned): how do data and keys lea
     autoLayout lr
 }
 
+// Entry paths and where authentication happens. Trust boundaries TB-1 to TB-3
+// in security/trust-boundaries.md. Azure (TB-4) is the OffProviderRecovery view.
+container hopin "Security" "Hopin (planned): what is internet-facing, where do users authenticate, and where are secrets?" {
+    include hopin.passengerApp hopin.adminWeb hopin.tripSharePage
+    include hopin.api hopin.identity hopin.secrets hopin.db stripe
+    autoLayout lr
+}
+
 dynamic hopin "RideRequest" "Hopin (planned): what happens between a passenger requesting a ride and seeing a matched driver?" {
     hopin.passengerApp -> hopin.api "Requests a ride from a valid fare quote"
     hopin.api -> hopin.db "Stores the ride as REQUESTED"

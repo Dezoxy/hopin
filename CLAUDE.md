@@ -4,9 +4,10 @@ Ride-hailing app for short city trips: passenger app (iOS, Android, Web), driver
 
 ## Where things are
 
-- `docs/hopin-plan.md` is the single living plan: product, platform, the S001–S110 step list and a detail section per started step. Expand steps there. Do not create parallel plan files.
+- `docs/hopin-plan.md` is the single living plan: product scope, domain model, the S001–S116 step list and a detail section per started step. Expand steps there. Do not create parallel plan files.
 - `docs/hopin-pre-plan.md` is the original product idea. Frozen.
-- `docs/architecture/` is the architecture knowledge base: Structurizr model, ADRs, overview. See its README for the view register.
+- `docs/architecture/` is the architecture knowledge base: Structurizr model, ADRs, requirements (constraints, quality attributes, assumptions), principles, security, data, integration, deployment, reliability, observability, risks and roadmap. Its README has the view register and the document index.
+- `docs/compliance/` holds regulatory research (S002 memo) and, later, the DPIA.
 - Planned code layout (plan Part B3): `apps/` (passenger, driver, admin, api, trip-share), `packages/` (shared, ui, api-client), `infra/terraform/`.
 
 ## Architecture authoring
@@ -27,6 +28,14 @@ Hopin specifics:
 - ADRs use architect-base's template (`docs/architecture/templates/adr.md`), not ECC's `architecture-decision-records` skill format. A new recommendation starts as Proposed. Only list alternatives that were actually considered.
 - When a plan step produces real content for a concern (security, reliability, data), move it from the plan into `docs/architecture/<concern>/` and link back. Do not create empty concern files.
 - `styles-shared.dsl`, `scripts/architecture-pdf.sh`, `scripts/build_architecture_pdf_source.py` and `.github/workflows/architecture-pdf.yml` are copied unchanged from `~/Documents/architect-base`. Improve them there first, then re-copy.
+
+## Pull requests and documentation
+
+- All work happens on a branch; `main` accepts changes only through merged pull requests (ruleset `protect-main`).
+- **Before opening or updating any pull request, run `/docs-sync`** (`.claude/skills/docs-sync/SKILL.md`): audit the branch diff for documentation it falsifies, fix it in the same branch, and put the proof in the PR body.
+- The counted half of that audit is `make docs` (`scripts/check_docs_consistency.py`). It runs in CI with `make check` in `.github/workflows/docs-consistency.yml`. A green run is a floor, not the audit: it cannot read prose.
+- docs-sync is adapted from `~/Developer/homelab/.claude/skills/docs-sync/`. Keep `.claude/skills/` and `.agents/skills/` byte-identical.
+- Each fact has one owning document. Requirements, security, data, reliability, observability and risks live under `docs/architecture/`; the plan links to them and keeps scope, steps and decisions.
 
 ## ECC rules, agents and skills for this stack
 
