@@ -46,4 +46,4 @@ Rough monthly production cost at idle to light traffic, EUR. Target is [QA-08](.
 | SMS one-time codes | usage-based, ~0.05 per message |
 | **Total** | **~190–220** |
 
-This is above the QA-08 target. The levers are removing NAT (VPC endpoints only) and single-AZ RDS until real traffic, reviewed in plan step S102.
+This is above the QA-08 target, so production runs single-AZ with no NAT (VPC endpoints only) until the first paying partner, at about 120 EUR a month, and moves to this shape then (founder decision, 2026-09-19). Three-year costs across scenarios, including Mapbox, people and one-off costs, are in the [three-year cost model](../../business/three-year-cost-model.md).

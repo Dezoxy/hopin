@@ -75,6 +75,10 @@ The pilot UI is English only, by founder decision. **Concern:** Budapest drivers
 
 "Hopin" collides with a known London-based events platform ([RISK-014](../architecture/risks/architecture-risks.md)). Backup name: **Gurul** ("it rolls" in Hungarian): short, pronounceable in English, no taxi app found under that name, and `gurul.com` appeared unregistered on 2026-09-19. `gurul.hu` is taken. An EU trademark search in classes 9, 39 and 42 is required before either name is used publicly.
 
+## Three-year view
+
+Costs, revenue and results over three years for three scenarios are in the [three-year cost model](three-year-cost-model.md).
+
 ## Sources
 
 - [TaxiCaller pricing](https://www.taxicaller.com/en/pricing)
