@@ -23,7 +23,7 @@ Passengers and drivers sign in with a phone number. The operator needs an admin 
 
 ## Decision
 
-We propose one Cognito user pool in eu-central-1 with groups for passenger, driver and admin. The API validates Cognito-issued tokens.
+We propose one Cognito user pool in eu-central-1 with groups for passenger, driver, admin and partner, and a tenant claim ([ADR 9](0009-hybrid-multi-tenancy.md)). The API validates Cognito-issued tokens. Drivers additionally bind a device key at onboarding; a new phone needs partner approval (threat model [T-02](../security/threat-model.md#tb-1-internet-to-edge), added 2026-09-19).
 
 ## Consequences
 

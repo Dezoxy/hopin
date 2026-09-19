@@ -6,8 +6,9 @@ Planned controls for the MVP. Nothing is deployed; each control names the plan s
 
 | Who | Authenticates with | Authorised by | Step |
 |---|---|---|---|
-| Passenger, driver | Phone number and SMS one-time code (Cognito) | Cognito group in the JWT, checked by a NestJS guard on every route and socket namespace | S026 |
-| Operator (admin web) | Same, plus the `admin` group | Admin group plus a WAF IP allowlist on the admin site; every admin action written to `audit_log` | S026, S080, S037 |
+| Passenger | Phone number and SMS one-time code (Cognito) | Cognito group in the JWT, checked by a NestJS guard on every route and socket namespace | S026 |
+| Driver | SMS one-time code plus a device key bound at onboarding; a new phone needs partner approval ([T-02](threat-model.md#tb-1-internet-to-edge)) | Cognito group in the JWT plus the bound device; same guard | S026 |
+| Operator (admin web) | Same, plus the `admin` group | Aggregated metrics only; partner detail only under a time-boxed grant from that partner ([ADR 13](../decisions/0013-operator-access-by-partner-grant.md)); WAF IP allowlist; every admin action written to `audit_log` | S026, S080, S037 |
 | Partner dispatcher (admin web) | Same, plus a `partner` group and a tenant claim | Tenant claim sets the database tenant; row-level security limits every query to that partner ([ADR 9](../decisions/0009-hybrid-multi-tenancy.md)) | S026, S073 |
 | Trip-share viewer | Nothing; holds a share token | Token is random, scoped to one ride, expires 2 h after completion, revocable | S035 |
 | Stripe | Webhook signature | Signature check before any processing; idempotent handler | S044 |
@@ -59,5 +60,5 @@ Resource ownership is checked in the API, not only the role: a passenger can rea
 
 ## Open items
 
-- Threat model (STRIDE) for the ride lifecycle, payments and onboarding: plan step S099.
+- Threat model: done in [threat-model.md](threat-model.md) (plan step S099); 26 threats, each mapped to a planned control or a tracked risk.
 - OWASP ASVS level 1 review: plan step S098.

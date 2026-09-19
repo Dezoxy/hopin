@@ -11,6 +11,7 @@ Retention periods are targets; the retention for dispatch order records waits on
 | Ride and ride events (pickup, drop-off, route points) | Personal, location | Hopin Database | 2 years | Disputes, tax, audit ([QA-11](../requirements/quality-attributes.md)) |
 | Driver documents (ID, licence, permits) | Personal, **high sensitivity** | Document Store (S3), Azure copy | While the driver is active + legal minimum | Never public; presigned access only |
 | Payment references (Stripe IDs, amounts) | Confidential, financial | Hopin Database | 8 years | Accounting duty |
+| Meter receipt photos | Personal, financial evidence | Document Store (S3) | 1 year, or until a dispute closes | Only when the typed amount exceeds the tariff check by 15 % ([T-09](threat-model.md#tb-2-edge-to-private-network)) |
 | Payment workflow history (ride ID, amounts, states) | Confidential, financial | AWS Step Functions | 90 days | [ADR 12](../decisions/0012-payment-capture-workflow.md) |
 | Card numbers, CVC | **Never stored** | — | — | Stripe SDK only ([QA-06](../requirements/quality-attributes.md)) |
 | Ratings and comments | Personal | Hopin Database | Life of account | |

@@ -24,8 +24,9 @@ What makes it hard is not the stack. It is the constraints:
 | [ADR 10: one app, one partner per order](docs/architecture/decisions/0010-one-app-for-all-partners.md) | Never let the platform become the licensed party by accident |
 | [ADR 11: joint controllers, pending legal review](docs/architecture/decisions/0011-joint-controllers-with-partners.md) | Controller roles follow the law, not the contract; leave it Proposed until counsel confirms |
 | [ADR 12: payment capture as a workflow named by the ride](docs/architecture/decisions/0012-payment-capture-workflow.md) | Exactly-once effect comes from idempotency, not the network: name the workflow after the thing it must not do twice |
+| [ADR 13: operator access by partner grant](docs/architecture/decisions/0013-operator-access-by-partner-grant.md) | The platform operator is not a super-user; the data owner grants access, briefly and on the record |
 
-All twelve ADRs, 25 model views and the reading paths per audience are in the [architecture README](docs/architecture/README.md). To present them, use the [talk tracks](docs/architecture/talks/talk-tracks.md) and the per-view [speaker notes](docs/architecture/talks/speaker-notes.md).
+All thirteen ADRs, 26 model views and the reading paths per audience are in the [architecture README](docs/architecture/README.md). To present them, use the [talk tracks](docs/architecture/talks/talk-tracks.md) and the per-view [speaker notes](docs/architecture/talks/speaker-notes.md).
 
 ## Read by audience
 
@@ -38,7 +39,6 @@ All twelve ADRs, 25 model views and the reading paths per audience are in the [a
 
 The design is complete for the MVP scope. The build roadmap in the [plan](docs/hopin-plan.md) is frozen. Active work is the portfolio track, plan Phase 12:
 
-- STRIDE threat model on the Security view
 - Three-year cost model
 - One-page executive summary
 - A thin, running slice with a load test, so at least one quality attribute is measured, not only targeted

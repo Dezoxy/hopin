@@ -468,7 +468,7 @@ Artifacts that make the design defensible in an architect interview. S099 moves 
 
 | ID | Step | Done when | Status | Depends |
 |---|---|---|---|---|
-| S099 | Threat model | STRIDE on the Security view and the ride, payment and onboarding flows; each threat mapped to a control or an accepted risk in the risk register | todo | — |
+| S099 | Threat model | [Threat model](./architecture/security/threat-model.md): 26 STRIDE threats across six trust boundaries, each with a control or a tracked risk; founder decided meter-amount checks, driver device binding, operator grants ([ADR 13](./architecture/decisions/0013-operator-access-by-partner-grant.md)) and trip-share protection | done | — |
 | S120 | Three-year cost model | Infrastructure, third-party services, people and growth scenarios over three years, including the dedicated-database path from ADR 9; compared with the business case revenue | todo | — |
 | S121 | Executive summary | One page a CFO can read: problem, decision, cost, risk, what is left open | todo | S099, S120 |
 | S122 | Payment-capture saga | [ADR 12](./architecture/decisions/0012-payment-capture-workflow.md) Accepted: outbox-started Step Functions workflow per ride, 1.3× hold, 3 retries in 24 h, partner carries failed fares up to a cap, batch fallback on Azure; views and event catalog updated | done | — |
@@ -552,3 +552,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.7 — Reframed as a reference architecture case study for an architect portfolio. Build roadmap frozen; S117 and S118 dropped; Phase 12 portfolio track added (S099 moved there, S120–S124). |
 | 2026-09-19 | v0.8 — Diagram portfolio: API components, authorities, monitoring, delivery and recovery environments; 16 new views (25 total); ADR 12 payment-capture saga (Proposed); RISK-017 identity lost with the AWS account; speaker notes and talk tracks; S125–S127 added. |
 | 2026-09-19 | v0.9 — ADR 12 Accepted after review: AWS Step Functions workflow per ride started from the outbox (replaces the job-queue draft), 1.3× hold, three retries in 24 h, partner carries failed fares up to a cap, batch capture fallback on Azure. Payment Workflow container added; ApiMoneyAndCompliance split into ApiPayments and ApiRegulatoryFeeds. S122 done. |
+| 2026-09-19 | v0.10 — S099 threat model: 26 threats; founder decisions on meter fraud (tariff check plus photo), driver device binding, operator access by partner grant (ADR 13) and trip share; RISK-018; S099 done. |

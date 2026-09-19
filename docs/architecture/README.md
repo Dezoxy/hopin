@@ -74,6 +74,7 @@ Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes
 - [0010 Ship one passenger app and one driver app for all partners](decisions/0010-one-app-for-all-partners.md) (Accepted)
 - [0011 Hopin and each partner are joint controllers for partner rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending lawyer)
 - [0012 Capture the meter amount with an outbox-started Step Functions workflow](decisions/0012-payment-capture-workflow.md) (Accepted)
+- [0013 The operator reads partner data only through time-boxed partner grants](decisions/0013-operator-access-by-partner-grant.md) (Accepted)
 
 New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
 
@@ -84,7 +85,7 @@ New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-titl
 | Overview | [architecture-overview](overview/architecture-overview.md) · [scope](overview/scope.md) · [glossary](overview/glossary.md) |
 | Principles | [architecture-principles](principles/architecture-principles.md) · [engineering-standards](principles/engineering-standards.md) |
 | Requirements | [constraints](requirements/constraints.md) · [quality-attributes](requirements/quality-attributes.md) · [assumptions](requirements/assumptions.md) |
-| Security | [security-architecture](security/security-architecture.md) · [trust-boundaries](security/trust-boundaries.md) · [data-classification](security/data-classification.md) |
+| Security | [security-architecture](security/security-architecture.md) · [trust-boundaries](security/trust-boundaries.md) · [threat-model](security/threat-model.md) · [data-classification](security/data-classification.md) |
 | Data | [data-architecture](data/data-architecture.md) |
 | Integration | [integration-architecture](integration/integration-architecture.md) · [event-catalog](integration/event-catalog.md) |
 | Deployment | [deployment-architecture](deployment/deployment-architecture.md) · [environments](deployment/environments.md) |
@@ -95,7 +96,7 @@ New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-titl
 
 Only `overview/` is imported into the model by `!docs`. The rest is plain Markdown linked from here.
 
-IDs are owned by one file each and cited everywhere else: `C-xx` constraints, `QA-xx` quality attributes, `A-xx` assumptions, `P-xx` principles, `RISK-xxx` risks. `scripts/check_docs_consistency.py` fails when a cited ID is not defined.
+IDs are owned by one file each and cited everywhere else: `C-xx` constraints, `QA-xx` quality attributes, `A-xx` assumptions, `P-xx` principles, `RISK-xxx` risks, `T-xx` threats. `scripts/check_docs_consistency.py` fails when a cited ID is not defined.
 
 Deliberately absent: `data-ownership` (one operator owns every store; ownership is a column in data-architecture) and `technical-debt` (no code yet). Add them when they have content.
 
