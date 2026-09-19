@@ -15,6 +15,108 @@ What makes it hard is not the stack. It is the constraints:
 - **Personal location data** under GDPR, with controller roles that depend on who holds the dispatch licence ([ADR 11](docs/architecture/decisions/0011-joint-controllers-with-partners.md)).
 - **One operator.** Every design choice has to be runnable by a single person ([P-01](docs/architecture/principles/architecture-principles.md)).
 
+## The architecture in four diagrams
+
+Redrawn from the [Structurizr model](docs/architecture/workspace.dsl) for reading on GitHub. The model stays the source of truth, and each redraw is logged in the [presentation ledger](docs/architecture/presentation/README.md). All 28 views with their checked layout are in the architecture PDF, published under [Releases](https://github.com/Dezoxy/hopin/releases).
+
+**Who uses Hopin, and what it depends on.** Three user types and three outside services. Partner staff and the authorities have their own views.
+
+<!-- Source: Context view, model commit dd0b063. Redrawn by hand; see docs/architecture/presentation/README.md -->
+```mermaid
+flowchart TB
+  passenger["<b>Passenger</b><br/>Books city rides, pays in the app, shares trips"]:::person
+  driver["<b>Driver</b><br/>Licensed taxi driver"]:::person
+  operator["<b>Operator</b><br/>Runs the platform; today the solo founder"]:::staff
+  hopin("<b>Hopin</b><br/>Booking, matching, live tracking, payment, ratings"):::system
+  stripe("<b>Stripe</b><br/>Cards, capture, driver payouts"):::ext
+  mapbox("<b>Mapbox</b><br/>Maps, search, directions"):::ext
+  expo("<b>Expo Push Service</b><br/>Push to APNs and FCM"):::ext
+
+  passenger -- "Books, tracks, pays for and rates rides" --> hopin
+  driver -- "Goes online, accepts and completes rides" --> hopin
+  operator -- "Approves drivers and runs operations" --> hopin
+  hopin -- "Pages the operator" --> operator
+  hopin -- "Authorises and captures fares" --> stripe
+  stripe -- "Signed payment webhooks" --> hopin
+  hopin -- "Map tiles, geocoding, routes" --> mapbox
+  hopin -- "Ride notifications" --> expo
+  expo -- "Delivers notifications to the apps" --> hopin
+
+  classDef person fill:#dbeafe,stroke:#2563eb,color:#1f2937
+  classDef staff fill:#ede9fe,stroke:#2563eb,color:#1f2937
+  classDef system fill:#e8f1fb,stroke:#1168bd,color:#1f2937
+  classDef ext fill:#f1f3f5,stroke:#8a96a8,stroke-dasharray:5 5,color:#1f2937
+```
+
+**How one partner's request stays inside that partner's data.** The database enforces isolation, not the application code ([ADR 9](docs/architecture/decisions/0009-hybrid-multi-tenancy.md)).
+
+<!-- Source: PartnerIsolation view, model commit dd0b063. Redrawn by hand; see docs/architecture/presentation/README.md -->
+```mermaid
+sequenceDiagram
+  autonumber
+  participant web as Admin Web<br/>(partner console)
+  participant dispatch as Dispatch and Admin
+  participant tenancy as Tenancy
+  participant identity as Identity<br/>(Cognito)
+  participant db as Hopin Database<br/>(PostgreSQL)
+  web->>dispatch: Requests live rides with a token carrying the partner's tenant
+  dispatch->>tenancy: Opens a tenant-scoped transaction
+  tenancy->>identity: Validates the token and reads the tenant claim
+  tenancy->>db: Sets the tenant for this transaction
+  dispatch->>db: Queries rides: row-level security returns only this partner's rows
+```
+
+**What runs on Azure after the AWS account is lost, and what is missing.** Drawing this view exposed the gap: Cognito cannot be exported, so every user re-enrols by SMS code ([ADR 1](docs/architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [RISK-017](docs/architecture/risks/architecture-risks.md)).
+
+<!-- Source: AccountRecovery view, model commit dd0b063. Redrawn by hand; see docs/architecture/presentation/README.md -->
+```mermaid
+flowchart LR
+  subgraph azure ["Azure subscription, used only when the AWS account is lost"]
+    restore["<b>Restore job</b><br/>Container Apps job, pg_restore"]:::infra
+    vault[("<b>Escrow Vault</b><br/>Key Vault: dump key, break-glass credentials")]:::recovery
+    backup[("<b>Off-provider Backup</b><br/>Blob Storage, immutable")]:::recovery
+    db[("<b>Hopin Database</b><br/>Azure PostgreSQL, restored from the dump")]:::data
+    api["<b>Hopin API</b><br/>Container Apps"]:::svc
+    cache[("<b>Realtime Cache</b><br/>Azure Redis, starts empty")]:::data
+    entra["<b>Replacement identity</b><br/>Entra External ID; users re-enrol by SMS"]:::gap
+  end
+  restore -- "Fetches the dump key" --> vault
+  restore -- "Reads the latest encrypted dump" --> backup
+  restore -- "Restores the dump into" --> db
+  api -- "Reads and writes" --> db
+  api -- "Positions, socket fan-out, jobs" --> cache
+  api -- "Validates access tokens" --> entra
+
+  style azure fill:#ffffff,stroke:#8a96a8,color:#1f2937
+  classDef infra fill:#f1f3f5,stroke:#8a96a8,color:#1f2937
+  classDef recovery fill:#e6f6f4,stroke:#2ba59a,color:#1f2937
+  classDef data fill:#eef1f6,stroke:#7a8aa0,color:#1f2937
+  classDef svc fill:#e9f7ee,stroke:#d9534f,stroke-width:3px,color:#1f2937
+  classDef gap fill:#fff4e5,stroke:#d97706,stroke-dasharray:5 5,color:#1f2937
+```
+
+**How a complaint becomes a draft reply that a human approves.** AI reads and drafts under the staff member's tenant; it never decides ([ADR 14](docs/architecture/decisions/0014-ai-assists-staff-read-and-draft-only.md), [ADR 15](docs/architecture/decisions/0015-bedrock-for-data-openrouter-for-evaluation.md)). This flow runs in the [slice](slice/README.md).
+
+<!-- Source: DisputeAssist view, model commit dd0b063. Redrawn by hand; step 7 drawn as a reply. See docs/architecture/presentation/README.md -->
+```mermaid
+sequenceDiagram
+  autonumber
+  actor staff as Partner Dispatcher
+  participant web as Admin Web
+  participant assist as AI Assist
+  participant tenancy as Tenancy
+  participant db as Hopin Database
+  participant bedrock as Amazon Bedrock<br/>(eu-west-1)
+  participant mon as Monitoring
+  staff->>web: Opens a ride and pastes the passenger's complaint
+  web->>assist: Asks for a draft reply for this ride
+  assist->>tenancy: Opens a transaction scoped to the staff member's partner
+  assist->>db: Reads the ride and its events: another partner's ride is not found
+  assist->>bedrock: Sends roles instead of IDs, no contact details, rounded positions, and gets a draft back
+  assist->>mon: Logs the outcome and cited event IDs, never the text
+  assist-->>web: Checked draft: staff edit, send or discard it
+```
+
 ## Decisions worth reading
 
 | Decision | The reusable rule it sets |
