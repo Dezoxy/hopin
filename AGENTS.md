@@ -27,7 +27,8 @@ Hopin specifics:
 - Everything in the model is planned, not deployed. Keep "(planned)" in view titles until real infrastructure exists, then check each claim against code and Terraform.
 - ADRs use architect-base's template (`docs/architecture/templates/adr.md`), not ECC's `architecture-decision-records` skill format. A new recommendation starts as Proposed. Only list alternatives that were actually considered.
 - When a plan step produces real content for a concern (security, reliability, data), move it from the plan into `docs/architecture/<concern>/` and link back. Do not create empty concern files.
-- `styles-shared.dsl`, `scripts/architecture-pdf.sh`, `scripts/build_architecture_pdf_source.py` and `.github/workflows/architecture-pdf.yml` are copied unchanged from `~/Documents/architect-base`. Improve them there first, then re-copy.
+- `styles-shared.dsl`, `scripts/architecture-pdf.sh` and `scripts/build_architecture_pdf_source.py` are copied unchanged from `~/Documents/architect-base`. Improve them there first, then re-copy.
+- `.github/workflows/architecture-pdf.yml` is architect-base's workflow with one Hopin change: it runs only when started by hand (no pull-request trigger). Re-apply that change after re-copying. Test PDF tooling changes locally with `make pdf`.
 
 ## Pull requests and documentation
 
