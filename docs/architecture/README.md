@@ -20,7 +20,7 @@ Hopin, a ride-hailing app for short city trips.
 |---|---|
 | Stakeholder | [Overview](overview/architecture-overview.md), Context, RideRequest, Authorities, DriverAlarm, [risks](risks/architecture-risks.md), [transition plan](roadmap/transition-plan.md) |
 | CTO / reviewer | Context, Security, PartnerIsolation, LocationData, ProductionCore, OffProviderRecovery, AccountRecovery, [ADR 1](decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [quality attributes](requirements/quality-attributes.md), [risks](risks/architecture-risks.md) |
-| Engineer | Clients, Backend, ApiRideFlow, ApiMoneyAndCompliance, PaymentCapture, Security, RideRequest, ProductionCore, Delivery, all ADRs, [principles](principles/architecture-principles.md), [integration](integration/integration-architecture.md) |
+| Engineer | Clients, Backend, ApiRideFlow, ApiPayments, PaymentCapture, Security, RideRequest, ProductionCore, Delivery, all ADRs, [principles](principles/architecture-principles.md), [integration](integration/integration-architecture.md) |
 | Operator | ProductionCore, AlertPath, DriverAlarm, RedisLost, AwsBackups, AzureRecovery, OffProviderRecovery, RegionRecovery, AccountRecovery, [availability](reliability/availability.md), [disaster recovery](reliability/disaster-recovery.md), [observability](observability/observability-architecture.md) |
 
 ## View register
@@ -39,11 +39,12 @@ Budgets come from the architecture-views skill. Visual check means the view was 
 | AwsBackups | CTO, operator | Which AWS backups exist, and in which regions? | Backup vault, what it protects, cross-region copy | Off-provider chain (see AzureRecovery) | Backup plan changes | Passed |
 | AzureRecovery | Operator | Where does the nightly off-provider copy run, and where do copies land? | Exporter task and the two Azure stores | Database and documents it reads (see ProductionCore) | Exporter placement or Azure layout changes | Passed |
 | ApiRideFlow | Engineer | Which components carry a ride from estimate to live tracking? | Two apps, four API components, database, cache | Mapbox (see Backend); tenancy (see PartnerConsole) | Ride flow components change | Passed |
-| ApiMoneyAndCompliance | Engineer | Which components do the asynchronous work? | Payments, webhooks, outbox, regulatory adapters; Stripe, BKK, invoicing; stores | Ride Lifecycle, whose outbox write is step 1 of PaymentCapture | Payment or regulatory integration changes | Passed; two crossings, labels readable |
+| ApiPayments | Engineer, CTO | Which parts move money, and how do they avoid charging twice? | Payments, webhooks, outbox, Payment Workflow, Stripe, database | Ride Lifecycle (step 1 of PaymentCapture); regulatory adapters (see ApiRegulatoryFeeds) | Payment flow changes ([ADR 12](decisions/0012-payment-capture-workflow.md)) | Passed; a few crossings, labels readable |
+| ApiRegulatoryFeeds | Engineer | How do committed changes reach BKK and the invoicing provider? | Outbox, regulatory adapters, database, cache, BKK, invoicing provider | NAV and the taxi meter (see Authorities) | Regulatory interfaces decided (S047, S112) | Passed after switching to top-to-bottom; labels on the API border stay readable |
 | PartnerConsole | Engineer, CTO | How does a partner's console reach its data, and only its data? | Admin Web, dispatch, tenancy, rides, realtime, Identity, database | Operator paths | Tenancy or console changes | Passed |
 | PartnerIsolation | CTO, engineer | How is a partner request kept inside that partner's data? | Five numbered steps | Writes; consumer brand requests | Tenancy mechanism changes ([ADR 9](decisions/0009-hybrid-multi-tenancy.md)) | Passed |
-| PaymentCapture | Engineer, CTO | How is the meter amount captured exactly once? | Seven steps from completion to confirmed capture | Meter above the authorisation; reconciler ([ADR 12](decisions/0012-payment-capture-saga-with-outbox.md)) | Capture flow changes | Passed |
-| PaymentCaptureDeclined | Engineer | What happens when the capture is declined? | Six steps to FAILED and a blocked account | Who carries the loss (open in ADR 12) | Retry or failure policy changes | Passed; step labels sit on the API border but stay readable |
+| PaymentCapture | Engineer, CTO | How is the meter amount captured exactly once? | Seven steps from completion to the resumed workflow | Meter above the hold (second charge inside the workflow); Azure fallback ([ADR 12](decisions/0012-payment-capture-workflow.md)) | Capture flow changes | Passed |
+| PaymentCaptureDeclined | Engineer | What happens when the capture is declined? | Six steps to FAILED and a blocked account | Partner loss cap (a contract term in ADR 12) | Retry or failure policy changes | Passed |
 | DriverAlarm | Stakeholder, operator | What happens when a driver presses the alarm? | Six steps from alarm to partner dispatcher and operator page | The 112 call itself | Alarm handling changes ([C-06](requirements/constraints.md)) | Passed |
 | TripShare | Stakeholder, engineer | How does someone without an account follow a shared ride? | Five steps | Revocation | Share flow or token rules change | Passed |
 | PhoneOrder | Stakeholder, operator | How does a phone order become a ride? | Six steps | Caller call-back details | Dispatch console changes | Passed |
@@ -72,7 +73,7 @@ Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes
 - [0009 Use a shared database with row-level security, with a dedicated database on demand](decisions/0009-hybrid-multi-tenancy.md) (Accepted)
 - [0010 Ship one passenger app and one driver app for all partners](decisions/0010-one-app-for-all-partners.md) (Accepted)
 - [0011 Hopin and each partner are joint controllers for partner rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending lawyer)
-- [0012 Capture the meter amount through a transactional outbox and idempotent jobs](decisions/0012-payment-capture-saga-with-outbox.md) (Proposed)
+- [0012 Capture the meter amount with an outbox-started Step Functions workflow](decisions/0012-payment-capture-workflow.md) (Accepted)
 
 New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
 

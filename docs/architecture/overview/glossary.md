@@ -15,7 +15,8 @@
 | EAS | Expo Application Services: cloud builds, store submission and over-the-air updates. |
 | Tenant | One dispatch partner, or the Hopin brand, whose data is isolated from all others ([ADR 9](../decisions/0009-hybrid-multi-tenancy.md)). |
 | Row-level security (RLS) | A PostgreSQL feature that filters every query by a policy, here the current tenant. |
-| Transactional outbox | A table written in the same transaction as a state change, so the change and the event about it commit together ([ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md)). |
+| Transactional outbox | A table written in the same transaction as a state change, so the change and the event about it commit together ([ADR 12](../decisions/0012-payment-capture-workflow.md)). |
 | Saga | A sequence of local steps with compensations instead of one distributed transaction. |
 | Idempotency key | A key that makes repeating a request return the first result instead of acting twice. |
 | Joint controllers | Two parties that decide together why and how personal data is processed (GDPR Article 26). |
+| Task token | A token a waiting Step Functions workflow hands out; sending it back resumes the workflow ([ADR 12](../decisions/0012-payment-capture-workflow.md)). |

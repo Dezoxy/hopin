@@ -18,7 +18,8 @@ Views: **RegionRecovery** and **AccountRecovery**.
 4. Decrypt and restore the latest dump.
 5. Stand up the replacement identity (Entra External ID). Users and partner staff re-enrol by SMS code against the phone numbers restored from the dump ([RISK-017](../risks/architecture-risks.md)).
 6. Deploy the API image, repoint DNS, rotate every third-party key.
-7. Reconcile payments against Stripe for the lost window.
+7. Run the capture fallback: a batch script over unfinished `ride.completed` outbox entries, with the same idempotency keys, because Step Functions is not available on Azure ([ADR 12](../decisions/0012-payment-capture-workflow.md)).
+8. Reconcile payments against Stripe for the lost window.
 
 Step-by-step commands belong in `docs/runbooks/restore.md` (plan step S096), not here.
 

@@ -86,12 +86,19 @@ component hopin.api "ApiRideFlow" "Hopin API (planned): which components carry a
     autoLayout lr
 }
 
-// Ride Lifecycle is left out: its outbox write is step 1 of PaymentCapture,
-// and drawing it here routed an arrow around the whole container.
-component hopin.api "ApiMoneyAndCompliance" "Hopin API (planned): which components do the asynchronous work (payments, webhooks, outbox, regulatory feeds)?" {
-    include hopin.api.payments hopin.api.webhooks hopin.api.outbox hopin.api.compliance
-    include stripe bkk invoicing hopin.db hopin.cache
+// Ride Lifecycle is left out: its outbox write is step 1 of PaymentCapture.
+// Regulatory adapters are split into ApiRegulatoryFeeds to stay within budget.
+component hopin.api "ApiPayments" "Hopin API (planned): which parts move money, and how do they avoid charging twice?" {
+    include hopin.api.payments hopin.api.webhooks hopin.api.outbox
+    include hopin.paymentWorkflow stripe hopin.db
     autoLayout lr
+}
+
+component hopin.api "ApiRegulatoryFeeds" "Hopin API (planned): how do committed changes reach BKK and the invoicing provider?" {
+    include hopin.api.outbox hopin.api.compliance
+    include hopin.db hopin.cache bkk invoicing
+    // Left-to-right placed BKK on the system boundary; top-to-bottom does not.
+    autoLayout tb
 }
 
 component hopin.api "PartnerConsole" "Hopin API (planned): how does a partner's dispatch console reach its data, and only its data?" {
@@ -115,18 +122,18 @@ dynamic hopin.api "PartnerIsolation" "Hopin API (planned): how is a partner requ
 dynamic hopin.api "PaymentCapture" "Hopin API (planned): after the driver completes a ride, how is the meter amount captured exactly once?" {
     hopin.api.rides -> hopin.db "Stores COMPLETED, the meter amount, a ride event and a ride.completed outbox entry in one transaction"
     hopin.api.outbox -> hopin.db "Reads the committed ride.completed entry"
-    hopin.api.outbox -> hopin.cache "Queues a capture job keyed by ride ID"
-    hopin.api.payments -> hopin.cache "Takes the capture job"
-    hopin.api.payments -> stripe "Captures the meter amount with the ride's idempotency key"
+    hopin.api.outbox -> hopin.paymentWorkflow "Starts the capture workflow named by the ride ID; a second start is rejected"
+    hopin.paymentWorkflow -> stripe "Captures the meter amount with the ride's idempotency key, then waits"
     stripe -> hopin.api.webhooks "Confirms the capture"
+    hopin.api.webhooks -> hopin.paymentWorkflow "Resumes the workflow with its task token"
     hopin.api.webhooks -> hopin.db "Marks the payment captured and writes a payment.captured outbox entry"
     autoLayout lr
 }
 
 dynamic hopin.api "PaymentCaptureDeclined" "Hopin API (planned): what happens when the capture is declined?" {
-    hopin.api.payments -> stripe "Tries to capture; the card is declined"
-    hopin.api.payments -> hopin.cache "Schedules retries with backoff"
-    hopin.api.payments -> stripe "Retries; still declined after the last attempt"
+    hopin.paymentWorkflow -> stripe "Tries to capture; the card is declined"
+    hopin.paymentWorkflow -> stripe "Waits and retries twice more within 24 hours; still declined"
+    hopin.paymentWorkflow -> hopin.api.payments "Reports the capture as failed"
     hopin.api.payments -> hopin.db "Marks the payment FAILED and writes a payment.failed outbox entry"
     hopin.api.outbox -> hopin.db "Reads the payment.failed entry"
     hopin.api.outbox -> expoPush "Asks the passenger to update the card; new rides blocked until paid"

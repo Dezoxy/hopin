@@ -68,16 +68,25 @@ Say the points in your own words. If an answer here is not one you would defend,
 - **Challenge:** "Why a modular monolith and not microservices?" **Answer:** One operator and one data store. Module boundaries give most of the design clarity; separate services would add network failure modes and deployments with no team to own them.
 - **Evidence:** [C-04](../requirements/constraints.md), [P-01](../principles/architecture-principles.md).
 
-### ApiMoneyAndCompliance
+### ApiPayments
 
-- **Question:** Which components do the asynchronous work?
+- **Question:** Which parts move money, and how do they avoid charging twice?
 - **Say:**
-  - Nothing that talks to Stripe, BKK or the invoicing provider runs inside a user request.
-  - The Outbox Relay turns committed database changes into jobs; workers pick them up.
-  - Webhooks are the confirmation channel from Stripe, applied idempotently.
-- **Challenge:** "Why not call Stripe directly when the ride ends?" **Answer:** A crash between the database commit and the Stripe call would lose or double a charge. The outbox makes the commit and the intent to charge one atomic fact.
-- **Evidence:** [ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md).
+  - The API authorises and refunds; the capture lives in a Step Functions workflow, one per ride.
+  - The workflow is started from the outbox and named by the ride ID, so it cannot start twice.
+  - Stripe's webhook resumes the waiting workflow; every handler is idempotent.
+- **Challenge:** "Why a workflow engine for one payment step?" **Answer:** Capture is not one step: capture, wait for confirmation, retry over a day, charge a difference, report. Declaring that in a managed engine is less code to get wrong than hand-built retries, and each execution is an audit trail.
+- **Evidence:** [ADR 12](../decisions/0012-payment-capture-workflow.md).
 
+### ApiRegulatoryFeeds
+
+- **Question:** How do committed changes reach BKK and the invoicing provider?
+- **Say:**
+  - The same outbox feeds the regulators: a committed change is the only trigger.
+  - Adapters take jobs from Redis, so a slow authority never blocks a ride.
+  - Both interfaces are marked not yet known; the adapter is where their shape will live.
+- **Challenge:** "What if the BKK feed is down?" **Answer:** Jobs stay queued and the outbox keeps the record, so data is sent late, not lost. How late is acceptable is a question for BKK, tracked under S112.
+- **Evidence:** [C-05](../requirements/constraints.md), [C-08](../requirements/constraints.md).
 ### PartnerConsole
 
 - **Question:** How does a partner's dispatch console reach its data, and only its data?
@@ -105,21 +114,19 @@ Say the points in your own words. If an answer here is not one you would defend,
 - **Question:** After the driver completes a ride, how is the meter amount captured exactly once?
 - **Say:**
   - Step 1 is the key: ride state, ride event and outbox entry commit in one transaction.
-  - Delivery is at least once; exactly-once comes from idempotency keys at Stripe and in the webhook handler.
-  - A reconciler re-queues work whose effect is missing, which covers a lost Redis.
-- **Challenge:** "Exactly once is impossible in distributed systems." **Answer:** Exactly-once delivery is. Exactly-once effect is not: at-least-once delivery plus idempotent consumers gives one charge per ride.
-- **Evidence:** [ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md), [QA-09](../requirements/quality-attributes.md).
-
+  - The workflow is named by the ride ID; a second start is rejected, and Stripe's idempotency key stops a second capture.
+  - The workflow waits for Stripe's webhook with a task token instead of polling.
+- **Challenge:** "Exactly once is impossible in distributed systems." **Answer:** Exactly-once delivery is. Exactly-once effect is not: at-least-once delivery plus a unique workflow name and idempotency keys gives one charge per ride.
+- **Evidence:** [ADR 12](../decisions/0012-payment-capture-workflow.md), [QA-09](../requirements/quality-attributes.md).
 ### PaymentCaptureDeclined
 
 - **Question:** What happens when the capture is declined?
 - **Say:**
-  - Three retries over 24 hours, then FAILED, a push asking for a new card, and new rides blocked.
-  - The failure is itself an outbox event, so notification and blocking follow the same guarantees.
-  - Who carries the loss is left open on purpose: it is a commercial term, not a technical one.
-- **Challenge:** "The driver finished the ride. Do they get paid?" **Answer:** That is the open decision in ADR 12. I would propose the partner carries it up to a limit, because the partner chose the passenger relationship. It belongs in the partner contract.
-- **Evidence:** [ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md).
-
+  - The workflow retries with wait states: three attempts within 24 hours.
+  - After the last one it reports failure; the account is blocked and the passenger asked for a new card.
+  - The partner carries the lost fare up to a contractual cap, and the driver is always paid.
+- **Challenge:** "Why should the partner pay?" **Answer:** The partner owns the passenger relationship for its rides and already carries this risk with cash and card today. The cap keeps a bad month survivable; above it Hopin shares the loss.
+- **Evidence:** [ADR 12](../decisions/0012-payment-capture-workflow.md), [business case](../../business/business-case.md).
 ### DriverAlarm
 
 - **Question:** What happens when a driver presses the alarm?
@@ -156,7 +163,7 @@ Say the points in your own words. If an answer here is not one you would defend,
 - **Say:**
   - Live positions and queued jobs disappear; ride state does not, because it lives in PostgreSQL.
   - Drivers re-report within seconds; the index rebuilds itself.
-  - Pending timers and jobs are re-derived from ride states and the outbox.
+  - Pending jobs are re-derived from ride states and the outbox; payment workflows are unaffected because they run in Step Functions, not Redis.
 - **Challenge:** "Why not a Redis cluster with replicas?" **Answer:** At this scale the cost and operational weight buy seconds. The design makes Redis loss boring instead; revisit when load grows ([A-06](../requirements/assumptions.md)).
 - **Evidence:** [ADR 5](../decisions/0005-redis-socketio-realtime.md), [RISK-008](../risks/architecture-risks.md), [availability](../reliability/availability.md).
 
@@ -260,6 +267,6 @@ Say the points in your own words. If an answer here is not one you would defend,
 - **Say:**
   - The API image runs on Container Apps, the dump restores into Azure PostgreSQL.
   - The restore job needs only what is already in Azure: the dump and the key.
-  - What is missing is identity: Cognito cannot be exported, so users re-enrol by SMS code.
+  - Two things are missing: identity, because Cognito cannot be exported, so users re-enrol by SMS code; and Step Functions, so captures run from a batch script over the outbox.
 - **Challenge:** "Would this actually work?" **Answer:** Not until it is drilled; it has never run. The identity gap was found by drawing this view, and it is now a tracked risk.
 - **Evidence:** [RISK-017](../risks/architecture-risks.md), [disaster recovery](../reliability/disaster-recovery.md).

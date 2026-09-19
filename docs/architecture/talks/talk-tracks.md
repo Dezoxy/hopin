@@ -26,7 +26,7 @@ For a design interview or an architecture review. Leave five minutes for questio
 | 2:30 | Clients | One API, four clients, one without login |
 | 3:30 | ApiRideFlow | Modular monolith, road-distance matching |
 | 5:00 | PartnerConsole → PartnerIsolation | Tenancy enforced by the database |
-| 7:00 | PaymentCapture | Outbox and idempotency: exactly-once effect |
+| 7:00 | PaymentCapture | Outbox plus a workflow named by ride ID: exactly-once effect |
 | 9:00 | Security | Entry points and trust boundaries |
 | 10:00 | ProductionCore | One region, honest failure domains |
 | 11:00 | OffProviderRecovery → AccountRecovery | Multi-cloud only for the failure you fear; the identity gap it revealed |
@@ -46,7 +46,7 @@ Keep these ready; use them when the interviewer pulls a thread.
 | Disaster recovery | RegionRecovery, AccountRecovery | [disaster recovery](../reliability/disaster-recovery.md) |
 | Safety features | DriverAlarm, TripShare | [trust boundaries](../security/trust-boundaries.md) |
 | The partner business | PhoneOrder, PartnerConsole | [business case](../../business/business-case.md) |
-| Async and consistency | ApiMoneyAndCompliance, PaymentCapture | [ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md), [event catalog](../integration/event-catalog.md) |
+| Async and consistency | ApiPayments, PaymentCapture, ApiRegulatoryFeeds | [ADR 12](../decisions/0012-payment-capture-workflow.md), [event catalog](../integration/event-catalog.md) |
 
 ## Slides
 

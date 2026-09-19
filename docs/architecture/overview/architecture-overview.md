@@ -26,12 +26,13 @@ See the **Context** view.
 | Realtime Cache | Live driver positions, socket fan-out, job queues | Redis |
 | Document Store | Driver documents, staged dumps | Amazon S3 |
 | Secrets Store | Credentials and API keys | AWS Secrets Manager |
+| Payment Workflow | One capture workflow per ride: capture, wait for confirmation, retry, report | AWS Step Functions |
 | Monitoring | Logs, metrics, traces, alarms, paging | CloudWatch, X-Ray, SNS |
 | Backup Exporter | Nightly encrypted copy to Azure | Scheduled container task |
 | Off-provider Backup | Immutable copies outside AWS | Azure Blob Storage |
 | Escrow Vault | Dump key and break-glass credentials | Azure Key Vault |
 
-See the **Clients**, **Backend** and **OffProviderRecovery** views. Inside the API, ten components carry the work; see **ApiRideFlow**, **ApiMoneyAndCompliance** and **PartnerConsole**.
+See the **Clients**, **Backend** and **OffProviderRecovery** views. Inside the API, ten components carry the work; see **ApiRideFlow**, **ApiPayments**, **ApiRegulatoryFeeds** and **PartnerConsole**.
 
 ## Key characteristics
 

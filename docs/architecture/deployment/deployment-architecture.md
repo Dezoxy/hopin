@@ -11,6 +11,7 @@ Planned; nothing is deployed. See the **ProductionCore**, **AwsBackups** and **A
 | Hopin Database | RDS PostgreSQL 16, Multi-AZ | Primary + standby | Automatic AZ failover, about 1–2 min |
 | Realtime Cache | ElastiCache Redis | 1 node | Loss drops live positions until drivers re-report ([RISK-008](../risks/architecture-risks.md)) |
 | Document Store | S3 | Regional | Regional service |
+| Payment Workflow | AWS Step Functions (Standard) | Managed, regional | Regional service; not available in the Azure restore ([ADR 12](../decisions/0012-payment-capture-workflow.md)) |
 | Web builds (passenger web, admin, trip share) | CloudFront + S3 | Global edge | Edge service |
 | Load balancer + WAF | ALB | Regional, multi-AZ | Regional service |
 
@@ -39,6 +40,7 @@ Rough monthly production cost at idle to light traffic, EUR. Target is [QA-08](.
 | ALB | ~20 |
 | CloudFront, S3, Route 53, CloudWatch | ~10 |
 | AWS Backup + cross-region copy | ~5 |
+| Step Functions (~10 transitions per ride) | < 5 |
 | Azure Blob (cool, ~50 GB) + Key Vault | ~5 |
 | Sentry, Mapbox, Expo (free tiers at MVP) | 0–30 |
 | SMS one-time codes | usage-based, ~0.05 per message |
