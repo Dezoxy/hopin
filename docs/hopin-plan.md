@@ -1,6 +1,6 @@
 # Hopin — Master Plan
 
-> **Status:** v0.1 — initial plan, 2026-09-19
+> **Status:** reference architecture case study (since v0.7, 2026-09-19). Hopin will not be built or operated. The build steps in Phases 0–11 are **frozen** as the designed roadmap; active work is **Phase 12, the portfolio track**. History of the plan is in Part H.
 > **Source of vision:** [hopin-pre-plan.md](./hopin-pre-plan.md)
 > **How to use this file:** this is the single living plan. Every step in Part D has an ID (`S001`…). When we start a step, we add a `### S0xx` section under Part E with details, decisions and results, and flip its status in the table. Nothing gets deleted; superseded decisions are struck through with a note.
 > **Architecture:** requirements, security, data, integration, deployment, reliability, observability, risks and decisions live in [architecture/](./architecture/README.md). This plan owns the product scope, the domain model until S005, the step list, open decisions and its own changelog.
@@ -277,7 +277,7 @@ Owned by [deployment architecture, Cost](./architecture/deployment/deployment-ar
 
 ## Part D — Roadmap and step list
 
-Status legend: `todo` · `doing` · `done` · `blocked` · `dropped`
+Status legend: `todo` · `doing` · `done` · `blocked` · `dropped` · `frozen` (designed, not executed: the build roadmap as a whole is frozen since v0.7 even where a row still says `todo`)
 
 Each step is sized for roughly half a day to two days of solo work. Dependencies are the step IDs in the last column.
 
@@ -423,7 +423,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S096 | DR runbook and restore drill | `docs/runbooks/restore.md` for same-region, cross-region and cross-cloud paths; first full drill completed with timings recorded | todo | S093, S094 |
 | S097 | Azure cold-restore module | Terraform module for Azure Database for PostgreSQL + Container Apps that can stand up the API from a dump; applied once in a drill, then destroyed | todo | S096 |
 | S098 | Security review | Dependency, container and secret scanning green; OWASP ASVS L1 checklist done; findings fixed or accepted with reason | todo | S087 |
-| S099 | Threat model | STRIDE on ride lifecycle, payments, driver onboarding; mitigations tracked as issues | todo | S098 |
+| S099 | Threat model | Moved to Phase 12 | frozen | — |
 | S100 | GDPR deliverables | DPIA written, privacy policy, retention jobs implemented (C3), export/delete flows verified, DPAs collected | todo | S002, S058, S077 |
 | S101 | Incident response | Runbook with severity levels, comms templates, status page process; one tabletop exercise done | todo | S090 |
 | S102 | Cost review | Actual vs C8, right-sizing applied, savings plan decision documented | todo | S092 |
@@ -456,9 +456,24 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 
 | ID | Step | Done when | Status | Depends |
 |---|---|---|---|---|
-| S117 | Driver interviews | Five licensed drivers interviewed with the [interview guide](./business/driver-interview-guide.md); anonymised findings note in `docs/business/`; A-08 re-checked | todo | — |
-| S118 | First partner conversation | Meeting with one dispatch company owner; pricing tested against the business case; letter of intent signed or reasons recorded; A-09 re-checked | todo | S117 |
+| S117 | Driver interviews | Five licensed drivers interviewed with the [interview guide](./business/driver-interview-guide.md); anonymised findings note in `docs/business/`; A-08 re-checked | dropped | — |
+| S118 | First partner conversation | Meeting with one dispatch company owner; pricing tested against the business case; letter of intent signed or reasons recorded; A-09 re-checked | dropped | S117 |
 | S119 | Dedicated tenant database | A partner can be moved to its own database with the same schema and routed by configuration; tested once end to end. Start only when a partner contract requires it ([ADR 9](./architecture/decisions/0009-hybrid-multi-tenancy.md)) | todo | S025, S118 |
+
+S117 and S118 were dropped with the portfolio reframe: the business case stays as a worked scenario, not a plan to execute.
+
+### Phase 12 — Portfolio track (active)
+
+Artifacts that make the design defensible in an architect interview. S099 moves here from Phase 8.
+
+| ID | Step | Done when | Status | Depends |
+|---|---|---|---|---|
+| S099 | Threat model | STRIDE on the Security view and the ride, payment and onboarding flows; each threat mapped to a control or an accepted risk in the risk register | todo | — |
+| S120 | Three-year cost model | Infrastructure, third-party services, people and growth scenarios over three years, including the dedicated-database path from ADR 9; compared with the business case revenue | todo | — |
+| S121 | Executive summary | One page a CFO can read: problem, decision, cost, risk, what is left open | todo | S099, S120 |
+| S122 | Payment-capture saga | ADR for capture after the meter reading: outbox, idempotent consumers, compensation, failure cases; dynamic view in the model; event catalog updated | todo | — |
+| S123 | Thin running slice | Ride request → matching → event written through the outbox, running locally or in a free tier; load test measures QA-01 and QA-02; results recorded as evidence | todo | S122 |
+| S124 | Walkthrough | Recorded English walkthrough of ADRs 1, 9 and 10, turned into a blog post or meetup talk | todo | S121 |
 
 ---
 
@@ -531,3 +546,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.4 — Architecture knowledge base completed from the architect-base template: principles, quality attributes, assumptions, security, data, integration, deployment, reliability, observability, risks, roadmap, plus a Security view. Parts A7, B5 (realtime), C and G moved there; the plan keeps pointers. docs-sync skill and consistency check added from homelab. |
 | 2026-09-19 | v0.5 — Business case added: white-label dispatch platform first, Hopin brand second; Part F question 7 answered; Phase 11 (S117 driver interviews, S118 first partner conversation) gates S003; i18n and white-label theming added to S007; RISK-011 to RISK-014, A-08, A-09 and business metrics added. |
 | 2026-09-19 | v0.6 — White-label architecture: ADR 9 (hybrid multi-tenancy with RLS), ADR 10 (one app, one partner per order, no cross-partner matching without legal clearance), ADR 11 (joint controllers, pending lawyer). Partner dispatcher added to the model; QA-12, RISK-015, RISK-016 and S119 added; S005, S025, S026, S037, S073 and S111 updated. |
+| 2026-09-19 | v0.7 — Reframed as a reference architecture case study for an architect portfolio. Build roadmap frozen; S117 and S118 dropped; Phase 12 portfolio track added (S099 moved there, S120–S124). |

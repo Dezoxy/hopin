@@ -1,8 +1,10 @@
 # Business Case
 
-> **Status:** first version, 2026-09-19, from a working session with the founder. Numbers are estimates until the driver interviews (plan step S117) and the first partner conversation (S118) replace them with real ones.
+> **Scenario.** Since 2026-09-19 Hopin is a reference architecture case study, not a business being started. This business case is kept as the worked business scenario the architecture answers to; it will not be executed.
 >
-> **Owner:** founder. **Review when:** after S117 and S118, and before any paid marketing.
+> **Status:** first version, 2026-09-19, from a working session with the founder. Numbers are estimates; the interviews and partner conversation that would have tested them (S117, S118) were dropped with the reframe.
+>
+> **Owner:** founder. **Review when:** the scenario changes, or the three-year cost model (S120) needs a revenue side.
 
 ## Summary
 

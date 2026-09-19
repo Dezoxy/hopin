@@ -1,14 +1,48 @@
-# Hopin
+# Hopin — a reference architecture for regulated ride-hailing dispatch
 
-*Hop in. Get there.* A ride-hailing app for short city trips in Hungary: a passenger app for iOS, Android and web, a driver app, an admin web, and a backend on AWS.
+*Hop in. Get there.*
 
-**Status: planning.** No application code exists yet. The plan, architecture and regulatory research are the current deliverables.
+**What this is:** an architecture case study. It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
 
-## Start here
+## The problem
 
-- [docs/hopin-plan.md](docs/hopin-plan.md) — the master plan and roadmap.
-- [docs/architecture/README.md](docs/architecture/README.md) — architecture, decisions and views.
-- [docs/compliance/s002-regulatory-memo.md](docs/compliance/s002-regulatory-memo.md) — what Hungarian law requires.
+A white-label dispatch platform for licensed Hungarian taxi companies, plus a consumer brand on the same platform: passenger app (iOS, Android, web), driver app, a dispatch console for partner staff, and a backend on AWS with recovery on Azure.
+
+What makes it hard is not the stack. It is the constraints:
+
+- **Law decides the product.** Only licensed taxis with certified meters may drive. The payable fare is the meter amount at fixed official rates, so no upfront prices, discounts or surge. A Budapest dispatch operator needs 100 M HUF equity and BKK-certified software. See the [regulatory memo](docs/compliance/s002-regulatory-memo.md) and [constraints C-01 to C-09](docs/architecture/requirements/constraints.md).
+- **Several companies share one system.** Partners must never see each other's data, yet share one app ([ADR 9](docs/architecture/decisions/0009-hybrid-multi-tenancy.md), [ADR 10](docs/architecture/decisions/0010-one-app-for-all-partners.md)).
+- **Personal location data** under GDPR, with controller roles that depend on who holds the dispatch licence ([ADR 11](docs/architecture/decisions/0011-joint-controllers-with-partners.md)).
+- **One operator.** Every design choice has to be runnable by a single person ([P-01](docs/architecture/principles/architecture-principles.md)).
+
+## Decisions worth reading
+
+| Decision | The reusable rule it sets |
+|---|---|
+| [ADR 1: AWS primary, Azure only for recovery](docs/architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md) | Use a second cloud for the failure you actually fear (losing the account), not for symmetry |
+| [ADR 9: shared database with row-level security, dedicated on demand](docs/architecture/decisions/0009-hybrid-multi-tenancy.md) | Isolation is enforced by the database; a silo is sold, not defaulted |
+| [ADR 10: one app, one partner per order](docs/architecture/decisions/0010-one-app-for-all-partners.md) | Never let the platform become the licensed party by accident |
+| [ADR 11: joint controllers, pending legal review](docs/architecture/decisions/0011-joint-controllers-with-partners.md) | Controller roles follow the law, not the contract; leave it Proposed until counsel confirms |
+
+All eleven ADRs, the model views and the reading paths per audience are in the [architecture README](docs/architecture/README.md).
+
+## Read by audience
+
+- **Executive:** [business case](docs/business/business-case.md), the Context view, the [risk register](docs/architecture/risks/architecture-risks.md).
+- **Architect or CTO:** [quality attributes](docs/architecture/requirements/quality-attributes.md), [constraints](docs/architecture/requirements/constraints.md), the ADRs, the Security and deployment views.
+- **Engineer:** the [architecture README](docs/architecture/README.md) engineer path, [integration](docs/architecture/integration/integration-architecture.md) and the [event catalog](docs/architecture/integration/event-catalog.md).
+- **Operator:** [availability](docs/architecture/reliability/availability.md), [disaster recovery](docs/architecture/reliability/disaster-recovery.md), [observability](docs/architecture/observability/observability-architecture.md).
+
+## Status and what comes next
+
+The design is complete for the MVP scope. The build roadmap in the [plan](docs/hopin-plan.md) is frozen. Active work is the portfolio track, plan Phase 12:
+
+- STRIDE threat model on the Security view
+- Three-year cost model
+- One-page executive summary
+- Payment-capture saga with an outbox
+- A thin, running slice with a load test, so at least one quality attribute is measured, not only targeted
+- A written or spoken walkthrough of the key decisions
 
 ## Repository layout
 
@@ -16,14 +50,12 @@
 .agents/skills/     agent skills (mirror of .claude/skills)
 .claude/            Claude Code skills and ECC language rules
 .github/workflows/  docs consistency and architecture PDF workflows
-docs/               plan, architecture knowledge base, compliance research
+docs/               plan, architecture knowledge base, business case, compliance research
 scripts/            docs consistency check, architecture PDF tooling
 AGENTS.md           agent instructions (identical to CLAUDE.md)
 CLAUDE.md           agent instructions
 Makefile            architecture model and docs commands (`make` lists them)
 ```
-
-Application code (`apps/`, `packages/`) and infrastructure (`infra/`) arrive with plan steps S010 and S014.
 
 ## Checks
 
