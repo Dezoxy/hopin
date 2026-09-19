@@ -32,3 +32,4 @@ Threats per boundary and their controls: [threat-model.md](threat-model.md). The
 | TB-4 | AWS to Azure | Encrypted dumps and document copies | Client-side encryption, write-only credential, immutability policy |
 | TB-5 | Operator privileged access | Console, admin web, break-glass | MFA, admin group, WAF IP allowlist, audit log, escrowed break-glass credentials |
 | TB-6 | Hopin to regulators and partners (planned) | BKK real-time feed ([C-05](../requirements/constraints.md)), invoicing provider, taxi-meter data | Defined when plan steps S112, S113 and S047 start |
+| TB-7 | Hopin to model providers (planned) | Minimised case files to Amazon Bedrock in an EU region; synthetic cases only to OpenRouter | [Threat model TB-7](threat-model.md#tb-7-hopin-to-model-providers), [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) |

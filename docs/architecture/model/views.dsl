@@ -108,6 +108,15 @@ component hopin.api "PartnerConsole" "Hopin API (planned): how does a partner's 
     autoLayout lr
 }
 
+// OpenRouter appears only through the operator: the API has no route to it.
+component hopin.api "AiAssist" "Hopin API (planned): where does AI help staff, and what keeps real data away from evaluation models?" {
+    include partnerDispatcher operator hopin.adminWeb
+    include hopin.api.assist hopin.api.tenancy hopin.db hopin.monitoring
+    include bedrock openrouter
+    exclude "operator -> hopin.offsiteBackup"
+    autoLayout lr
+}
+
 // ── Runtime scenarios ───────────────────────────────────────────────────────
 
 dynamic hopin.api "PartnerIsolation" "Hopin API (planned): how is a partner request kept inside that partner's data?" {
@@ -138,6 +147,18 @@ dynamic hopin.api "PaymentCaptureDeclined" "Hopin API (planned): what happens wh
     hopin.api.outbox -> hopin.db "Reads the payment.failed entry"
     hopin.api.outbox -> expoPush "Asks the passenger to update the card; new rides blocked until paid"
     // Left-to-right placed Expo Push on the system boundary; top-to-bottom does not.
+    autoLayout tb
+}
+
+dynamic hopin.api "DisputeAssist" "Hopin API (planned): how does a complaint become a draft reply that a human approves?" {
+    partnerDispatcher -> hopin.adminWeb "Opens a ride and pastes the passenger's complaint"
+    hopin.adminWeb -> hopin.api.assist "Asks for a draft reply for this ride"
+    hopin.api.assist -> hopin.api.tenancy "Opens a transaction scoped to the staff member's partner"
+    hopin.api.assist -> hopin.db "Reads the ride and its events; another partner's ride is not found"
+    hopin.api.assist -> bedrock "Sends roles instead of IDs, no contact details, rounded positions; gets a draft back"
+    hopin.api.assist -> hopin.monitoring "Logs the outcome and cited event IDs, never the text"
+    hopin.adminWeb -> hopin.api.assist "Receives the checked draft; staff edit, send or discard it"
+    // Left-to-right drew the logging arrow through the database; top-to-bottom does not.
     autoLayout tb
 }
 

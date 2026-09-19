@@ -8,6 +8,7 @@ const id = z.string().min(1).max(64).regex(/^[\w-]+$/);
 
 export const passengerIdentity = z.object({ tenantId: id, passengerId: id });
 export const driverIdentity = z.object({ tenantId: id, driverId: id });
+export const staffIdentity = z.object({ tenantId: id, staffId: id });
 export type PassengerIdentity = z.infer<typeof passengerIdentity>;
 export type DriverIdentity = z.infer<typeof driverIdentity>;
 

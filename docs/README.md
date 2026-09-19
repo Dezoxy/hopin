@@ -12,5 +12,6 @@
 | [business/driver-interview-guide.md](business/driver-interview-guide.md) | Script for the five driver interviews (S117) |
 | [architecture/evidence/s123-slice-results.md](architecture/evidence/s123-slice-results.md) | First measurements: thin running slice and load test (S123) |
 | [compliance/s002-regulatory-memo.md](compliance/s002-regulatory-memo.md) | Hungarian taxi, tax and data-protection rules for Hopin (2026-09-19, not legal advice) |
+| [compliance/ai-act-classification.md](compliance/ai-act-classification.md) | EU AI Act risk class of the four AI use cases, and the boundaries that keep it (2026-09-19, not legal advice) |
 
 Every document under `docs/` must be reachable from this page or from the architecture README. `python3 scripts/check_docs_consistency.py` enforces it.

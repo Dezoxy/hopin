@@ -68,6 +68,18 @@ Four threats had a real trade-off. The founder chose:
 | T-22 | I | Data sent to BKK or the invoicing provider beyond what the law requires | Adapter sends only the fields the rule names; reviewed in the DPIA | Planned, S112, S100 |
 | T-23 | S | Forged meter data if the meter integration trusts the phone | Decide with the meter vendor in S113; until then T-09 applies | Open, S113 |
 
+## TB-7 Hopin to model providers
+
+Added with [ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md) and [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md). The dispute assistant is built in the slice; the other three AI use cases are design only.
+
+| ID | STRIDE | Threat | Control | Status |
+|---|---|---|---|---|
+| T-27 | T | Prompt injection in complaint text steers the draft, for example to promise a refund | The complaint is marked as untrusted data in the prompt; the model has no write tools; drafts promising money or citing unknown events are rejected; a human approves every reply | In place in the slice; integration test |
+| T-28 | I | The assistant reads another partner's ride | The ride is read under the staff member's tenant with row-level security; a foreign ride returns not found | In place in the slice; integration test |
+| T-29 | I | Real personal data reaches the evaluation plane | Every model client declares a plane and the API accepts only the data plane; the OpenRouter client lives outside the application source; evaluation cases are synthetic and reviewed | In place in the slice; unit test |
+| T-30 | T | The model invents facts, or promises money in words the runtime check does not know | Citations must match real event IDs; English and Hungarian promise patterns at runtime; the same cases in the evaluation set; human approval | In place in the slice; residual: unusual phrasing relies on the reviewer |
+| T-31 | I | More personal data sent to the model provider than the task needs | Case file carries roles instead of IDs, no ride ID, no contact details, positions rounded to about 1 km; logs hold metadata only, never text | In place in the slice; unit test. Residual: contact details are removed by pattern, so a disguised one gets through |
+
 ## Delivery and supply chain
 
 | ID | STRIDE | Threat | Control | Status |
