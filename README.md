@@ -23,7 +23,7 @@ What makes it hard is not the stack. It is the constraints:
 | [ADR 9: shared database with row-level security, dedicated on demand](docs/architecture/decisions/0009-hybrid-multi-tenancy.md) | Isolation is enforced by the database; a silo is sold, not defaulted |
 | [ADR 10: one app, one partner per order](docs/architecture/decisions/0010-one-app-for-all-partners.md) | Never let the platform become the licensed party by accident |
 | [ADR 11: joint controllers, pending legal review](docs/architecture/decisions/0011-joint-controllers-with-partners.md) | Controller roles follow the law, not the contract; leave it Proposed until counsel confirms |
-| [ADR 12: payment capture through an outbox](docs/architecture/decisions/0012-payment-capture-saga-with-outbox.md) | Exactly-once effect comes from at-least-once delivery plus idempotent consumers, not from the network |
+| [ADR 12: payment capture as a workflow named by the ride](docs/architecture/decisions/0012-payment-capture-workflow.md) | Exactly-once effect comes from idempotency, not the network: name the workflow after the thing it must not do twice |
 
 All twelve ADRs, 25 model views and the reading paths per audience are in the [architecture README](docs/architecture/README.md). To present them, use the [talk tracks](docs/architecture/talks/talk-tracks.md) and the per-view [speaker notes](docs/architecture/talks/speaker-notes.md).
 
@@ -41,7 +41,6 @@ The design is complete for the MVP scope. The build roadmap in the [plan](docs/h
 - STRIDE threat model on the Security view
 - Three-year cost model
 - One-page executive summary
-- Payment-capture saga with an outbox: designed ([ADR 12](docs/architecture/decisions/0012-payment-capture-saga-with-outbox.md), Proposed), awaiting review
 - A thin, running slice with a load test, so at least one quality attribute is measured, not only targeted
 - A written or spoken walkthrough of the key decisions
 

@@ -19,12 +19,12 @@ Stripe webhook events consumed (`payment_intent.*`, `charge.refunded`, `payout.*
 
 ## Outbox events
 
-Written in the same transaction as the state change they describe, then relayed as jobs at least once ([ADR 12](../decisions/0012-payment-capture-saga-with-outbox.md)). Every consumer is idempotent by the key shown.
+Written in the same transaction as the state change they describe, then relayed at least once: `ride.completed` starts a payment workflow, the rest become jobs ([ADR 12](../decisions/0012-payment-capture-workflow.md)). Every consumer is idempotent by the key shown.
 
 | Event | Written when | Consumers | Idempotency key |
 |---|---|---|---|
-| `ride.completed` | Driver completes the ride with the meter amount | Payments (capture), notifications | Ride ID |
+| `ride.completed` | Driver completes the ride with the meter amount | Payment workflow start (execution named by ride ID), notifications | Ride ID |
 | `payment.captured` | Stripe webhook confirms the capture | Notifications (ride summary), invoicing (Hopin fee) | Stripe event ID |
-| `payment.failed` | Last capture retry declined | Notifications (update card), account block | Ride ID |
+| `payment.failed` | Payment workflow reports the last retry declined | Notifications (update card), account block | Ride ID |
 | `alarm.raised` | Driver presses the alarm | Monitoring page, partner console | Alarm ID |
 | `taxi.meter` | Meter starts or stops | BKK real-time feed (S112) | Ride ID plus event time |

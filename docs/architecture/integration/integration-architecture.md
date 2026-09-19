@@ -14,7 +14,7 @@ How Hopin talks to its clients and to outside systems. Exact contracts live in `
 
 | System | Direction | Contract | Auth | Failure handling |
 |---|---|---|---|---|
-| Stripe | Out: charges, refunds, payouts. In: webhooks | Stripe API, signed webhooks | Restricted API key; webhook signature | Idempotency keys; webhook handler idempotent; nightly reconciliation (S044) |
+| Stripe | Out: authorisations and refunds from the API, captures from the payment workflow, payouts. In: webhooks, which resume the waiting workflow | Stripe API, signed webhooks | Restricted API key; webhook signature | Idempotency keys; webhook handler idempotent; nightly reconciliation (S044) |
 | Mapbox | Out: geocoding, directions, matrix | Mapbox APIs | Server token; URL-restricted public token for tiles | Cache geocoding; if routing fails, matching falls back to nearest by straight line and flags the ride. **Budapest requires road distance ([C-04](../requirements/constraints.md)), so the fallback must be reviewed with the lawyer.** |
 | Expo Push | Out: notifications | Expo push API | Access token | Retry; drop invalid device tokens |
 | Cognito | Sign-in, token validation | OIDC/JWKS | — | Cached JWKS; sign-in unavailable during a Cognito outage |

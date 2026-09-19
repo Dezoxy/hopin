@@ -45,6 +45,8 @@ A starting position for the first conversation: **around 10,000 HUF per car per 
 
 Stripe takes over a fifth of the commission because it processes the whole fare. This is structural under a fixed tariff.
 
+A fare that finally fails to capture is carried by the partner up to a monthly cap in the partner contract; above the cap Hopin and the partner split it, and the driver is always paid ([ADR 12](../architecture/decisions/0012-payment-capture-workflow.md)).
+
 ## Target and break-even
 
 Founder's goal: the platform pays its own infrastructure and yields **3 M HUF net per month** to the founder. That needs about **5 M HUF revenue per month** after infrastructure, taxes and dividend costs (estimate; confirm with an accountant).

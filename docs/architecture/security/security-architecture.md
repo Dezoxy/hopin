@@ -20,7 +20,7 @@ Resource ownership is checked in the API, not only the role: a passenger can rea
 
 ## Secrets
 
-- **Runtime source:** AWS Secrets Manager holds database credentials, Stripe keys, Mapbox server token, Cognito app secrets and the Azure credential. Tasks read them at start through task-definition secrets.
+- **Runtime source:** AWS Secrets Manager holds database credentials, Stripe keys, Mapbox server token, Cognito app secrets and the Azure credential. Tasks read them at start through task-definition secrets; the payment workflow reads the Stripe key through an EventBridge connection ([ADR 12](../decisions/0012-payment-capture-workflow.md)).
 - **Rotation:** database credentials rotate automatically; third-party keys rotate manually on a calendar reminder and after any suspected exposure.
 - **Escrow:** Azure Key Vault holds the dump encryption key and break-glass credentials (AWS break-glass user, Stripe restricted key) with purge protection and soft delete ([ADR 1](../decisions/0001-aws-primary-azure-for-off-provider-recovery.md)).
 - **Client-side tokens:** the Mapbox public token is URL-restricted; no other secret ships in an app bundle.
