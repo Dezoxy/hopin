@@ -1,9 +1,10 @@
 name: Slice / Tests
 
 # Typecheck and all tests of the thin slice against real PostgreSQL and Redis.
+# A required check on main: on pull requests it always runs, and passes
+# quickly without testing when nothing under slice/ or this file changed.
 on:
   pull_request:
-    paths: ["slice/**", ".github/workflows/slice.yml"]
   push:
     branches: [main]
     paths: ["slice/**", ".github/workflows/slice.yml"]
@@ -45,16 +46,39 @@ jobs:
       DATABASE_URL: postgres://hopin_app:hopin-local-app@localhost:5432/hopin
       APP_DB_PASSWORD: hopin-local-app
       REDIS_URL: redis://localhost:6379
+      SLICE_INSECURE_IDENTITY: "true"
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+        with:
+          fetch-depth: 0
+      - name: Detect changes to the slice
+        id: changes
+        working-directory: .
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "slice=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "origin/${BASE_REF}...HEAD" | grep -qE '^(slice/|\.github/workflows/slice\.yml$)'; then
+            echo "slice=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "slice=false" >> "$GITHUB_OUTPUT"
+            echo "No slice changes; tests skipped."
+          fi
+      - if: steps.changes.outputs.slice == 'true'
+        uses: pnpm/action-setup@v6
         with:
           version: 11
-      - uses: actions/setup-node@v7
+      - if: steps.changes.outputs.slice == 'true'
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
           cache-dependency-path: slice/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm test:coverage
+      - if: steps.changes.outputs.slice == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.changes.outputs.slice == 'true'
+        run: pnpm typecheck
+      - if: steps.changes.outputs.slice == 'true'
+        run: pnpm test:coverage

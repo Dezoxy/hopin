@@ -1,0 +1,38 @@
+{
+  "at": "2026-09-19T15:58:49.990Z",
+  "config": {
+    "DRIVERS": 200,
+    "RIDES_PER_MIN": 50,
+    "DURATION_S": 180,
+    "LOCATION_EVERY_MS": 2500,
+    "SAMPLE_EVERY_MS": 250
+  },
+  "counts": {
+    "requests": 150,
+    "httpErrors": 0,
+    "offers": 134,
+    "accepted": 134,
+    "noDriver": 0
+  },
+  "offerLatencyMs": {
+    "n": 134,
+    "p50": 13,
+    "p95": 22,
+    "p99": 44,
+    "max": 124
+  },
+  "positionStalenessMs": {
+    "n": 15303,
+    "p50": 1231,
+    "p95": 2376,
+    "p99": 2482,
+    "max": 2570
+  },
+  "positionTransportMs": {
+    "n": 6889,
+    "p50": 4,
+    "p95": 10,
+    "p99": 15,
+    "max": 113
+  }
+}

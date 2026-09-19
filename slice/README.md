@@ -8,7 +8,7 @@ It follows the architecture: NestJS ([ADR 3](../docs/architecture/decisions/0003
 
 | Production design | In the slice |
 |---|---|
-| Cognito tokens with a tenant claim | Identity headers and socket auth fields, validated but trusted |
+| Cognito tokens with a tenant claim | Identity headers and socket auth fields, validated but trusted. The app refuses to start unless `SLICE_INSECURE_IDENTITY=true`, so it cannot be run as the real API by mistake |
 | Road ETAs with traffic (Mapbox Matrix, C-04) | Straight-line distance at 25 km/h |
 | Offer timeouts as durable timers | In-memory timers: one API instance only |
 | PostGIS service areas | Plain PostgreSQL; no service-area check |

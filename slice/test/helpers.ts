@@ -13,6 +13,7 @@ const DEV_ENV: Record<string, string> = {
   APP_DB_PASSWORD: 'hopin-local-app',
   REDIS_URL: 'redis://localhost:6379',
   PORT: '0',
+  SLICE_INSECURE_IDENTITY: 'true',
 };
 
 export function testConfig(): Config {
