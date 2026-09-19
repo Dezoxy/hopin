@@ -1,0 +1,4 @@
+# Extra pages for the architecture PDF, after the ADRs and before the views.
+# One path per line, relative to this directory. See scripts/build_architecture_pdf_source.py.
+evidence/design-findings.md
+risks/architecture-risks.md

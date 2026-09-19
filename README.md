@@ -2,7 +2,7 @@
 
 *Hop in. Get there.*
 
-**What this is:** an architecture case study, with one thin slice of running code for evidence. Short on time? Read the one-page [executive summary](docs/executive-summary.md). It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
+**What this is:** an architecture case study, with one thin slice of running code for evidence. Short on time? Read the one-page [executive summary](docs/executive-summary.md), then the [design findings](docs/architecture/evidence/design-findings.md): twelve problems the process caught before any production code, and what changed. It designs a taxi dispatch platform for Hungary end to end, from statute text to deployment and disaster recovery, as a public portfolio of architecture work. **It is not a product and will not be operated.** Where the documents say "planned", read "designed, not built".
 
 ## The problem
 
@@ -17,7 +17,7 @@ What makes it hard is not the stack. It is the constraints:
 
 ## The architecture in four diagrams
 
-Redrawn from the [Structurizr model](docs/architecture/workspace.dsl) for reading on GitHub. The model stays the source of truth, and each redraw is logged in the [presentation ledger](docs/architecture/presentation/README.md). All 28 views with their checked layout are in the architecture PDF, published under [Releases](https://github.com/Dezoxy/hopin/releases).
+Redrawn from the [Structurizr model](docs/architecture/workspace.dsl) for reading on GitHub. The model stays the source of truth, and each redraw is logged in the [presentation ledger](docs/architecture/presentation/README.md). The architecture PDF under [Releases](https://github.com/Dezoxy/hopin/releases) holds the overview, all fifteen ADRs, the design findings, the risk register and all 28 views in their checked layout.
 
 **Who uses Hopin, and what it depends on.** Three user types and three outside services. Partner staff and the authorities have their own views.
 
