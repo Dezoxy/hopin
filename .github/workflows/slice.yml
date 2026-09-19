@@ -1,0 +1,60 @@
+name: Slice / Tests
+
+# Typecheck and all tests of the thin slice against real PostgreSQL and Redis.
+on:
+  pull_request:
+    paths: ["slice/**", ".github/workflows/slice.yml"]
+  push:
+    branches: [main]
+    paths: ["slice/**", ".github/workflows/slice.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: slice tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: slice
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: hopin_admin
+          POSTGRES_PASSWORD: hopin-local-admin
+          POSTGRES_DB: hopin
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U hopin_admin -d hopin"
+          --health-interval 2s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 2s --health-retries 20
+    env:
+      DATABASE_ADMIN_URL: postgres://hopin_admin:hopin-local-admin@localhost:5432/hopin
+      DATABASE_URL: postgres://hopin_app:hopin-local-app@localhost:5432/hopin
+      APP_DB_PASSWORD: hopin-local-app
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: slice/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test -- --coverage

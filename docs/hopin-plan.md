@@ -472,7 +472,7 @@ Artifacts that make the design defensible in an architect interview. S099 moves 
 | S120 | Three-year cost model | [Cost model](./business/three-year-cost-model.md) from `scripts/cost_model.py`: ambitious base case plus base and conservative sensitivity; founder at market rate shown apart; Mapbox routing identified as the largest technology cost (RISK-019); A-10 hires | done | — |
 | S121 | Executive summary | [Executive summary](./executive-summary.md): one-page decision memo with recommendation, three-scenario returns, protections, top risks and three gates (lawyer, letter of intent, restore drill) | done | S099, S120 |
 | S122 | Payment-capture saga | [ADR 12](./architecture/decisions/0012-payment-capture-workflow.md) Accepted: outbox-started Step Functions workflow per ride, 1.3× hold, 3 retries in 24 h, partner carries failed fares up to a cap, batch fallback on Azure; views and event catalog updated | done | — |
-| S123 | Thin running slice | Ride request → matching → event written through the outbox, running locally or in a free tier; load test measures QA-01 and QA-02; results recorded as evidence | todo | S122 |
+| S123 | Thin running slice | [slice/](../slice/README.md) with 26 tests and a load test; QA-01 p95 23 ms and QA-02 p95 2.85 s locally ([evidence](./architecture/evidence/s123-slice-results.md)); a shutdown race found and fixed | done | S122 |
 | S124 | Walkthrough | Recorded English walkthrough of ADRs 1, 9 and 10, turned into a blog post or meetup talk | todo | S121 |
 | S125 | Model depth and view expansion | API components, authorities, monitoring, delivery and two recovery environments in the model; 25 views, each rendered and visually checked, registered with audience and omissions | done | S122 |
 | S126 | Speaker notes | A section per view with question, three points, likely challenge and answer, evidence links; enforced by `make docs` | done | S125 |
@@ -555,3 +555,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.10 — S099 threat model: 26 threats; founder decisions on meter fraud (tariff check plus photo), driver device binding, operator access by partner grant (ADR 13) and trip share; RISK-018; S099 done. |
 | 2026-09-19 | v0.11 — S120 three-year cost model: ambitious base case, founder at market rate apart, cheap year-1 production until the first partner, legal/security/company/store costs included; RISK-019 routing cost, A-10 hires. |
 | 2026-09-19 | v0.12 — S121 executive summary written; linked from the README and the stakeholder reading path. |
+| 2026-09-19 | v0.13 — S123 thin running slice and load test: first measured quality attributes; findings on QA-02 headroom, event-before-subscribe, and a shutdown race fixed. |

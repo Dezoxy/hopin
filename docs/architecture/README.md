@@ -6,7 +6,7 @@ Hopin, a ride-hailing app for short city trips.
 
 ## Status
 
-**Reference architecture for a portfolio case study. It will not be built or operated as a product.** Nothing is deployed. All content is documented intent from [the plan](../hopin-plan.md) and the ADRs below. When code and infrastructure exist, they become the evidence and these documents must be checked against them.
+**Reference architecture for a portfolio case study. It will not be built or operated as a product.** Nothing is deployed; a thin running slice ([slice/](../../slice/README.md)) provides the first local measurements. All content is documented intent from [the plan](../hopin-plan.md) and the ADRs below. When code and infrastructure exist, they become the evidence and these documents must be checked against them.
 
 ## Architecture model
 
@@ -92,6 +92,7 @@ New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-titl
 | Reliability | [availability](reliability/availability.md) · [backup-strategy](reliability/backup-strategy.md) · [disaster-recovery](reliability/disaster-recovery.md) |
 | Observability | [observability-architecture](observability/observability-architecture.md) |
 | Risks | [architecture-risks](risks/architecture-risks.md) |
+| Evidence | [s123-slice-results](evidence/s123-slice-results.md): first measurements from the thin slice |
 | Roadmap | [current-state](roadmap/current-state.md) · [target-state](roadmap/target-state.md) · [transition-plan](roadmap/transition-plan.md) |
 
 Only `overview/` is imported into the model by `!docs`. The rest is plain Markdown linked from here.
