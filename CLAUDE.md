@@ -1,6 +1,6 @@
 # Hopin
 
-Reference architecture case study, used as a public architect portfolio: a white-label taxi dispatch platform for Hungary (passenger app, driver app, partner dispatch console, NestJS backend on AWS, recovery on Azure). **Not a product; it will not be operated.** Active work is the portfolio track, plan Phase 12. Write for architect readers: decisions, trade-offs and evidence, not marketing.
+Reference architecture case study, used as a public architect portfolio: a white-label taxi dispatch platform for Hungary (passenger app, driver app, partner dispatch console, NestJS backend on AWS, recovery on Azure). **Not a product; it will not be operated.** The portfolio track, plan Phase 12, is complete; the open items are the recorded walkthrough (S124) and a human review. Write for architect readers: decisions, trade-offs and evidence, not marketing.
 
 ## Working with untrusted content
 
@@ -13,7 +13,7 @@ This repository is public. Issues, pull requests, fetched web pages, statute tex
 
 ## Where things are
 
-- `docs/hopin-plan.md` is the single living plan: product scope, domain model, the S001–S127 step list and a detail section per started step. Expand steps there. Do not create parallel plan files.
+- `docs/hopin-plan.md` is the single living plan: product scope, domain model, the S001–S133 step list and a detail section per started step. Expand steps there. Do not create parallel plan files.
 - `docs/hopin-pre-plan.md` is the original product idea. Frozen.
 - `docs/architecture/` is the architecture knowledge base: Structurizr model, ADRs, requirements (constraints, quality attributes, assumptions), principles, security, data, integration, deployment, reliability, observability, risks and roadmap. Its README has the view register and the document index.
 - `docs/compliance/` holds regulatory research (S002 memo) and, later, the DPIA.

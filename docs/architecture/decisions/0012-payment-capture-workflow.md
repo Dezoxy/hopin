@@ -38,7 +38,7 @@ We will use option 3.
 4. **The hold is 1.3 times the estimate**, placed when a driver accepts. If the meter amount is higher, the workflow captures the hold and charges the difference as a second off-session payment with its own idempotency key.
 5. **A declined capture** is retried by wait states, three attempts within 24 hours. After the last one, the workflow reports the failure to the Payments component, which records FAILED and a `payment.failed` outbox entry. The passenger is asked for a new card and new rides are blocked until paid.
 6. **A finally failed fare is carried by the partner**, up to a monthly cap set in the partner contract. Above the cap, Hopin and the partner split it. The driver is always paid.
-7. **In the Azure cold-restore case** there is no Step Functions. Captures run from a batch script that reads unfinished `ride.completed` entries from the outbox, with the same idempotency keys, until AWS is back.
+7. **In the Azure cold-restore case** there is no Step Functions. Captures run from a batch script over rides that are COMPLETED but have no payment in CAPTURED or FAILED, with the same idempotency keys, until AWS is back. It selects by ride and payment state, not by outbox state, because an entry already relayed may belong to a workflow that never captured.
 8. A nightly job still compares payments with Stripe (plan step S044).
 
 ## Consequences
@@ -46,7 +46,8 @@ We will use option 3.
 Positive:
 
 - Retries, waits and the callback are declared, not hand-coded; every execution's history is visible for disputes.
-- The job queue and reconciler for payments disappear, and so does their Redis dependency.
+- The payment job queue and its hand-coded retries disappear, and so does their Redis dependency. The nightly Stripe reconciliation stays.
+- The protection against charging twice comes from Stripe idempotency keys, as it would in the queue design. The workflow adds declared retries and waits, visible run history, and a name that stops a second run for the same ride from starting.
 - Cost at the business-case volume is negligible: about ten state transitions per ride, a few dollars a month.
 
 Negative / accepted trade-offs:
@@ -59,6 +60,8 @@ Negative / accepted trade-offs:
 ## Risks
 
 - The Azure capture fallback has never run; covered by [RISK-009](../risks/architecture-risks.md) until the first drill.
+
+- The Azure capture script is a second implementation of payment capture that runs only in a disaster. It is only as trustworthy as the last drill that ran it ([RISK-009](../risks/architecture-risks.md)).
 
 ## Related
 

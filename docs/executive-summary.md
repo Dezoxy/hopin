@@ -30,7 +30,7 @@ Three-year view in million HUF ([cost model](business/three-year-cost-model.md))
 - **Partners' data stays theirs.** One shared platform, but the database itself separates partners, and the operator sees a partner's data only under a time-boxed grant from that partner ([ADR 9](architecture/decisions/0009-hybrid-multi-tenancy.md), [ADR 13](architecture/decisions/0013-operator-access-by-partner-grant.md)).
 - **No double charges.** Each ride's payment runs in one workflow named after the ride ([ADR 12](architecture/decisions/0012-payment-capture-workflow.md)).
 - **Survives losing the cloud account.** Encrypted, immutable copies and keys live outside AWS ([ADR 1](architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md)).
-- **Security reviewed before code:** 26 threats, each with a planned control or a tracked risk ([threat model](architecture/security/threat-model.md)).
+- **Security reviewed before code:** 31 threats, each with a planned control or a tracked risk ([threat model](architecture/security/threat-model.md)).
 
 ## Top risks
 

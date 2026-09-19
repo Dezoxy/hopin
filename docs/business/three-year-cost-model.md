@@ -35,6 +35,8 @@
 | Founder at market rate (shown apart) | 24.4 | 24.4 | 24.4 | 73.2 |
 | **Result after founder** | -15.7 | 14.3 | 83.2 | 81.7 |
 
+**How precise this is.** The script prints one decimal, but the inputs are judgements: read the results as whole millions at best. Year 1 assumes paying cars from the first month, with no build period without revenue. A build period would lower year 1 and the three-year result; it is not modelled.
+
 ## Sensitivity
 
 | Scenario | Rides/day Y3 | Revenue Y1 / Y2 / Y3 | Cash costs Y1 / Y2 / Y3 | 3-year result after founder |

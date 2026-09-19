@@ -47,6 +47,24 @@ Keep these ready; use them when the interviewer pulls a thread.
 | Safety features | DriverAlarm, TripShare | [trust boundaries](../security/trust-boundaries.md) |
 | The partner business | PhoneOrder, PartnerConsole | [business case](../../business/business-case.md) |
 | Async and consistency | ApiPayments, PaymentCapture, ApiRegulatoryFeeds | [ADR 12](../decisions/0012-payment-capture-workflow.md), [event catalog](../integration/event-catalog.md) |
+| AI | AiAssist, DisputeAssist | [ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md), [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md), [AI Act classification](../../compliance/ai-act-classification.md) |
+
+## Track 4: the recorded walkthrough
+
+The script for plan step S124: one take of about ten minutes, screen-shared, following the README's ten-minute review. Show the README diagrams and the published PDF; no slides are needed.
+
+| Time | On screen | Say |
+|---|---|---|
+| 0:00 | README, top | "Hopin is a reference architecture for taxi dispatch in Hungary. It is not a product. I designed it end to end to show how I make architecture decisions under real constraints." |
+| 0:45 | Executive summary | The recommendation in one sentence, the three gates, and why the consumer brand comes second. |
+| 2:00 | Design findings | Pick three findings, one per method: the law (the 100 M HUF rule), drawing (the identity gap), and running code (the shutdown race). Land the pattern: cheap methods found the expensive problems. |
+| 4:00 | Partner isolation diagram, ADR 9 | Why row-level security instead of a database per partner, and the sales trigger for a silo. |
+| 5:30 | ADR 12 | Exactly-once effect: the workflow is named by the ride, and the meter amount is captured, not the estimate. |
+| 7:00 | Recovery diagram, ADR 1 | A second cloud for the failure you fear. The gap the drawing exposed, and why nothing counts until a drill (RISK-009). |
+| 8:30 | Retrospective | One thing you would do differently, one weakness you have not fixed, and the next decision. |
+| 9:30 | README | Close with the reusable rule you want remembered: *never let the platform become the licensed party by accident.* |
+
+Record it once, watch it back, and cut anything you read from the screen instead of saying. Link the recording from the README when it is published.
 
 ## Slides
 
