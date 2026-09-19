@@ -28,7 +28,7 @@ For a solo operator the realistic catastrophe is losing the primary account itse
 
 ## Decision
 
-We will run everything users touch on AWS in eu-central-1. Azure holds immutable encrypted copies of the database and driver documents, the dump encryption key and escrowed break-glass credentials. The Azure restore path is a tested runbook and Terraform module, not a running environment.
+We will run everything users touch on AWS in eu-central-1. Azure holds immutable encrypted copies of the database and driver documents, the dump encryption key and escrowed break-glass credentials. The Azure restore path is a runbook and Terraform module, not a running environment. It counts as working only after a restore drill ([RISK-009](../risks/architecture-risks.md)).
 
 ## Consequences
 

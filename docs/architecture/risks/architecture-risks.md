@@ -3,7 +3,7 @@
 Reviewed at the start of each plan phase and after any incident. Owner for all: the founder. Likelihood is a judgement until there is data.
 
 | ID | Risk | Impact | Likelihood | Mitigation | Residual risk | Review trigger |
-|---|---|---|---|---|---|---|
+|---|------|----|--|------|---|---|
 | RISK-001 | Budapest dispatch rules (100 M HUF equity, BKK-certified software) block launching Hopin as its own operator | High: no legal launch in Budapest | High | Technology-provider model or another city ([S002 memo](../../compliance/s002-regulatory-memo.md), [A-01](../requirements/assumptions.md)) | Depends on a partner or a smaller market | Plan step S111 |
 | RISK-002 | SMS one-time code cost or delivery problems in Hungary | Medium: sign-in friction, cost | Medium | Budget alert on SMS; email code fallback ([A-04](../requirements/assumptions.md)) | Some users fail first sign-in | Plan step S026 |
 | RISK-003 | App stores reject background location in the driver app | High: launch delay | Medium | Follow platform guidance from day one; in-app disclosure; demo video ([A-07](../requirements/assumptions.md)) | Review delays | Plan step S105 |

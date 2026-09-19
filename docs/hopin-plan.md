@@ -479,6 +479,8 @@ Artifacts that make the design defensible in an architect interview. S099 moves 
 | S127 | Talk tracks | Three-minute, fifteen-minute and deep-dive tracks built from the views; slides deferred to a design-library pass per architect-base `presentation.md` | done | S126 |
 | S128 | AI assist boundaries and prototype | [ADR 14](./architecture/decisions/0014-ai-assists-staff-read-and-draft-only.md) read-and-draft only for four use cases; [ADR 15](./architecture/decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) Bedrock in eu-west-1 for real data (residency checked against AWS documentation), OpenRouter for synthetic evaluation; [AI Act classification](./compliance/ai-act-classification.md); dispute assistant and evaluation harness in [slice/](../slice/README.md); AiAssist and DisputeAssist views; T-27–T-31, RISK-020, RISK-021, QA-13 | done | S123 |
 | S129 | Visible diagrams and PDF edition | Four views redrawn as Mermaid in the root README (Context, PartnerIsolation, AccountRecovery, DisputeAssist), logged in the [presentation ledger](./architecture/presentation/README.md); architecture PDF published as [release architecture-dd0b063](https://github.com/Dezoxy/hopin/releases/tag/architecture-dd0b063): overview plus all 28 views, 34 pages | done | S128 |
+| S130 | Design findings | [Design findings](./architecture/evidence/design-findings.md): twelve problems caught by legal reading, modelling, costing, the slice, review and vendor documentation, with what changed and what is still unfound | done | S129 |
+| S131 | Full PDF edition | The PDF builder, improved in architect-base first, adds every ADR and the pages listed in `docs/architecture/pdf-sections.txt` (design findings, risk register); repository links print as plain text | done | S130 |
 
 ---
 
@@ -561,3 +563,4 @@ Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-0
 | 2026-09-19 | v0.14 — After S123: drivers report every 2.5 s (QA-02 headroom, run 2 confirms); the slice refuses to start without SLICE_INSECURE_IDENTITY=true; slice tests become a required check. |
 | 2026-09-19 | v0.15 — S128 AI assist: read-and-draft only (ADR 14), two model planes (ADR 15, Accepted after checking AWS documentation: no cross-region routing on the Messages endpoint, Opus 5 in-region in eu-west-1 not eu-central-1, region allowlist fixed to exclude London and Zurich), AI Act classification, dispute-assistant prototype with an evaluation harness; 28 views. |
 | 2026-09-19 | v0.16 — S129 done: four views as Mermaid in the README, and the first published PDF edition (architecture-dd0b063). |
+| 2026-09-19 | v0.17 — S130 design findings page; S131 the PDF now carries all ADRs, the findings and the risk register. |

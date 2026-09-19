@@ -10,6 +10,14 @@ by `!docs` in workspace.dsl, joined in filename order, with
   landscape page;
 - normalises headings so the top level used becomes level 1, whether the files
   use `#` or `##` for their sections;
+- appends a "Decisions" section with every ADR the workspace imports with
+  `!adrs`, in number order, each on its own page;
+- appends the Markdown files listed in an optional `pdf-sections.txt` in the
+  architecture directory (one path per line, relative to that directory; `#`
+  starts a comment), for documents outside the Documentation tab such as a
+  risk register;
+- turns links to repository files into plain text, because on paper they lead
+  nowhere; web links and in-page anchors stay links;
 - appends a "Views" section with every view that the text does not embed, so
   the PDF shows the whole model even when the pages embed nothing;
 - writes a YAML header for the Eisvogel cover (project, date, edition) and
@@ -48,6 +56,15 @@ EMBED = re.compile(r"^!\[[^\]]*\]\(embed:([A-Za-z0-9_-]+)\)\s*$")
 HEADING = re.compile(r"^(#{1,6})(\s.*)$")
 FENCE = re.compile(r"^(```|~~~)")
 DOCS_DIRECTIVE = re.compile(r"^\s*!docs\s+(\S+)")
+# A Markdown link whose target has no URL scheme and is not an in-page anchor:
+# a path in the repository. Images (![...]) are left alone.
+REPO_LINK = re.compile(r"(?<!!)\[([^\]]+)\]\((?![A-Za-z][A-Za-z0-9+.-]*:|#)[^)\s]+\)")
+# Optional list of extra Markdown files, relative to the architecture directory.
+EXTRA_SECTIONS = "pdf-sections.txt"
+NEW_PAGE = "```{=latex}\n\\clearpage\n```"
+# Structurizr rewrites a link from one ADR to another as an anchor on the
+# target's ID, such as (#9). The PDF gives each ADR the anchor adr-<ID>.
+ADR_LINK = re.compile(r"\]\(#([^)\s]+)\)")
 # Reading order for views the text does not embed: zoom in, then behaviour,
 # then where it runs.
 VIEW_ORDER = [
@@ -221,11 +238,27 @@ def heading_shift(lines: list[str]) -> int:
     return min(levels) - 1 if levels else 0
 
 
+def plain_links(line: str) -> str:
+    """Links to repository files as their text; web links and anchors unchanged."""
+    return REPO_LINK.sub(r"\1", line)
+
+
 def body(
-    lines: list[str], views: dict[str, dict], generated: Path
+    lines: list[str],
+    views: dict[str, dict],
+    generated: Path,
+    *,
+    top: int = 1,
+    unnumbered: bool = False,
+    anchor: str | None = None,
 ) -> tuple[str, set[str]]:
-    """Lines with headings normalised and embeds replaced; also the embedded keys."""
-    shift, fenced = heading_shift(lines), False
+    """Lines with headings normalised and embeds replaced; also the embedded keys.
+
+    The top heading level used becomes `top`. With unnumbered, headings carry
+    no section number (an ADR has its own), and only the top level is listed
+    in the contents, and the first top-level heading gets the anchor.
+    """
+    shift, fenced = heading_shift(lines) - (top - 1), False
     out: list[str] = []
     embedded: set[str] = set()
     for line in lines:
@@ -234,7 +267,14 @@ def body(
         heading = None if fenced else HEADING.match(line)
         embed = None if fenced else EMBED.match(line)
         if heading:
-            out.append("#" * (len(heading.group(1)) - shift) + heading.group(2))
+            level = len(heading.group(1)) - shift
+            text = plain_links(heading.group(2))
+            if unnumbered and level == top and anchor:
+                text += f" {{#{anchor} .unnumbered}}"
+                anchor = None
+            elif unnumbered:
+                text += " {.unnumbered}" if level == top else " {.unnumbered .unlisted}"
+            out.append("#" * level + text)
         elif embed:
             key = embed.group(1)
             if key not in views:
@@ -243,8 +283,74 @@ def body(
             out.append(on_page([markdown], wide))
             embedded.add(key)
         else:
-            out.append(line)
+            out.append(line if fenced else plain_links(line))
     return "\n".join(out), embedded
+
+
+def decision_order(decision: dict) -> tuple[int, str]:
+    """Numeric IDs in number order, then any others by ID."""
+    ident = str(decision.get("id", ""))
+    return (int(ident), "") if ident.isdigit() else (sys.maxsize, ident)
+
+
+def decisions(
+    workspace: dict, views: dict[str, dict], generated: Path
+) -> tuple[str, set[str]]:
+    """A section with every Markdown ADR in the workspace, one per page."""
+    records = [
+        record
+        for record in workspace.get("documentation", {}).get("decisions", [])
+        if isinstance(record, dict) and record.get("content")
+    ]
+    markdown = [record for record in records if record.get("format", "Markdown") == "Markdown"]
+    if len(markdown) < len(records):
+        print(f"skipped {len(records) - len(markdown)} non-Markdown ADRs", file=sys.stderr)
+    if not markdown:
+        return "", set()
+    ids = {str(record.get("id")) for record in markdown}
+
+    def to_adr(match: re.Match[str]) -> str:
+        target = match.group(1)
+        return f"](#adr-{target})" if target in ids else match.group(0)
+
+    parts = ["", "# Decisions", "", "Architecture decision records, in number order.", ""]
+    embedded: set[str] = set()
+    for record in sorted(markdown, key=decision_order):
+        content = ADR_LINK.sub(to_adr, record["content"])
+        text, keys = body(
+            content.splitlines(),
+            views,
+            generated,
+            top=2,
+            unnumbered=True,
+            anchor=f"adr-{record.get('id')}",
+        )
+        parts += [NEW_PAGE, "", text, ""]
+        embedded |= keys
+    return "\n".join(parts), embedded
+
+
+def extra_sections(
+    arch_dir: Path, views: dict[str, dict], generated: Path
+) -> tuple[str, set[str]]:
+    """The files listed in pdf-sections.txt, each from a new page."""
+    listing = arch_dir / EXTRA_SECTIONS
+    if not listing.exists():
+        return "", set()
+    root = arch_dir.resolve()
+    parts: list[str] = []
+    embedded: set[str] = set()
+    for raw in listing.read_text().splitlines():
+        entry = raw.split("#", 1)[0].strip()
+        if not entry:
+            continue
+        path = (arch_dir / entry).resolve()
+        if root not in path.parents or path.suffix != ".md" or not path.is_file():
+            sys.exit(f"{listing}: {entry} is not a Markdown file inside {arch_dir}")
+        text, keys = body(path.read_text().splitlines(), views, generated)
+        parts += ["", NEW_PAGE, "", text]
+        embedded |= keys
+    return "\n".join(parts), embedded
 
 
 def appendix(views: list[dict], embedded: set[str], generated: Path) -> str:
@@ -310,12 +416,17 @@ def main() -> int:
         sys.exit(f"no Markdown files in {docs_dir(arch_dir)}")
     by_key = {view["key"]: view for view in views}
     text, embedded = body(page_lines(pages, project), by_key, generated)
+    adrs, adr_views = decisions(workspace, by_key, generated)
+    extra, extra_views = extra_sections(arch_dir, by_key, generated)
+    embedded |= adr_views | extra_views
     sha, dirty = edition(arch_dir)
     edition_text = f"{sha} with uncommitted changes" if dirty else sha
     today = dt.datetime.now(dt.UTC).astimezone().date()  # the operator's local date
     output.write_text(
         header(project, edition_text, today)
         + text
+        + adrs
+        + extra
         + appendix(views, embedded, generated)
     )
     print(
