@@ -8,6 +8,7 @@ Planned controls for the MVP. Nothing is deployed; each control names the plan s
 |---|---|---|---|
 | Passenger, driver | Phone number and SMS one-time code (Cognito) | Cognito group in the JWT, checked by a NestJS guard on every route and socket namespace | S026 |
 | Operator (admin web) | Same, plus the `admin` group | Admin group plus a WAF IP allowlist on the admin site; every admin action written to `audit_log` | S026, S080, S037 |
+| Partner dispatcher (admin web) | Same, plus a `partner` group and a tenant claim | Tenant claim sets the database tenant; row-level security limits every query to that partner ([ADR 9](../decisions/0009-hybrid-multi-tenancy.md)) | S026, S073 |
 | Trip-share viewer | Nothing; holds a share token | Token is random, scoped to one ride, expires 2 h after completion, revocable | S035 |
 | Stripe | Webhook signature | Signature check before any processing; idempotent handler | S044 |
 | Hopin API to AWS services | ECS task role | Least-privilege IAM policy per task | S081 |
