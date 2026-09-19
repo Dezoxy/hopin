@@ -126,7 +126,7 @@ hopin.api.compliance -> invoicing "Issues Hopin fee invoices through" "Provider 
 hopin.adminWeb -> hopin.api.assist "Asks for dispute reply drafts through" "HTTPS/JSON" "Layer Clients"
 hopin.api.assist -> hopin.api.tenancy "Opens tenant-scoped transactions through" "In-process" "Layer Services"
 hopin.api.assist -> hopin.db "Reads one ride and its events from" "SQL, row-level security" "Layer Services"
-hopin.api.assist -> bedrock "Sends a minimised case file and receives a draft from" "HTTPS, task IAM role, EU region" "Layer Services"
+hopin.api.assist -> bedrock "Sends a minimised case file and receives a draft from" "HTTPS, task IAM role, eu-west-1" "Layer Services"
 hopin.api.assist -> hopin.monitoring "Logs draft outcomes, never complaint or draft text, to" "CloudWatch" "Layer Services"
 operator -> openrouter "Compares candidate models on synthetic cases through" "Evaluation harness, HTTPS" "Person"
 

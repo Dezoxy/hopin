@@ -4,9 +4,7 @@ Date: 2026-09-19
 
 ## Status
 
-Proposed
-
-Accepted once EU-only processing on the Bedrock endpoint is confirmed ([RISK-020](../risks/architecture-risks.md)).
+Accepted
 
 ## Context
 
@@ -30,11 +28,25 @@ Choosing a model needs comparison: the same cases through several models, scored
 
 We will use option 3.
 
-- **Data plane.** The API calls Claude on Amazon Bedrock through the Anthropic SDK's Bedrock client, in eu-central-1, with the task's IAM role. No API key exists to leak. AWS's processor terms already cover Hopin.
+- **Data plane.** The API calls Claude on Amazon Bedrock's Messages endpoint (`bedrock-mantle`) in eu-west-1, Ireland, with the task's IAM role. No API key exists to leak. AWS's processor terms already cover Hopin. The API itself stays in eu-central-1; only the model call crosses to Ireland, inside the EU.
+- **Retention.** The Bedrock account's data-retention mode in eu-west-1 is set to `none` if the model allows it, otherwise `default`. A service control policy forbids `aws_review`, so no human at AWS reads complaints. Models that require human review, such as Claude Fable 5.1, are therefore not used on the data plane.
 - **Evaluation plane.** An evaluation harness sends synthetic cases to candidate models through OpenRouter, asking for providers that do not store data. It scores each model with the same checks the application enforces.
 - **The boundary is in code.** Every model client declares its plane. The API refuses to send a case file to any client that is not on the data plane, and it refuses a Bedrock region outside the EU. The OpenRouter client lives outside the application's source folder, so the application cannot import it.
 
 A model chosen on the evaluation plane is then run on the data plane with the same cases before it goes live.
+
+## Residency evidence
+
+Checked against AWS and Anthropic documentation on 2026-09-19:
+
+- **The Messages endpoint has no cross-region inference.** AWS's endpoint comparison marks geographic and global profiles as unsupported on `bedrock-mantle`, so a request is processed in the region it is sent to.
+- **Claude Opus 5 runs in-region on that endpoint in eu-west-1 and eu-north-1.** It is not available there in eu-central-1, so Frankfurt, the region of the rest of Hopin, cannot be used for this call.
+- **Model providers cannot see prompts.** Bedrock runs each provider's model in an AWS-owned deployment account that the provider cannot access.
+- **Retained data stays in the region.** Under `default` mode AWS may keep inputs for abuse detection, in the region that processed them, and never passes them to the provider.
+
+The code accepts only EU member-state regions that offer this endpoint. A prefix check would have let London (eu-west-2) and Zurich (eu-central-2) through.
+
+Anthropic's region table lists Frankfurt with "Global, EU" endpoint types, which reads differently from AWS's per-model table. The AWS model card governs; the call fails rather than leaves the EU if it is wrong.
 
 ## Consequences
 
@@ -49,10 +61,11 @@ Negative / accepted trade-offs:
 - Only models offered on Bedrock can run in production.
 - Evaluation results on OpenRouter may differ slightly from the same model on Bedrock; the final check on the data plane covers that.
 - Bedrock's Claude endpoint does not support structured outputs; drafts come back through a tool call and are validated in code.
+- The model call crosses from Frankfurt to Ireland, adding some network latency to a staff-facing draft that already takes seconds.
 
 ## Risks
 
-- The EU-only guarantee depends on how Bedrock routes the model; it must be confirmed before real data flows ([RISK-020](../risks/architecture-risks.md)).
+- Documentation is not a contract, and AWS can change which regions serve a model or what they retain ([RISK-020](../risks/architecture-risks.md)). Re-check the model card and the account's retention mode before go-live and when the model changes.
 - A developer pastes a real complaint into an evaluation case ([T-29](../security/threat-model.md#tb-7-hopin-to-model-providers)); mitigated by review of the cases file, which lives in a public repository.
 
 ## Related

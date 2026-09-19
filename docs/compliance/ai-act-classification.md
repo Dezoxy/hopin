@@ -26,7 +26,7 @@ No use case interacts with passengers or callers directly, so the Article 50 dut
 ## GDPR notes for the DPIA
 
 - Personal data in a case file: complaint text and ride events with rounded positions. No names, phone numbers, emails or IDs.
-- Processor: AWS, under the existing agreement, EU region only ([RISK-020](../architecture/risks/architecture-risks.md) until confirmed). No transfer to OpenRouter, which receives synthetic cases only.
+- Processor: AWS, under the existing agreement. Claude runs in eu-west-1 with no cross-region routing, and the model provider cannot see prompts ([ADR 15](../architecture/decisions/0015-bedrock-for-data-openrouter-for-evaluation.md)). AWS may keep inputs for abuse detection in that region; human review by AWS is forbidden by policy ([RISK-020](../architecture/risks/architecture-risks.md)). No transfer to OpenRouter, which receives synthetic cases only.
 - Lawful basis follows the complaint handling itself: contract with the passenger, and the joint-controller arrangement with the partner ([ADR 11](../architecture/decisions/0011-joint-controllers-with-partners.md)).
 - No automated decision with legal or similar effect (GDPR Article 22), because a human decides every outcome.
 

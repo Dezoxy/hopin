@@ -32,9 +32,20 @@ export interface BedrockConfig {
   readonly model: string;
 }
 
-/** Bedrock has no inference_geo parameter; residency comes from an EU region (and EU routing). */
+/**
+ * Regions in EU member states where AWS offers the bedrock-mantle endpoint.
+ * The endpoint has no cross-region inference, so a request is processed in the
+ * region it is sent to (ADR 15). A prefix check is not enough: eu-west-2 is
+ * London and eu-central-2 is Zurich.
+ */
+export const EU_MANTLE_REGIONS: readonly string[] = ['eu-central-1', 'eu-west-1', 'eu-south-1', 'eu-north-1'];
+
 export function bedrockConfigFor(cfg: BedrockConfig): BedrockConfig {
-  if (!cfg.region.startsWith('eu-')) throw new AssistError(`Bedrock region must be in the EU, got ${cfg.region}`);
+  if (!EU_MANTLE_REGIONS.includes(cfg.region)) {
+    throw new AssistError(
+      `Bedrock region must be an EU member-state region with the Messages endpoint (${EU_MANTLE_REGIONS.join(', ')}), got ${cfg.region}`,
+    );
+  }
   return cfg;
 }
 

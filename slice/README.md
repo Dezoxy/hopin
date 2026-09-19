@@ -46,7 +46,7 @@ curl -X POST localhost:3000/v1/assist/disputes/<rideId>/draft \
   -H 'content-type: application/json' -d '{"complaint":"The driver was 15 minutes late."}'
 ```
 
-- **Off by default.** With `ASSIST_PROVIDER=none` the endpoint answers 503. With `ASSIST_PROVIDER=bedrock` it calls Claude on Amazon Bedrock in `BEDROCK_REGION` (EU regions only) with your AWS credentials. There is no API key in the app.
+- **Off by default.** With `ASSIST_PROVIDER=none` the endpoint answers 503. With `ASSIST_PROVIDER=bedrock` it calls Claude on Amazon Bedrock in `BEDROCK_REGION`, default eu-west-1, with your AWS credentials. Only EU member-state regions that offer the Messages endpoint are accepted; London and Zurich are refused. There is no API key in the app.
 - **What the model sees.** Roles instead of IDs, no emails or phone numbers, and positions rounded to about 1 km ([case-file.ts](src/assist/case-file.ts)).
 - **What is rejected.** A draft that cites an unknown event or promises a refund or payment comes back as `rejected`, and staff write the reply themselves.
 - **Where real data may go.** Only to a model client on the data plane. The evaluation client cannot be used by the app ([ADR 15](../docs/architecture/decisions/0015-bedrock-for-data-openrouter-for-evaluation.md)).

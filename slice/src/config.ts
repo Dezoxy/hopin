@@ -9,7 +9,8 @@ const schema = z.object({
   // The slice trusts identity headers instead of verifying tokens. It must be
   // switched on deliberately so it can never run as if it were the real API.
   ASSIST_PROVIDER: z.enum(['none', 'bedrock']).default('none'),
-  BEDROCK_REGION: z.string().default('eu-central-1'),
+  // Claude Opus 5 runs in-region on bedrock-mantle in eu-west-1 and eu-north-1, not eu-central-1 (ADR 15).
+  BEDROCK_REGION: z.string().default('eu-west-1'),
   BEDROCK_MODEL: z.string().default('anthropic.claude-opus-5'),
   SLICE_INSECURE_IDENTITY: z.literal('true', {
     error: 'must be "true": the slice trusts unauthenticated identity and is for local measurement only',

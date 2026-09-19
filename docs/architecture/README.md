@@ -78,7 +78,7 @@ Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes
 - [0012 Capture the meter amount with an outbox-started Step Functions workflow](decisions/0012-payment-capture-workflow.md) (Accepted)
 - [0013 The operator reads partner data only through time-boxed partner grants](decisions/0013-operator-access-by-partner-grant.md) (Accepted)
 - [0014 AI assists staff with read-and-draft tasks only](decisions/0014-ai-assists-staff-read-and-draft-only.md) (Accepted)
-- [0015 Real data goes only to Amazon Bedrock in the EU; OpenRouter is for synthetic evaluation only](decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) (Proposed, pending RISK-020)
+- [0015 Real data goes only to Amazon Bedrock in the EU; OpenRouter is for synthetic evaluation only](decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) (Accepted)
 
 New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
 

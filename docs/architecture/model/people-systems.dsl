@@ -21,5 +21,5 @@ sentry = softwareSystem "Sentry" "Crash and performance reports from the apps an
 
 // AI model providers (ADR 15). Bedrock is the data plane; OpenRouter is used
 // only by the evaluation harness with synthetic cases.
-bedrock = softwareSystem "Amazon Bedrock" "Runs Claude in an EU region for staff-facing drafts, under AWS's processor terms." "External"
+bedrock = softwareSystem "Amazon Bedrock" "Runs Claude in eu-west-1 (Ireland) for staff-facing drafts, under AWS's processor terms; no cross-region routing on this endpoint." "External"
 openrouter = softwareSystem "OpenRouter" "Routes synthetic evaluation cases to candidate models; never receives real data." "External"

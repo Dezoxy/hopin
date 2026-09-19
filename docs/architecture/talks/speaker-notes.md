@@ -280,6 +280,7 @@ Say the points in your own words. If an answer here is not one you would defend,
   - OpenRouter is reached only by the operator's evaluation harness, with synthetic cases; the API has no arrow to it, and the code enforces that.
 - **Challenge:** "Why not let the AI refund small amounts and save support time?" **Answer:** A refund is a decision about money, and drivers' work is high-risk under the AI Act. Read and draft only keeps a human accountable and keeps Hopin out of the high-risk category ([ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md)).
 - **Evidence:** [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md), [AI Act classification](../../compliance/ai-act-classification.md), [RISK-020](../risks/architecture-risks.md).
+- **Second challenge:** "How do you know Bedrock keeps it in the EU?" **Answer:** Bedrock's Messages endpoint has no cross-region routing, and Opus 5 runs in-region in Ireland. Frankfurt does not serve it there, which the check found. The code refuses London and Zurich even though their names start with "eu-".
 
 ### DisputeAssist
 
