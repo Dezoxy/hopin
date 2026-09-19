@@ -37,6 +37,7 @@ ID_OWNERS = {
     r"\bP-\d{2}\b": ARCH / "principles" / "architecture-principles.md",
     r"\bRISK-\d{3}\b": ARCH / "risks" / "architecture-risks.md",
     r"\bTD-\d{3}\b": ARCH / "risks" / "technical-debt.md",
+    r"\bT-\d{2}\b": ARCH / "security" / "threat-model.md",
 }
 
 ADR_NAME = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
