@@ -32,4 +32,4 @@ make docs     # documentation consistency
 make check    # Structurizr model validate + inspect (needs Docker)
 ```
 
-Both run in CI on every pull request. `main` accepts changes only through pull requests.
+Both run in CI on every pull request, alongside Markdown lint and secret scanning. `main` accepts changes only through pull requests.

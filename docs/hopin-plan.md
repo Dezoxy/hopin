@@ -105,6 +105,7 @@ Full research, sources and open questions: [S002 memo](./compliance/s002-regulat
 - The taxi operator issues the passenger's receipt; Hopin invoices its fee to drivers and files DAC7 reports.
 - A DPIA is mandatory before launch. The Platform Work Directive applies to matching from its transposition (deadline 2026-12-02).
 - App stores: background location on the driver app needs a clear justification and in-app disclosure.
+
 ---
 
 ## Part B — Architecture
@@ -233,6 +234,7 @@ REST under `/v1`, OpenAPI-documented, JWT (Cognito) bearer auth. Full contract i
 - `webhooks/stripe`
 
 Realtime events are owned by the [event catalog](./architecture/integration/event-catalog.md).
+
 ---
 
 ## Part C — Platform, security, backup
@@ -270,7 +272,6 @@ Owned by [deployment architecture, Delivery](./architecture/deployment/deploymen
 ### C8. Rough monthly cost (prod, idle-to-light traffic, EUR)
 
 Owned by [deployment architecture, Cost](./architecture/deployment/deployment-architecture.md#cost): about 190–220 EUR/month, above the QA-08 target; levers reviewed in S102.
-
 
 ---
 
@@ -479,7 +480,6 @@ Each step gets a section here when it starts. Template:
 **Result / verification:** Pending your review of Part A and Part C4.
 **Follow-ups:** Part F items need your answers before S004 and S002 can close.
 
-
 ### S002 — Regulatory and legal check
 **Status:** doing · **Started:** 2026-09-19 · **Finished:** —
 **Goal:** Know what Hungarian law requires before any product code is written.
@@ -490,6 +490,7 @@ Each step gets a section here when it starts. Template:
 **Work log:** Read Government Decree 176/2015, Budapest decree 31/2013 as amended to 2026, NAV guidance, the NAIH DPIA list, DAC7 and the Platform Work Directive. Wrote [S002 memo](./compliance/s002-regulatory-memo.md). Updated A3, A4, A8, S004, S031, S043, S046, S047, S055, S067, ADR 5 and ADR 7; added S111–S116.
 **Result / verification:** Memo written with primary-law citations. Not confirmed by a lawyer.
 **Follow-ups:** S111 (entry decision and lawyer review) closes this step.
+
 ---
 
 ## Part F — Decisions needed from you
@@ -509,6 +510,7 @@ These shape business logic, so they are yours, not mine. Answer inline here and 
 ## Part G — Risks
 
 Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-001 to RISK-010). The top risk today is RISK-001: the Budapest dispatch rules block launching Hopin as its own operator; see Part F question 7.
+
 ---
 
 ## Part H — Changelog of this plan
