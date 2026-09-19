@@ -162,6 +162,22 @@ def check_view_register(f: Failures) -> None:
         f.add("view-register", f"view '{key}' is in the README view register but not in views.dsl")
 
 
+def check_speaker_notes(f: Failures) -> None:
+    """Every view in views.dsl has a '### <key>' section in the speaker notes."""
+    notes_path = ARCH / "talks" / "speaker-notes.md"
+    if not notes_path.exists():
+        f.add("speaker-notes", f"{rel(notes_path)} is missing")
+        return
+    notes = set(re.findall(r"^### (\S+)\s*$", read(notes_path), re.MULTILINE))
+    defined = set(re.findall(
+        r'^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|'
+        r'dynamic\s+\S+|deployment\s+\S+\s+\S+)\s+"([^"]+)"', read(VIEWS_DSL), re.MULTILINE))
+    for key in sorted(defined - notes):
+        f.add("speaker-notes", f"view '{key}' has no section in {rel(notes_path)}")
+    for key in sorted(notes - defined):
+        f.add("speaker-notes", f"{rel(notes_path)} has a section for '{key}', which is not a view")
+
+
 def check_ids(f: Failures) -> None:
     """Every cited requirement/risk ID is defined in its owning document."""
     sources = markdown_files() + sorted(ARCH.rglob("*.dsl"))
@@ -175,7 +191,7 @@ def check_ids(f: Failures) -> None:
 
 
 CHECKS = (check_twins, check_skill_mirror, check_links, check_docs_index,
-          check_adrs, check_view_register, check_ids)
+          check_adrs, check_view_register, check_speaker_notes, check_ids)
 
 
 def main() -> int:

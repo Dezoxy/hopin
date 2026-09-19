@@ -26,11 +26,12 @@ See the **Context** view.
 | Realtime Cache | Live driver positions, socket fan-out, job queues | Redis |
 | Document Store | Driver documents, staged dumps | Amazon S3 |
 | Secrets Store | Credentials and API keys | AWS Secrets Manager |
+| Monitoring | Logs, metrics, traces, alarms, paging | CloudWatch, X-Ray, SNS |
 | Backup Exporter | Nightly encrypted copy to Azure | Scheduled container task |
 | Off-provider Backup | Immutable copies outside AWS | Azure Blob Storage |
 | Escrow Vault | Dump key and break-glass credentials | Azure Key Vault |
 
-See the **Clients**, **Backend** and **OffProviderRecovery** views.
+See the **Clients**, **Backend** and **OffProviderRecovery** views. Inside the API, ten components carry the work; see **ApiRideFlow**, **ApiMoneyAndCompliance** and **PartnerConsole**.
 
 ## Key characteristics
 

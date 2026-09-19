@@ -76,3 +76,139 @@ deployment hopin production "AzureRecovery" "Hopin (planned): where does the nig
     include production.azure.kv.escrowInstance
     autoLayout lr
 }
+
+// ── Components: inside the Hopin API ────────────────────────────────────────
+
+component hopin.api "ApiRideFlow" "Hopin API (planned): which components carry a ride from estimate to live tracking?" {
+    include hopin.passengerApp hopin.driverApp
+    include hopin.api.quotes hopin.api.rides hopin.api.matching hopin.api.realtime
+    include hopin.db hopin.cache
+    autoLayout lr
+}
+
+// Ride Lifecycle is left out: its outbox write is step 1 of PaymentCapture,
+// and drawing it here routed an arrow around the whole container.
+component hopin.api "ApiMoneyAndCompliance" "Hopin API (planned): which components do the asynchronous work (payments, webhooks, outbox, regulatory feeds)?" {
+    include hopin.api.payments hopin.api.webhooks hopin.api.outbox hopin.api.compliance
+    include stripe bkk invoicing hopin.db hopin.cache
+    autoLayout lr
+}
+
+component hopin.api "PartnerConsole" "Hopin API (planned): how does a partner's dispatch console reach its data, and only its data?" {
+    include hopin.adminWeb
+    include hopin.api.dispatch hopin.api.tenancy hopin.api.rides hopin.api.realtime
+    include hopin.identity hopin.db
+    autoLayout lr
+}
+
+// ── Runtime scenarios ───────────────────────────────────────────────────────
+
+dynamic hopin.api "PartnerIsolation" "Hopin API (planned): how is a partner request kept inside that partner's data?" {
+    hopin.adminWeb -> hopin.api.dispatch "Requests live rides with a token carrying the partner's tenant"
+    hopin.api.dispatch -> hopin.api.tenancy "Opens a tenant-scoped transaction"
+    hopin.api.tenancy -> hopin.identity "Validates the token and reads the tenant claim"
+    hopin.api.tenancy -> hopin.db "Sets the tenant for this transaction"
+    hopin.api.dispatch -> hopin.db "Queries rides; row-level security returns only this partner's rows"
+    autoLayout lr
+}
+
+dynamic hopin.api "PaymentCapture" "Hopin API (planned): after the driver completes a ride, how is the meter amount captured exactly once?" {
+    hopin.api.rides -> hopin.db "Stores COMPLETED, the meter amount, a ride event and a ride.completed outbox entry in one transaction"
+    hopin.api.outbox -> hopin.db "Reads the committed ride.completed entry"
+    hopin.api.outbox -> hopin.cache "Queues a capture job keyed by ride ID"
+    hopin.api.payments -> hopin.cache "Takes the capture job"
+    hopin.api.payments -> stripe "Captures the meter amount with the ride's idempotency key"
+    stripe -> hopin.api.webhooks "Confirms the capture"
+    hopin.api.webhooks -> hopin.db "Marks the payment captured and writes a payment.captured outbox entry"
+    autoLayout lr
+}
+
+dynamic hopin.api "PaymentCaptureDeclined" "Hopin API (planned): what happens when the capture is declined?" {
+    hopin.api.payments -> stripe "Tries to capture; the card is declined"
+    hopin.api.payments -> hopin.cache "Schedules retries with backoff"
+    hopin.api.payments -> stripe "Retries; still declined after the last attempt"
+    hopin.api.payments -> hopin.db "Marks the payment FAILED and writes a payment.failed outbox entry"
+    hopin.api.outbox -> hopin.db "Reads the payment.failed entry"
+    hopin.api.outbox -> expoPush "Asks the passenger to update the card; new rides blocked until paid"
+    // Left-to-right placed Expo Push on the system boundary; top-to-bottom does not.
+    autoLayout tb
+}
+
+dynamic hopin "DriverAlarm" "Hopin (planned): what happens when a driver presses the alarm?" {
+    hopin.driverApp -> hopin.api "Sends the alarm with live position"
+    hopin.api -> hopin.db "Records the alarm as a ride event"
+    hopin.adminWeb -> hopin.api "Receives the alarm on the partner dispatch console"
+    partnerDispatcher -> hopin.adminWeb "Acknowledges and calls 112 with the position"
+    hopin.api -> hopin.monitoring "Raises a page-worthy event"
+    hopin.monitoring -> operator "Pages the platform operator"
+    autoLayout lr
+}
+
+dynamic hopin "TripShare" "Hopin (planned): how does someone without an account follow a shared ride?" {
+    hopin.passengerApp -> hopin.api "Creates a share link for the ride"
+    hopin.api -> hopin.db "Stores a random token that expires 2 hours after the ride"
+    tripViewer -> hopin.tripSharePage "Opens the link from a message"
+    hopin.tripSharePage -> hopin.api "Polls the ride's position with the token"
+    hopin.api -> hopin.cache "Reads the live driver position"
+    autoLayout lr
+}
+
+dynamic hopin "PhoneOrder" "Hopin (planned): how does a phone order become a ride?" {
+    partnerDispatcher -> hopin.adminWeb "Enters the caller's pickup and phone number"
+    hopin.adminWeb -> hopin.api "Creates a ride for this partner"
+    hopin.api -> hopin.db "Stores the order in the partner's order register"
+    hopin.api -> hopin.cache "Finds nearby online taxis of this partner"
+    hopin.driverApp -> hopin.api "Receives the offer and accepts it"
+    hopin.adminWeb -> hopin.api "Sees the match and confirms it to the caller"
+    autoLayout lr
+}
+
+dynamic hopin "RedisLost" "Hopin (planned): what happens when the Redis node is lost?" {
+    hopin.api -> hopin.cache "Loses the connection; live positions and queued jobs are gone"
+    hopin.api -> hopin.db "Keeps serving ride state from the database; matching pauses"
+    hopin.driverApp -> hopin.api "Reconnects and re-reports position within seconds"
+    hopin.api -> hopin.cache "Rebuilds the live index on the replacement node"
+    hopin.api -> hopin.db "Re-derives pending timers and jobs from ride states"
+    autoLayout lr
+}
+
+// ── Concern views ───────────────────────────────────────────────────────────
+
+container hopin "LocationData" "Hopin (planned): where does personal location data go, and where does it leave the system?" {
+    include hopin.driverApp hopin.passengerApp hopin.tripSharePage
+    include hopin.api hopin.cache hopin.db bkk
+    include hopin.backupExporter hopin.offsiteBackup
+    autoLayout lr
+}
+
+container hopin "AlertPath" "Hopin (planned): how does a failure become a page to the operator?" {
+    include hopin.api hopin.backupExporter hopin.monitoring
+    include hopin.passengerApp hopin.driverApp sentry operator
+    exclude "hopin.passengerApp -> hopin.api" "hopin.driverApp -> hopin.api"
+    // Left-to-right placed Sentry on the system boundary; top-to-bottom does not.
+    autoLayout tb
+}
+
+container hopin "Authorities" "Hopin (planned): which authorities and regulated devices touch the system, and how?" {
+    include hopin.api hopin.driverApp taxiMeter bkk invoicing nav
+    autoLayout lr
+}
+
+// ── Delivery and recovery placement ─────────────────────────────────────────
+
+deployment hopin production "Delivery" "Hopin (planned): how does a change reach production, and with which identity?" {
+    include production.github.actions
+    include production.aws.euc1.ecr production.aws.euc1.tfState
+    include production.aws.euc1.ecs.apiService.apiInstance
+    autoLayout lr
+}
+
+deployment hopin regionRecovery "RegionRecovery" "Hopin (planned): what runs in eu-west-1 after eu-central-1 is lost?" {
+    include *
+    autoLayout lr
+}
+
+deployment hopin accountRecovery "AccountRecovery" "Hopin (planned): what runs on Azure after the AWS account is lost, and what is missing?" {
+    include *
+    autoLayout lr
+}
