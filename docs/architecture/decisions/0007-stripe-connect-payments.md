@@ -24,7 +24,7 @@ Alternatives were not recorded. Local providers should be compared during plan s
 
 ## Decision
 
-We propose Stripe for card and wallet payments and Stripe Connect Express for driver payouts. The fare is authorised when a driver accepts and captured when the ride completes.
+We propose Stripe for card and wallet payments and Stripe Connect Express for driver payouts. An amount above the estimate is authorised when a driver accepts. The taxi-meter amount is captured when the ride completes, because only the meter amount may be charged ([C-02](../requirements/constraints.md)).
 
 ## Consequences
 

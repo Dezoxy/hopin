@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Hopin is a ride-hailing app for short city trips. Passengers book in a few taps, see the fare before the ride, follow the driver live, share the trip with someone they trust and pay in the app. Drivers are licensed taxi drivers.
+Hopin is a ride-hailing app for short city trips. Passengers book in a few taps, see a fare estimate before the ride, follow the driver live, share the trip with someone they trust and pay in the app. Drivers are licensed taxi drivers, and the charged fare is the taxi-meter amount at the official tariff ([C-02](../requirements/constraints.md)).
 
 ## Context
 

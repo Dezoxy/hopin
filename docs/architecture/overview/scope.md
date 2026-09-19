@@ -10,5 +10,6 @@ Scheduled and pooled rides, surge pricing, in-app chat and navigation, promo cod
 
 ## Open questions that can change the architecture
 
-- Hungarian taxi rules may fix the fare formula and require an invoicing provider (plan step S002). No invoicing provider is modelled yet.
+- The market-entry model is open (plan Part F, question 7). Operating as Hopin's own Budapest dispatch needs 100 M HUF equity and BKK-certified software ([S002 memo](../../compliance/s002-regulatory-memo.md)). A partner model would move the legal operator role out of Hopin.
+- Taxi-meter integration, the BKK real-time data feed and an invoicing provider are not modelled yet (plan steps S112, S113, S047).
 - The Azure region is not chosen yet (plan step S012).

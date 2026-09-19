@@ -11,7 +11,7 @@
 
 ### A1. Vision
 
-Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps, see the fare before the ride, track the driver live, share the trip with someone they trust, pay in-app and rate the driver afterwards. Tagline: *Hop in. Get there.*
+Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps, see a fare estimate before the ride, track the driver live, share the trip with someone they trust, pay in-app and rate the driver afterwards. Tagline: *Hop in. Get there.*
 
 ### A2. MVP scope (decided)
 
@@ -27,11 +27,11 @@ Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps
 
 - Phone-number login (OTP) for passengers and drivers.
 - Pickup and destination selection on a map with address search.
-- Upfront fare quote, valid for a short window.
+- ~~Upfront fare quote~~ Fare **estimate** from the official tariff, valid for a short window. The charge is the taxi-meter amount ([S002 memo](./compliance/s002-regulatory-memo.md)).
 - Driver matching by proximity, with accept/decline and timeout fallback.
 - Live driver location to the passenger before and during the trip.
 - Ride lifecycle: requested → matched → arriving → in progress → completed / cancelled.
-- In-app card payment (Apple Pay / Google Pay / saved card) via Stripe; tips; cancellation fees.
+- In-app card payment (Apple Pay / Google Pay / saved card) via Stripe; tips and ~~cancellation fees~~ waiting charges only where the lawyer confirms them ([S002 memo](./compliance/s002-regulatory-memo.md)).
 - Driver payouts via Stripe Connect.
 - Trip sharing through a public tracking link.
 - Ratings both ways (passenger rates driver; driver rates passenger).
@@ -43,10 +43,10 @@ Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps
 ### A4. Explicitly out of scope for MVP (v2 backlog)
 
 - Scheduled / advance rides, ride pooling, multi-stop rides.
-- Surge pricing (fare parameters exist, surge multiplier is fixed at 1.0).
+- Surge pricing. **Not allowed in Budapest**: unit rates are fixed official prices ([S002 memo](./compliance/s002-regulatory-memo.md)).
 - In-app turn-by-turn navigation for drivers (MVP deep-links to Google/Apple/Waze).
 - In-app chat (MVP: masked phone call only; chat is a v2 item).
-- Promo codes, referral programs, corporate accounts, cash payment.
+- Promo codes and discounts (**not allowed in Budapest**, fixed tariff), referral programs, corporate accounts, cash payment.
 - Multiple cities / multiple currencies. MVP is one city, HUF only.
 - A second running copy of production in Azure (see Part C4 for what Azure *does* do).
 
@@ -104,13 +104,16 @@ Every transition is written to `ride_events` (append-only) with actor, timestamp
 | Accessibility | WCAG 2.1 AA on web, platform a11y basics on mobile | Public-facing consumer app |
 | Cost ceiling | Idle infra ≤ ~150 EUR/month before real traffic | Solo developer budget |
 
-### A8. Regulatory notes (must be checked in S002, not assumed)
+### A8. Regulatory summary (from S002, 2026-09-19)
 
-- In Hungary, ride-hailing must be performed by licensed taxi drivers with licensed vehicles; in Budapest the fare is a regulated fixed tariff (base + per-km + per-minute). "Upfront fare" must be computed with the legal tariff, not a free-form price.
-- Every ride is a taxable service: receipts/invoices must comply with NAV rules (online invoice reporting). Plan for an invoicing provider integration (e.g. a Hungarian API such as számlázz.hu / Billingo) rather than home-grown invoices.
-- GDPR: location history is personal data. We need a DPIA, retention rules, export and delete-my-account flows, and DPAs with AWS, Azure, Stripe, Mapbox, Expo, Sentry.
+Full research, sources and open questions: [S002 memo](./compliance/s002-regulatory-memo.md). Architecture constraints: [constraints.md](./architecture/requirements/constraints.md). Not yet confirmed by a lawyer.
+
+- Hopin is legally a taxi **dispatch service**. Only licensed taxis with a certified meter may drive. Private-car ride-sharing is not an option.
+- **Budapest dispatch needs 100 M HUF equity** and BKK-certified software. This makes launching Hopin as its own Budapest dispatch unrealistic for a solo founder; see Part F question 7.
+- The Budapest fare is the **meter amount only**, at fixed official rates (1,300 HUF base, 520 HUF/km, 130 HUF/min since 2026-08-01). No discounts, surge or passenger fees.
+- The taxi operator issues the passenger's receipt; Hopin invoices its fee to drivers and files DAC7 reports.
+- A DPIA is mandatory before launch. The Platform Work Directive applies to matching from its transposition (deadline 2026-12-02).
 - App stores: background location on the driver app needs a clear justification and in-app disclosure.
-
 ---
 
 ## Part B — Architecture
@@ -349,9 +352,9 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | ID | Step | Done when | Status | Depends |
 |---|---|---|---|---|
 | S001 | Finalize scope, non-goals and NFRs (this document, Parts A–C) | You've read and signed off on Part A and Part C4 | doing | — |
-| S002 | Regulatory and legal check for operating in Hungary | Written memo: licensing requirements, Budapest tariff rules, NAV invoicing obligation, chosen invoicing provider, GDPR DPIA outline | todo | S001 |
+| S002 | Regulatory and legal check for operating in Hungary | Written memo: licensing requirements, Budapest tariff rules, NAV invoicing obligation, invoicing provider shortlist, GDPR DPIA outline | doing | S001 |
 | S003 | Ride state machine and event catalogue | `packages/shared` contains the state machine as pure TS with exhaustive tests; A6 updated if it changed | todo | S001 |
-| S004 | Fare model definition | Formula and parameters documented (needs your input, see Part F); implemented as a pure function with tests | todo | S002 |
+| S004 | Fare model definition | Official tariff table versioned by city and effective date (C-02, C-03); estimate function with tests; no discounts or fees | todo | S002 |
 | S005 | Domain model and ERD | B4 refined, ERD in `docs/architecture/data/`, first Drizzle schema committed | todo | S003, S004 |
 | S006 | API and realtime contract | OpenAPI 3.1 file and Socket.IO event schema (zod) in `packages/shared`; reviewed against every journey in A5 | todo | S005 |
 | S007 | Design system and wireframes | Tokens (colour, type, spacing), key screens for all three surfaces in Figma/Stitch; exported to `packages/ui` | todo | S001 |
@@ -388,7 +391,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S028 | Driver onboarding API | Document upload via presigned S3 (type/size limits), vehicle registration, status transitions pending→approved | todo | S027 |
 | S029 | Maps services | Mapbox proxy for geocoding/autocomplete and directions with caching; server-side only tokens | todo | S023 |
 | S030 | Fare quote service | `POST /quotes` validates service area (PostGIS), computes distance/duration, applies active fare config, returns quote with TTL | todo | S004, S025, S029 |
-| S031 | Matching engine | Redis GEO index of online drivers, offer loop (nearest N, 15 s timeout each, max 5 offers), fallback to NO_DRIVER; metrics emitted | todo | S030 |
+| S031 | Matching engine | Redis GEO pre-filter, then automatic best-taxi choice by **road ETA with traffic** (C-04); offer loop (15 s timeout each, max 5 offers), fallback to NO_DRIVER; metrics emitted | todo | S030 |
 | S032 | Ride lifecycle | All A6 transitions as endpoints with guards, `ride_events` written, cancellation fee rules | todo | S003, S031 |
 | S033 | Realtime gateway | Socket.IO namespaces per B5, Redis adapter, driver location ingest → Redis GEO + batched Postgres writes, passenger room fan-out | todo | S031 |
 | S034 | Push notifications | Expo Push service integration, templates for every ride event, retry and token cleanup | todo | S027, S032 |
@@ -405,11 +408,11 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 |---|---|---|---|---|
 | S041 | Stripe accounts | Stripe account (HU entity), Connect enabled, restricted API keys in Secrets Manager, test mode wired to dev/staging | todo | S017 |
 | S042 | Payment methods | SetupIntent flow, saved cards, Apple Pay / Google Pay merchant setup, default method on profile | todo | S027, S041 |
-| S043 | Ride charging | PaymentIntent authorised at MATCHED for the quote amount, captured at COMPLETED with final amount, tip as separate capture/charge | todo | S032, S042 |
+| S043 | Ride charging | PaymentIntent authorised at MATCHED for estimate plus buffer, captured at COMPLETED with the **meter amount** (C-02, S113), payment traceable to the car's plate (C-07), tip as separate charge if lawful | todo | S032, S042 |
 | S044 | Webhooks | Signature-verified, idempotent handler for intent/charge/payout events, reconciliation job comparing Stripe vs `payments` nightly | todo | S043 |
 | S045 | Driver payouts | Connect Express onboarding link in driver app, weekly transfer job, `payouts` records, failure alerts | todo | S028, S041 |
-| S046 | Refunds and cancellation fees | Admin refund (full/partial), automatic cancellation fee per S004 rules, passenger-visible breakdown | todo | S037, S043 |
-| S047 | Receipts and invoices | SES receipt email after capture; invoicing-provider integration per S002 memo | todo | S002, S043 |
+| S046 | Refunds and waiting charges | Admin refund (full/partial); waiting charged only via the booked-ride meter-start rule unless the lawyer confirms a cancellation fee (S111) | todo | S037, S043 |
+| S047 | Receipts and invoices | Ride summary email; legal receipt comes from the taxi operator (C-08); choose Számlázz.hu or Billingo and invoice Hopin's fee to drivers | todo | S002, S043 |
 | S048 | Payment tests | Stripe test cards and fixtures covering auth failure, capture failure, refund, disputed charge | todo | S044 |
 
 ### Phase 4 — Passenger app
@@ -422,7 +425,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S052 | Pickup and destination | Autocomplete search, draggable pickup pin, recent places | todo | S051 |
 | S053 | Quote and confirm | Fare card with breakdown, quote countdown, payment method chip, confirm → `POST /rides` | todo | S030, S042, S052 |
 | S054 | Requesting and matched | Searching animation, driver + vehicle card, live driver marker via Socket.IO, ETA | todo | S033, S053 |
-| S055 | In-trip | Route line, ETA, driver contact (masked call), SOS button (calls 112, logs event) | todo | S054 |
+| S055 | In-trip | Route line, ETA, driver contact (masked call), SOS button (calls 112, logs event), fare-check view against the official tariff (C-06) | todo | S054 |
 | S056 | Share trip | Native share sheet with link, revoke from trip screen | todo | S035, S055 |
 | S057 | Trip complete | Rating, tip presets, receipt summary | todo | S036, S043, S055 |
 | S058 | History and settings | Ride history with receipts, payment methods management, delete account, export data | todo | S057 |
@@ -439,7 +442,7 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S064 | Onboarding | Document capture (camera + gallery), vehicle form, pending-approval screen with status polling | todo | S028, S063 |
 | S065 | Online/offline and background location | Foreground service (Android), background location mode (iOS), 3 s location emit while online, permission rationale screens | todo | S033, S063 |
 | S066 | Ride offers | Full-screen offer with countdown, pickup distance, fare; accept/decline; sound + vibration | todo | S031, S065 |
-| S067 | To pickup and trip control | Navigate button (deep link to Google/Apple/Waze), Arrived → Start → Complete buttons with confirmations | todo | S032, S066 |
+| S067 | To pickup and trip control | Order shown with audible alert, navigate button (deep link to Google/Apple/Waze), Arrived → Start → Complete, **driver alarm** with live location to the operator (C-06) | todo | S032, S066 |
 | S068 | Trip summary | Earnings for the ride, passenger rating prompt | todo | S036, S067 |
 | S069 | Earnings and payouts | Daily/weekly earnings, payout history, Connect dashboard link | todo | S045, S068 |
 | S070 | Account | Ratings received, documents status, vehicle, support contact | todo | S064 |
@@ -500,9 +503,20 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S105 | Store review readiness | Background-location justification, payment compliance, demo account for reviewers, review notes | todo | S104 |
 | S106 | Marketing site | Landing page with app links, driver sign-up CTA, legal pages; hosted on S3 + CloudFront | todo | S085 |
 | S107 | Legal documents | Terms of service, driver agreement, privacy policy live in apps and web | todo | S100 |
-| S108 | Soft launch | Production live in one district; SLO dashboard watched daily for two weeks; kill-switch (service area) ready | todo | S105, S107, S096 |
+| S108 | Soft launch | Production live in one district; SLO dashboard watched daily for two weeks; kill-switch (service area) ready | todo | S105, S107, S096, S111, S116 |
 | S109 | Post-launch loop | Weekly triage of Sentry, support tickets, driver feedback into backlog | todo | S108 |
-| S110 | Retrospective and v2 plan | Retro written; v2 scope chosen from A4 (scheduled rides, surge, chat, promo codes, Azure standby?) | todo | S109 |
+| S110 | Retrospective and v2 plan | Retro written; v2 scope chosen from A4 (scheduled rides, chat, other cities, Azure standby?) | todo | S109 |
+
+### Phase 10 — Regulatory additions (from S002)
+
+| ID | Step | Done when | Status | Depends |
+|---|---|---|---|---|
+| S111 | Market-entry decision and lawyer review | Part F question 7 answered; a Hungarian lawyer has answered the memo's open questions; A8 and constraints updated | todo | S002 |
+| S112 | BKK real-time data feed | Taxi position and meter start/stop sent to BKK in real time (C-05); accepted by BKK in a test | todo | S033, S111 |
+| S113 | Meter amount capture | Chosen way to get the meter amount into Hopin (meter integration or driver entry checked against route and tariff) working end to end | todo | S043, S111 |
+| S114 | Phone-order intake | Phone orders recorded in the same order register as app orders (C-06) | todo | S032 |
+| S115 | DAC7 annual report | Yearly driver income report generated and filed with NAV (C-08) | todo | S045 |
+| S116 | BKK software certification | Dispatch software certified by BKK against the Budapest rules (C-06), if the entry model requires it | todo | S067, S074, S111 |
 
 ---
 
@@ -532,18 +546,30 @@ Each step gets a section here when it starts. Template:
 **Result / verification:** Pending your review of Part A and Part C4.
 **Follow-ups:** Part F items need your answers before S004 and S002 can close.
 
+
+### S002 — Regulatory and legal check
+**Status:** doing · **Started:** 2026-09-19 · **Finished:** —
+**Goal:** Know what Hungarian law requires before any product code is written.
+**Decisions:**
+- Memo lives in `docs/compliance/`; architecture-relevant rules become constraints C-01 to C-09 in `docs/architecture/requirements/constraints.md`.
+- Invoicing provider is shortlisted (Számlázz.hu, Billingo), not chosen. Who issues invoices depends on the entry model, so the choice moves to S047.
+- Recommended entry model: technology provider to a licensed Budapest dispatch, keeping another city open. Your decision: Part F question 7.
+**Work log:** Read Government Decree 176/2015, Budapest decree 31/2013 as amended to 2026, NAV guidance, the NAIH DPIA list, DAC7 and the Platform Work Directive. Wrote [S002 memo](./compliance/s002-regulatory-memo.md). Updated A3, A4, A8, S004, S031, S043, S046, S047, S055, S067, ADR 5 and ADR 7; added S111–S116.
+**Result / verification:** Memo written with primary-law citations. Not confirmed by a lawyer.
+**Follow-ups:** S111 (entry decision and lawyer review) closes this step.
 ---
 
 ## Part F — Decisions needed from you
 
 These shape business logic, so they are yours, not mine. Answer inline here and we'll fold them into the relevant step.
 
-1. **Fare formula (blocks S004, S030).** Do we follow the Budapest regulated tariff exactly (base fee + per-km + per-minute, no discounting), or is the launch city different? Write the numbers you want to launch with, or "use current legal tariff" and I'll parameterise it.
+1. ~~**Fare formula (blocks S004, S030).**~~ Answered by S002: the official tariff is mandatory and fixed. Only the launch city (question 2) changes the numbers.
 2. **Launch city and service area (blocks S078, S108).** Which city, and roughly which districts for the soft launch?
-3. **Cancellation rules (blocks S046).** Free cancellation window after match (e.g. 2 minutes)? Fee amount after that? Free waiting time at pickup before a fee (e.g. 3 minutes)?
-4. **Driver matching policy (S031).** Nearest-first only, or nearest with a rating floor (e.g. ≥ 4.3)? How many drivers to offer before giving up?
+3. **Cancellation rules (blocks S046).** A passenger cancellation fee may be unlawful in Budapest (memo, open question 2). Wait for the lawyer before setting numbers.
+4. **Driver matching policy (S031).** Budapest requires automatic best-taxi selection by road distance and time. Do you also want a rating floor (e.g. ≥ 4.3), and how many offers before giving up?
 5. **Brand.** Colours/logo exist, or should S007 propose them?
 6. **Azure region.** West Europe (Netherlands) vs Germany West Central. Default: Germany West Central for data-residency optics; West Europe if a required feature is missing there.
+7. **Market-entry model (blocks S111 and launch).** (A) own Budapest dispatch licence, needs 100 M HUF equity; (B) another Hungarian city with lighter rules; (C) technology provider to a licensed Budapest dispatch; (D) outside Hungary. Recommended: C, keeping B open. Details in [S002 memo](./compliance/s002-regulatory-memo.md).
 
 ---
 
@@ -551,7 +577,7 @@ These shape business logic, so they are yours, not mine. Answer inline here and 
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Hungarian taxi regulation makes "upfront fare" or independent drivers illegal in the form we planned | Product pivot | S002 first, before any app code |
+| ~~Hungarian taxi regulation makes "upfront fare" or independent drivers illegal in the form we planned~~ Confirmed by S002: fare is meter-only and Budapest dispatch needs 100 M HUF equity | Entry-model change | Part F question 7, S111 |
 | SMS OTP cost or deliverability in HU | Login friction, cost | Budget alert on SNS; fallback to email OTP; consider WhatsApp later |
 | App Store rejects driver background location | Launch delay | Follow Apple/Google guidance from day one (S065, S105), record a demo video |
 | Solo on-call | Outages linger | Keep architecture boring, alarms actionable, runbooks short; scale-to-zero dev to save money for prod HA |
@@ -567,3 +593,4 @@ These shape business logic, so they are yours, not mine. Answer inline here and 
 |---|---|
 | 2026-09-19 | v0.1 — initial plan from pre-plan; stack and cloud decisions recorded; 110 steps defined |
 | 2026-09-19 | v0.2 — architecture knowledge base added under `docs/architecture/`. Corrections: admin is a Next.js static export, since server components would need a server runtime the plan never hosted (B2, S073). WAF sits on the load balancer and the Cognito pool as well as CloudFront, because the API bypasses CloudFront and sign-in codes are Cognito's (C2, S086). |
+| 2026-09-19 | v0.3 — S002 regulatory memo. Fare becomes a meter-based estimate; surge, promo codes and passenger fees are not allowed in Budapest; matching must use road distance; driver alarm and fare-check features added; Phase 10 (S111–S116) added; Part F question 7 on the market-entry model. |
