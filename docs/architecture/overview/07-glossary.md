@@ -1,4 +1,4 @@
-# Glossary
+## Glossary
 
 | Term | Meaning |
 |---|---|
@@ -13,10 +13,10 @@
 | PITR | Point-in-time recovery: restoring a database to any moment within a retention window. |
 | RPO / RTO | Recovery point objective (how much data may be lost) and recovery time objective (how long recovery may take). |
 | EAS | Expo Application Services: cloud builds, store submission and over-the-air updates. |
-| Tenant | One dispatch partner, or the Hopin brand, whose data is isolated from all others ([ADR 9](../decisions/0009-hybrid-multi-tenancy.md)). |
+| Tenant | One dispatch partner, or the Hopin brand, whose data is isolated from all others. |
 | Row-level security (RLS) | A PostgreSQL feature that filters every query by a policy, here the current tenant. |
-| Transactional outbox | A table written in the same transaction as a state change, so the change and the event about it commit together ([ADR 12](../decisions/0012-payment-capture-workflow.md)). |
+| Transactional outbox | A table written in the same transaction as a state change, so the change and the event about it commit together. |
 | Saga | A sequence of local steps with compensations instead of one distributed transaction. |
 | Idempotency key | A key that makes repeating a request return the first result instead of acting twice. |
 | Joint controllers | Two parties that decide together why and how personal data is processed (GDPR Article 26). |
-| Task token | A token a waiting Step Functions workflow hands out; sending it back resumes the workflow ([ADR 12](../decisions/0012-payment-capture-workflow.md)). |
+| Task token | A token a waiting Step Functions workflow hands out; sending it back resumes the workflow. |

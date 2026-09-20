@@ -16,12 +16,16 @@ Hopin, a ride-hailing app for short city trips.
 
 ## Reading paths
 
-| Audience | Read in this order |
-|---|---|
-| Stakeholder | [Executive summary](../executive-summary.md), [Overview](overview/architecture-overview.md), Context, RideRequest, Authorities, DriverAlarm, [risks](risks/architecture-risks.md), [transition plan](roadmap/transition-plan.md) |
-| CTO / reviewer | Context, Security, PartnerIsolation, LocationData, AiAssist, ProductionCore, OffProviderRecovery, AccountRecovery, [ADR 1](decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [quality attributes](requirements/quality-attributes.md), [risks](risks/architecture-risks.md) |
-| Engineer | Clients, Backend, ApiRideFlow, ApiPayments, PaymentCapture, Security, RideRequest, ProductionCore, Delivery, all ADRs, [principles](principles/architecture-principles.md), [integration](integration/integration-architecture.md) |
-| Operator | ProductionCore, AlertPath, DriverAlarm, RedisLost, AwsBackups, AzureRecovery, OffProviderRecovery, RegionRecovery, AccountRecovery, [availability](reliability/availability.md), [disaster recovery](reliability/disaster-recovery.md), [observability](observability/observability-architecture.md) |
+Each path is written as a section of `overview/`, so it is also a section of
+the Structurizr Documentation tab and of the PDF, with its diagrams inline.
+Start with [the overview](overview/01-overview.md).
+
+| Audience | Path | Views it walks through |
+|---|---|---|
+| Stakeholder | [For stakeholders](overview/03-for-stakeholders.md) | Context, RideRequest, Authorities, DriverAlarm |
+| CTO / reviewer | [For the CTO](overview/04-for-the-cto.md) | Security, PartnerIsolation, LocationData, AiAssist, ProductionCore, OffProviderRecovery, AccountRecovery |
+| Engineer | [For engineers](overview/05-for-engineers.md) | Clients, Backend, ApiRideFlow, RideRequest, ApiPayments, PaymentCapture, PaymentCaptureDeclined, ApiRegulatoryFeeds, PartnerConsole, TripShare, PhoneOrder, DisputeAssist, Delivery |
+| Operator | [For operators](overview/06-for-operators.md) | ProductionCore, AlertPath, RedisLost, DriverAlarm, AwsBackups, AzureRecovery, OffProviderRecovery, RegionRecovery, AccountRecovery |
 
 ## View register
 
@@ -86,7 +90,7 @@ New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-titl
 
 | Area | Documents |
 |---|---|
-| Overview | [architecture-overview](overview/architecture-overview.md) · [scope](overview/scope.md) · [glossary](overview/glossary.md) |
+| Overview (the Documentation tab) | [01-overview](overview/01-overview.md) · [02-scope](overview/02-scope.md) · [03-for-stakeholders](overview/03-for-stakeholders.md) · [04-for-the-cto](overview/04-for-the-cto.md) · [05-for-engineers](overview/05-for-engineers.md) · [06-for-operators](overview/06-for-operators.md) · [07-glossary](overview/07-glossary.md) |
 | Principles | [architecture-principles](principles/architecture-principles.md) · [engineering-standards](principles/engineering-standards.md) |
 | Requirements | [constraints](requirements/constraints.md) · [quality-attributes](requirements/quality-attributes.md) · [assumptions](requirements/assumptions.md) |
 | Security | [security-architecture](security/security-architecture.md) · [trust-boundaries](security/trust-boundaries.md) · [threat-model](security/threat-model.md) · [data-classification](security/data-classification.md) |
@@ -100,7 +104,11 @@ New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-titl
 | Presentation | [presentation ledger](presentation/README.md): communication diagrams redrawn from accepted views |
 | Roadmap | [current-state](roadmap/current-state.md) · [target-state](roadmap/target-state.md) · [transition-plan](roadmap/transition-plan.md) |
 
-Only `overview/` is imported into the model by `!docs`. The rest is plain Markdown linked from here.
+Only `overview/` is imported into the model by `!docs`: those seven files, in
+filename order, are the Documentation tab, and their `![](embed:Key)` lines are
+where the diagrams appear. They link outward with absolute GitHub URLs, because
+a relative repository path does not resolve inside Structurizr. The rest is plain
+Markdown linked from here.
 
 IDs are owned by one file each and cited everywhere else: `C-xx` constraints, `QA-xx` quality attributes, `A-xx` assumptions, `P-xx` principles, `RISK-xxx` risks, `T-xx` threats. `scripts/check_docs_consistency.py` fails when a cited ID is not defined.
 
