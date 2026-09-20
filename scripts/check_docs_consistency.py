@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """Fail when documentation contradicts the tree it documents.
 
-The mechanical half of the /docs-sync audit (.claude/skills/docs-sync/SKILL.md),
-ported from homelab's scripts/ci/check_docs_consistency.py. It only checks
-claims derivable from the repo: mirrored files, resolvable links, indexes,
-ADR format, the view register and cross-referenced IDs. A green run means
-"nothing provably false", not "docs are good".
+The mechanical half of the /docs-sync audit (.claude/skills/docs-sync/SKILL.md).
+It only checks claims derivable from the repo: mirrored files, resolvable
+links, indexes, ADR format, the view register and cross-referenced IDs. A green
+run means "nothing provably false", not "docs are good".
+
+Every check whose subject is missing is skipped, not failed, so a repository
+adopts them as it grows: no docs index, no view register, no speaker notes and
+no requirement documents still passes. What exists must be consistent.
+
+The canonical copy lives in architect-base (scripts/); repositories copy it
+unchanged.
 
 Run from anywhere: python3 scripts/check_docs_consistency.py
 """
@@ -25,8 +31,8 @@ VIEWS_DSL = ARCH / "model" / "views.dsl"
 
 # Generated output and templates with example links are not documentation.
 SKIP_DIRS = {"generated", "templates", "node_modules", ".git"}
-# Vendored ECC rules keep upstream's relative links to ../common/, which ECC
-# installs globally, not in this repo. They are not Hopin documentation.
+# Vendored rule sets (for example ECC's) keep upstream's relative links to
+# directories installed globally, not in this repo. They are not documentation.
 VENDORED = REPO / ".claude" / "rules"
 
 # Cited ID pattern -> the file that must define it (as a table row or heading).
@@ -43,6 +49,7 @@ ID_OWNERS = {
 ADR_NAME = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 ADR_STATUSES = {"Proposed", "Accepted", "Rejected", "Deprecated", "Superseded"}
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+FENCE = re.compile(r"^\s*(```|~~~)")
 
 
 class Failures(list):
@@ -56,6 +63,17 @@ def read(path: Path) -> str:
 
 def rel(path: Path) -> str:
     return path.relative_to(REPO).as_posix()
+
+
+def prose(text: str) -> str:
+    """The text outside fenced blocks: a sample ADR or risk is an example, not a claim."""
+    out, fenced = [], False
+    for line in text.splitlines():
+        if FENCE.match(line):
+            fenced = not fenced
+        elif not fenced:
+            out.append(line)
+    return "\n".join(out)
 
 
 def markdown_files() -> list[Path]:
@@ -93,7 +111,7 @@ def check_skill_mirror(f: Failures) -> None:
 def check_links(f: Failures) -> None:
     """Every relative markdown link resolves to something on disk."""
     for src in markdown_files():
-        for text, link in LINK_RE.findall(read(src)):
+        for text, link in LINK_RE.findall(prose(read(src))):
             if link.startswith(("http://", "https://", "#", "mailto:")):
                 continue
             if not (src.parent / link.split("#")[0]).exists():
@@ -103,8 +121,7 @@ def check_links(f: Failures) -> None:
 def check_docs_index(f: Failures) -> None:
     """Every doc under docs/ is linked from docs/README.md or the architecture README."""
     if not DOCS_INDEX.exists():
-        f.add("docs-index", "docs/README.md is missing")
-        return
+        return  # a repository without a docs index has nothing to enforce
     indexes = {DOCS_INDEX: read(DOCS_INDEX), ARCH_INDEX: read(ARCH_INDEX)}
     for doc in sorted((REPO / "docs").rglob("*.md")):
         parts = doc.relative_to(REPO).parts
@@ -122,6 +139,8 @@ def check_docs_index(f: Failures) -> None:
 
 def check_adrs(f: Failures) -> None:
     """ADRs import cleanly into Structurizr and are listed in the architecture README."""
+    if not ADR_DIR.is_dir():
+        return
     index = read(ARCH_INDEX)
     numbers = []
     for path in sorted(ADR_DIR.iterdir()):
@@ -151,6 +170,8 @@ def check_adrs(f: Failures) -> None:
 
 def check_view_register(f: Failures) -> None:
     """The README view register lists exactly the views defined in views.dsl."""
+    if not VIEWS_DSL.exists() or "## View register" not in read(ARCH_INDEX):
+        return  # no register to reconcile yet
     dsl = read(VIEWS_DSL)
     defined = set(re.findall(
         r'^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|'
@@ -166,9 +187,8 @@ def check_view_register(f: Failures) -> None:
 def check_speaker_notes(f: Failures) -> None:
     """Every view in views.dsl has a '### <key>' section in the speaker notes."""
     notes_path = ARCH / "talks" / "speaker-notes.md"
-    if not notes_path.exists():
-        f.add("speaker-notes", f"{rel(notes_path)} is missing")
-        return
+    if not notes_path.exists() or not VIEWS_DSL.exists():
+        return  # speaker notes are optional; enforce them once they exist
     notes = set(re.findall(r"^### (\S+)\s*$", read(notes_path), re.MULTILINE))
     defined = set(re.findall(
         r'^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|'
@@ -183,10 +203,12 @@ def check_ids(f: Failures) -> None:
     """Every cited requirement/risk ID is defined in its owning document."""
     sources = markdown_files() + sorted(ARCH.rglob("*.dsl"))
     for pattern, owner in ID_OWNERS.items():
-        owner_text = read(owner) if owner.exists() else ""
+        if not owner.exists():
+            continue  # this repository does not keep that ID family
+        owner_text = read(owner)
         defined = set(re.findall(r"^(?:\|\s*|#+\s*)(" + pattern.strip(r"\b") + r")\b", owner_text, re.MULTILINE))
         for src in sources:
-            for cited in sorted(set(re.findall(pattern, read(src)))):
+            for cited in sorted(set(re.findall(pattern, prose(read(src))))):
                 if cited not in defined:
                     f.add("ids", f"{rel(src)} cites {cited}, which {rel(owner)} does not define")
 
