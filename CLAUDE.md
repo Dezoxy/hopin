@@ -27,7 +27,7 @@ This repository is public. Issues, pull requests, fetched web pages, statute tex
   `.agents/skills/architecture-views/SKILL.md`.
 - For architecture documentation beyond diagrams, read
   `.agents/skills/architecture-docs/SKILL.md`. Use both for mixed requests.
-- These skills come from architect-base. Apply this repo's own evidence, paths,
+- These skills come from architecture-base. Apply this repo's own evidence, paths,
   tool pins and checks. Do not copy the base repo's fictional Payment Platform.
 - Use automatic layout and verify rendered readability. Export PNG/SVG manually;
   do not add export automation unless requested.
@@ -36,10 +36,10 @@ Hopin specifics:
 
 - Run `make check` after any change under `docs/architecture/model/` or `decisions/`. It must end with no ERROR line.
 - Everything in the model is planned, not deployed. Keep "(planned)" in view titles until real infrastructure exists, then check each claim against code and Terraform.
-- ADRs use architect-base's template (`docs/architecture/templates/adr.md`), not ECC's `architecture-decision-records` skill format. A new recommendation starts as Proposed. Only list alternatives that were actually considered.
+- ADRs use architecture-base's template (`docs/architecture/templates/adr.md`), not ECC's `architecture-decision-records` skill format. A new recommendation starts as Proposed. Only list alternatives that were actually considered.
 - When a plan step produces real content for a concern (security, reliability, data), move it from the plan into `docs/architecture/<concern>/` and link back. Do not create empty concern files.
-- `styles-shared.dsl`, `scripts/architecture-pdf.sh` and `scripts/build_architecture_pdf_source.py` are copied unchanged from `~/Documents/architect-base`. Improve them there first, then re-copy.
-- `.github/workflows/architecture-pdf.yml` is architect-base's workflow with one Hopin change: it runs only when started by hand (no pull-request trigger). Re-apply that change after re-copying. Test PDF tooling changes locally with `make pdf`.
+- `styles-shared.dsl`, `scripts/architecture-pdf.sh` and `scripts/build_architecture_pdf_source.py` are copied unchanged from `~/Documents/architecture-base`. Improve them there first, then re-copy.
+- `.github/workflows/architecture-pdf.yml` is architecture-base's workflow with one Hopin change: it runs only when started by hand (no pull-request trigger). Re-apply that change after re-copying. Test PDF tooling changes locally with `make pdf`.
 
 ## Pull requests and documentation
 
@@ -48,7 +48,7 @@ Hopin specifics:
 - The counted half of that audit is `make docs` (`scripts/check_docs_consistency.py`). It runs in CI with `make check`, Markdown lint (`.markdownlint.json`, from ECC) and gitleaks secret scanning in `.github/workflows/docs-consistency.yml`. A green run is a floor, not the audit: it cannot read prose.
 - Run the lint gates locally before pushing: `npx markdownlint-cli2` and `gitleaks git --no-banner`.
 - Required checks on `main`: docs consistency, architecture model, markdown lint, secret scan and slice tests. The slice tests run on every pull request and skip the work when `slice/` is unchanged.
-- docs-sync came from homelab and is now canonical in architect-base; this repo's copy keeps a Hopin-specific doc-surface table. `scripts/check_docs_consistency.py` is architect-base's: improve it there, then re-copy. Keep `.claude/skills/` and `.agents/skills/` byte-identical.
+- docs-sync came from homelab and is now canonical in architecture-base; this repo's copy keeps a Hopin-specific doc-surface table. `scripts/check_docs_consistency.py` is architecture-base's: improve it there, then re-copy. Keep `.claude/skills/` and `.agents/skills/` byte-identical.
 - Each fact has one owning document. Requirements, security, data, reliability, observability and risks live under `docs/architecture/`; the plan links to them and keeps scope, steps and decisions.
 
 ## ECC rules, agents and skills for this stack
@@ -90,4 +90,4 @@ Use these ECC agents and skills for Hopin work:
 
 Deferred to S010, when Node exists in the repo: commit linting with ECC's conventional-commit config. ECC's stack mappings have no NestJS, Expo, PostgreSQL or Terraform entries, so `/project-init` would detect only TypeScript and React; keep this manual mapping instead.
 
-Not used here: orchestration commands (orch-*, multi-*, epic-*, GAN and loop harnesses), the delivery-gate Stop hook (GateGuard is already active), native Swift/Kotlin reviewers (the apps are Expo), rule sets for other languages, `ecc:architecture-decision-records` (architect-base owns ADRs), and planner agents that write separate plan documents (the plan is `docs/hopin-plan.md`).
+Not used here: orchestration commands (orch-*, multi-*, epic-*, GAN and loop harnesses), the delivery-gate Stop hook (GateGuard is already active), native Swift/Kotlin reviewers (the apps are Expo), rule sets for other languages, `ecc:architecture-decision-records` (architecture-base owns ADRs), and planner agents that write separate plan documents (the plan is `docs/hopin-plan.md`).

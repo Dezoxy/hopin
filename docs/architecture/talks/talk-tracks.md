@@ -68,4 +68,4 @@ Record it once, watch it back, and cut anything you read from the screen instead
 
 ## Slides
 
-Slides redrawn in a design tool follow architect-base's `presentation.md`: drawn only from accepted views, from a library that uses the colours in `styles.dsl`, and logged in a ledger next to this file. Until that exists, present the views themselves or the PDF.
+Slides redrawn in a design tool follow architecture-base's `presentation.md`: drawn only from accepted views, from a library that uses the colours in `styles.dsl`, and logged in a ledger next to this file. Until that exists, present the views themselves or the PDF.

@@ -1,6 +1,6 @@
 // Hopin's styles. Shared meanings (people, systems, external, shapes, security
 // markings, arrows) and the approved palette come from styles-shared.dsl,
-// copied unchanged from architect-base. This file only maps Hopin's layers and
+// copied unchanged from architecture-base. This file only maps Hopin's layers and
 // groups onto palette families. Tag order on an element: layer first,
 // security marking last.
 

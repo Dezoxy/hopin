@@ -6,7 +6,7 @@ name: Docs / Architecture PDF
 # architecture-<edition>. It runs `make pdf`, so the image pins at the top of
 # the Makefile apply here exactly as they do locally.
 #
-# Hopin change from the architect-base original: it runs ONLY when an
+# Hopin change from the architecture-base original: it runs ONLY when an
 # operator starts it (workflow_dispatch). The pull_request trigger that built
 # the PDF on changes to this workflow, scripts/** or the Makefile is removed,
 # so no PR spends a runner on a PDF nobody asked for. Test changes to the PDF

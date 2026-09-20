@@ -1,4 +1,4 @@
-# Shared architecture styles. Canonical in architect-base; every repository
+# Shared architecture styles. Canonical in architecture-base; every repository
 # copies this file unchanged and includes it first inside its styles { } block:
 #
 #     styles {
@@ -8,7 +8,7 @@
 #
 # It defines what a colour, border or line means, so a reader of any of our
 # workspaces reads the same meaning. It never mentions a specific system. Fix
-# or extend it in architect-base first, then copy it back out.
+# or extend it in architecture-base first, then copy it back out.
 
 # ── Approved layer palette ───────────────────────────────────────────────────
 # A repository maps each of its layers (groups of containers by capability) to
