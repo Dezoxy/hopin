@@ -1,6 +1,9 @@
 # Trust Boundaries
 
-Threats per boundary and their controls: [threat-model.md](threat-model.md). The **Security** view in `workspace.dsl` shows the modelled version: the `Client devices (untrusted)`, `AWS eu-central-1` and `Azure (off-provider recovery)` groups mark the boundaries.
+Threats per boundary and their controls: [threat-model.md](threat-model.md). The
+**Security** view in `workspace.dsl` shows the modelled version: the `Client
+devices (untrusted)`, `AWS eu-central-1` and `Azure (off-provider recovery)`
+groups mark the boundaries.
 
 ```text
       Passenger / driver phones, browsers, trip-share viewers        Stripe

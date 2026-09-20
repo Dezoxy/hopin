@@ -1,6 +1,9 @@
 # Event Catalog
 
-Realtime events on Socket.IO. Schemas will live in `packages/shared` as zod definitions (plan step S006). Delivery is **at most once**: a client that reconnects re-reads ride state over REST, so no event is the only copy of a fact ([P-05](../principles/architecture-principles.md)).
+Realtime events on Socket.IO. Schemas will live in `packages/shared` as zod
+definitions (plan step S006). Delivery is **at most once**: a client that
+reconnects re-reads ride state over REST, so no event is the only copy of a fact
+([P-05](../principles/architecture-principles.md)).
 
 | Namespace | Event | Direction | Payload (summary) | Rate | Notes |
 |---|---|---|---|---|---|
@@ -15,11 +18,15 @@ Realtime events on Socket.IO. Schemas will live in `packages/shared` as zod defi
 | `/admin` | `ops.snapshot` | Server → admin | online drivers, active rides | Every 5 s | Aggregated |
 | `/admin` | `driver.alarm` | Server → admin | driver, position, type | On alarm | Must reach the operator immediately |
 
-Stripe webhook events consumed (`payment_intent.*`, `charge.refunded`, `payout.*`, `account.updated`) are handled idempotently by event ID.
+Stripe webhook events consumed (`payment_intent.*`, `charge.refunded`,
+`payout.*`, `account.updated`) are handled idempotently by event ID.
 
 ## Outbox events
 
-Written in the same transaction as the state change they describe, then relayed at least once: `ride.completed` starts a payment workflow, the rest become jobs ([ADR 12](../decisions/0012-payment-capture-workflow.md)). Every consumer is idempotent by the key shown.
+Written in the same transaction as the state change they describe, then relayed
+at least once: `ride.completed` starts a payment workflow, the rest become jobs
+([ADR 12](../decisions/0012-payment-capture-workflow.md)). Every consumer is
+idempotent by the key shown.
 
 | Event | Written when | Consumers | Idempotency key |
 |---|---|---|---|

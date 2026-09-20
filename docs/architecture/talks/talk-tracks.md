@@ -1,6 +1,10 @@
 # Talk Tracks
 
-Three ways to present Hopin, built from the accepted views and their [speaker notes](speaker-notes.md). Show each view with `make view` or from the architecture PDF (`make pdf`), which contains every view. Timings are targets for spoken English; rehearse against a clock and record yourself (plan step S124).
+Three ways to present Hopin, built from the accepted views and their [speaker
+notes](speaker-notes.md). Show each view with `make view` or from the
+architecture PDF (`make pdf`), which contains every view. Timings are targets
+for spoken English; rehearse against a clock and record yourself (plan step
+S124).
 
 ## Track 1: the three-minute version
 
@@ -13,7 +17,8 @@ For a recruiter, a hiring manager, or the first minutes of an interview.
 | 1:30 | RideRequest | "A ride from request to matched driver, where the card is charged only after a driver accepts, and only the meter amount." |
 | 2:15 | *(risk register)* | "The top risk was never technical: Budapest dispatch needs 100 million forints of equity, which is why this is a platform for licensed partners." |
 
-Close with the reusable rule: *never let the platform become the licensed party by accident* ([ADR 10](../decisions/0010-one-app-for-all-partners.md)).
+Close with the reusable rule: *never let the platform become the licensed party
+by accident* ([ADR 10](../decisions/0010-one-app-for-all-partners.md)).
 
 ## Track 2: the fifteen-minute architecture interview
 
@@ -32,7 +37,9 @@ For a design interview or an architecture review. Leave five minutes for questio
 | 11:00 | OffProviderRecovery → AccountRecovery | Multi-cloud only for the failure you fear; the identity gap it revealed |
 | 12:30 | *(ADR list)* | What is Accepted, what is Proposed and why ADR 11 waits for a lawyer |
 
-Close with the decision you would reverse first if the load grew tenfold. Suggested answer: the single Redis node and the shared database, in that order, and what would trigger each.
+Close with the decision you would reverse first if the load grew tenfold.
+Suggested answer: the single Redis node and the shared database, in that order,
+and what would trigger each.
 
 ## Track 3: deep dives on demand
 
@@ -51,7 +58,9 @@ Keep these ready; use them when the interviewer pulls a thread.
 
 ## Track 4: the recorded walkthrough
 
-The script for plan step S124: one take of about ten minutes, screen-shared, following the README's ten-minute review. Show the README diagrams and the published PDF; no slides are needed.
+The script for plan step S124: one take of about ten minutes, screen-shared,
+following the README's ten-minute review. Show the README diagrams and the
+published PDF; no slides are needed.
 
 | Time | On screen | Say |
 |---|---|---|
@@ -64,8 +73,12 @@ The script for plan step S124: one take of about ten minutes, screen-shared, fol
 | 8:30 | Retrospective | One thing you would do differently, one weakness you have not fixed, and the next decision. |
 | 9:30 | README | Close with the reusable rule you want remembered: *never let the platform become the licensed party by accident.* |
 
-Record it once, watch it back, and cut anything you read from the screen instead of saying. Link the recording from the README when it is published.
+Record it once, watch it back, and cut anything you read from the screen instead
+of saying. Link the recording from the README when it is published.
 
 ## Slides
 
-Slides redrawn in a design tool follow architecture-base's `presentation.md`: drawn only from accepted views, from a library that uses the colours in `styles.dsl`, and logged in a ledger next to this file. Until that exists, present the views themselves or the PDF.
+Slides redrawn in a design tool follow architecture-base's `presentation.md`:
+drawn only from accepted views, from a library that uses the colours in
+`styles.dsl`, and logged in a ledger next to this file. Until that exists,
+present the views themselves or the PDF.

@@ -1,15 +1,15 @@
-## For operators
+# For operators
 
 A reading path for whoever is paged. Where it runs, how a failure becomes a
 page, what degrades, and every restore path. Five stops.
 
-### What runs where
+## What runs where
 
 ![Production core view: where the live service runs in AWS and what fails together](embed:ProductionCore)
 
 - [Deployment architecture](https://github.com/Dezoxy/hopin/blob/main/docs/architecture/deployment/deployment-architecture.md)
 
-### How a failure becomes a page
+## How a failure becomes a page
 
 A page-worthy failure should reach the operator within five minutes
 ([QA-10](https://github.com/Dezoxy/hopin/blob/main/docs/architecture/requirements/quality-attributes.md)).
@@ -18,7 +18,7 @@ A page-worthy failure should reach the operator within five minutes
 
 - [Observability architecture](https://github.com/Dezoxy/hopin/blob/main/docs/architecture/observability/observability-architecture.md): the alarms and what each one means
 
-### What degrades rather than fails
+## What degrades rather than fails
 
 Redis holds only data that can be rebuilt, so losing it pauses matching and
 drops live positions for seconds instead of losing rides.
@@ -29,7 +29,7 @@ drops live positions for seconds instead of losing rides.
 
 - [Availability](https://github.com/Dezoxy/hopin/blob/main/docs/architecture/reliability/availability.md): the failure table, including the night-outage case
 
-### Backups, and where copies live
+## Backups, and where copies live
 
 Two chains. AWS Backup protects against corruption and region loss; a nightly
 encrypted export to Azure protects against losing the AWS account itself. The
@@ -45,7 +45,7 @@ attacker inside AWS can add junk but cannot destroy the copies
 
 - [Backup strategy](https://github.com/Dezoxy/hopin/blob/main/docs/architecture/reliability/backup-strategy.md)
 
-### Restoring
+## Restoring
 
 Three scenarios, three different answers, and none of them has been drilled.
 Corruption inside the region is a point-in-time restore. Losing the region

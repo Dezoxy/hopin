@@ -1,0 +1,1 @@
+../integration/event-catalog.md

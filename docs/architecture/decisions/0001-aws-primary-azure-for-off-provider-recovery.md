@@ -8,9 +8,13 @@ Accepted
 
 ## Context
 
-Hopin is built and run by one person in Hungary. The owner wants hands-on use of both AWS and Azure. Running the live service on two clouds would double the identity, network, infrastructure-as-code and on-call surface.
+Hopin is built and run by one person in Hungary. The owner wants hands-on use of
+both AWS and Azure. Running the live service on two clouds would double the
+identity, network, infrastructure-as-code and on-call surface.
 
-For a solo operator the realistic catastrophe is losing the primary account itself: compromise, billing lock-out or a provider-wide incident. Same-provider backups do not survive that.
+For a solo operator the realistic catastrophe is losing the primary account
+itself: compromise, billing lock-out or a provider-wide incident. Same-provider
+backups do not survive that.
 
 ## Decision drivers
 
@@ -23,12 +27,17 @@ For a solo operator the realistic catastrophe is losing the primary account itse
 
 1. AWS only.
 2. Azure only.
-3. AWS primary, Azure secondary for backups, secret escrow and a documented cold-restore path.
+3. AWS primary, Azure secondary for backups, secret escrow and a documented
+   cold-restore path.
 4. Active or warm standby on Azure.
 
 ## Decision
 
-We will run everything users touch on AWS in eu-central-1. Azure holds immutable encrypted copies of the database and driver documents, the dump encryption key and escrowed break-glass credentials. The Azure restore path is a runbook and Terraform module, not a running environment. It counts as working only after a restore drill ([RISK-009](../risks/architecture-risks.md)).
+We will run everything users touch on AWS in eu-central-1. Azure holds immutable
+encrypted copies of the database and driver documents, the dump encryption key
+and escrowed break-glass credentials. The Azure restore path is a runbook and
+Terraform module, not a running environment. It counts as working only after a
+restore drill ([RISK-009](../risks/architecture-risks.md)).
 
 ## Consequences
 

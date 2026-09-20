@@ -1,6 +1,8 @@
 # Disaster Recovery
 
-Objectives: [QA-04](../requirements/quality-attributes.md). **No restore has been performed yet**; every objective below is a target without evidence until plan step S096 records the first drill.
+Objectives: [QA-04](../requirements/quality-attributes.md). **No restore has
+been performed yet**; every objective below is a target without evidence until
+plan step S096 records the first drill.
 
 Views: **RegionRecovery** and **AccountRecovery**.
 
@@ -16,9 +18,16 @@ Views: **RegionRecovery** and **AccountRecovery**.
 2. Retrieve break-glass credentials and the dump key from Azure Key Vault.
 3. Apply the Azure cold-restore Terraform module.
 4. Decrypt and restore the latest dump.
-5. Stand up the replacement identity (Entra External ID). Users and partner staff re-enrol by SMS code against the phone numbers restored from the dump ([RISK-017](../risks/architecture-risks.md)).
+5. Stand up the replacement identity (Entra External ID). Users and partner
+   staff re-enrol by SMS code against the phone numbers restored from the dump
+   ([RISK-017](../risks/architecture-risks.md)).
 6. Deploy the API image, repoint DNS, rotate every third-party key.
-7. Run the capture fallback: a batch script over rides that are COMPLETED but have no payment in CAPTURED or FAILED, with the same idempotency keys, because Step Functions is not available on Azure ([ADR 12](../decisions/0012-payment-capture-workflow.md)). It selects by ride and payment state, not by outbox state: an entry already relayed may belong to a workflow that never captured.
+7. Run the capture fallback: a batch script over rides that are COMPLETED but
+   have no payment in CAPTURED or FAILED, with the same idempotency keys,
+   because Step Functions is not available on Azure ([ADR
+   12](../decisions/0012-payment-capture-workflow.md)). It selects by ride and
+   payment state, not by outbox state: an entry already relayed may belong to a
+   workflow that never captured.
 8. Reconcile payments against Stripe for the lost window.
 
 Step-by-step commands belong in `docs/runbooks/restore.md` (plan step S096), not here.

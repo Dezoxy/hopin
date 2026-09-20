@@ -8,7 +8,8 @@ Accepted
 
 ## Context
 
-Hopin needs a passenger app on iOS, Android and the web, a driver app on iOS and Android, and an admin website. One developer maintains all of them.
+Hopin needs a passenger app on iOS, Android and the web, a driver app on iOS and
+Android, and an admin website. One developer maintains all of them.
 
 ## Decision drivers
 
@@ -24,9 +25,13 @@ Hopin needs a passenger app on iOS, Android and the web, a driver app on iOS and
 
 ## Decision
 
-We will build the passenger and driver apps with React Native and Expo, using EAS for builds, store submission and over-the-air updates. The passenger web target comes from the same Expo codebase.
+We will build the passenger and driver apps with React Native and Expo, using
+EAS for builds, store submission and over-the-air updates. The passenger web
+target comes from the same Expo codebase.
 
-The admin is a Next.js app built as a static export and served from the CDN. All data comes from the Hopin API. This corrects the first plan draft, which relied on server components; those would need a separate server runtime.
+The admin is a Next.js app built as a static export and served from the CDN. All
+data comes from the Hopin API. This corrects the first plan draft, which relied
+on server components; those would need a separate server runtime.
 
 ## Consequences
 

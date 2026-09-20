@@ -1,8 +1,13 @@
 # Threat Model
 
-STRIDE analysis of the planned design, plan step S099, 2026-09-19. It covers the trust boundaries in [trust-boundaries.md](trust-boundaries.md) and the flows in the Security, PartnerIsolation, TripShare, PaymentCapture, LocationData and OffProviderRecovery views. Nothing is built, so every control is **planned**; each names the plan step that builds it or the risk that tracks what is left.
+STRIDE analysis of the planned design, plan step S099, 2026-09-19. It covers the
+trust boundaries in [trust-boundaries.md](trust-boundaries.md) and the flows in
+the Security, PartnerIsolation, TripShare, PaymentCapture, LocationData and
+OffProviderRecovery views. Nothing is built, so every control is **planned**;
+each names the plan step that builds it or the risk that tracks what is left.
 
-**STRIDE:** Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege.
+**STRIDE:** Spoofing, Tampering, Repudiation, Information disclosure, Denial of
+service, Elevation of privilege.
 
 ## Founder decisions
 
@@ -70,7 +75,10 @@ Four threats had a real trade-off. The founder chose:
 
 ## TB-7 Hopin to model providers
 
-Added with [ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md) and [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md). The dispute assistant is built in the slice; the other three AI use cases are design only.
+Added with [ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md)
+and [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md).
+The dispute assistant is built in the slice; the other three AI use cases are
+design only.
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
@@ -91,7 +99,8 @@ Added with [ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md) a
 ## What this model does not cover
 
 - Physical safety of passengers and drivers beyond the alarm flow.
-- Fraud patterns that need data: collusion between drivers and passengers, card testing. Revisit with real traffic.
+- Fraud patterns that need data: collusion between drivers and passengers, card
+  testing. Revisit with real traffic.
 - The mobile operating systems and the certified meter's own security.
 
 Review this model when a trust boundary, an entry point or an identity mechanism changes.

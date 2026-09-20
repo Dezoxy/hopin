@@ -1,6 +1,8 @@
 # Deployment Architecture
 
-Planned; nothing is deployed. See the **ProductionCore**, **AwsBackups** and **AzureRecovery** views. Terraform in `/infra` will be the source of truth for every setting once it exists (plan steps S013–S016).
+Planned; nothing is deployed. See the **ProductionCore**, **AwsBackups** and
+**AzureRecovery** views. Terraform in `/infra` will be the source of truth for
+every setting once it exists (plan steps S013–S016).
 
 ## Placement
 
@@ -15,7 +17,9 @@ Planned; nothing is deployed. See the **ProductionCore**, **AwsBackups** and **A
 | Web builds (passenger web, admin, trip share) | CloudFront + S3 | Global edge | Edge service |
 | Load balancer + WAF | ALB | Regional, multi-AZ | Regional service |
 
-Shared failure domain: everything live is in **eu-central-1**. A regional outage stops the service; recovery follows [disaster-recovery.md](../reliability/disaster-recovery.md).
+Shared failure domain: everything live is in **eu-central-1**. A regional outage
+stops the service; recovery follows
+[disaster-recovery.md](../reliability/disaster-recovery.md).
 
 ## Delivery
 
@@ -46,4 +50,8 @@ Rough monthly production cost at idle to light traffic, EUR. Target is [QA-08](.
 | SMS one-time codes | usage-based, ~0.05 per message |
 | **Total** | **~190–220** |
 
-This is above the QA-08 target, so production runs single-AZ with no NAT (VPC endpoints only) until the first paying partner, at about 120 EUR a month, and moves to this shape then (founder decision, 2026-09-19). Three-year costs across scenarios, including Mapbox, people and one-off costs, are in the [three-year cost model](../../business/three-year-cost-model.md).
+This is above the QA-08 target, so production runs single-AZ with no NAT (VPC
+endpoints only) until the first paying partner, at about 120 EUR a month, and
+moves to this shape then (founder decision, 2026-09-19). Three-year costs across
+scenarios, including Mapbox, people and one-off costs, are in the [three-year
+cost model](../../business/three-year-cost-model.md).

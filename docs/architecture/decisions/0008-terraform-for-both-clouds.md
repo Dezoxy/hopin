@@ -8,7 +8,8 @@ Proposed
 
 ## Context
 
-Both AWS and Azure resources must be created, reviewed and reproduced from code (ADR 1). The Azure restore path must be applied during drills.
+Both AWS and Azure resources must be created, reviewed and reproduced from code
+(ADR 1). The Azure restore path must be applied during drills.
 
 ## Decision drivers
 
@@ -22,7 +23,8 @@ Both AWS and Azure resources must be created, reviewed and reproduced from code 
 
 ## Decision
 
-We propose Terraform for both clouds, with state in S3 and deployments from GitHub Actions using OIDC.
+We propose Terraform for both clouds, with state in S3 and deployments from
+GitHub Actions using OIDC.
 
 ## Consequences
 

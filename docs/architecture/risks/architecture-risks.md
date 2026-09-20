@@ -1,6 +1,7 @@
 # Architecture Risks
 
-Reviewed at the start of each plan phase and after any incident. Owner for all: the founder. Likelihood is a judgement until there is data.
+Reviewed at the start of each plan phase and after any incident. Owner for all:
+the founder. Likelihood is a judgement until there is data.
 
 | ID | Risk | Impact | Likelihood | Mitigation | Residual risk | Review trigger |
 |---|------|----|--|------|---|---|

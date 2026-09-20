@@ -6,13 +6,21 @@ Hopin, a ride-hailing app for short city trips.
 
 ## Status
 
-**Reference architecture for a portfolio case study. It will not be built or operated as a product.** Nothing is deployed; a thin running slice ([slice/](../../slice/README.md)) provides the first local measurements. All content is documented intent from [the plan](../hopin-plan.md) and the ADRs below. When code and infrastructure exist, they become the evidence and these documents must be checked against them.
+**Reference architecture for a portfolio case study. It will not be built or
+operated as a product.** Nothing is deployed; a thin running slice
+([slice/](../../slice/README.md)) provides the first local measurements. All
+content is documented intent from [the plan](../hopin-plan.md) and the ADRs
+below. When code and infrastructure exist, they become the evidence and these
+documents must be checked against them.
 
 ## Architecture model
 
 - [workspace.dsl](workspace.dsl) is the entry point. Fragments live in [model/](model/).
-- `make view` opens it at <http://localhost:8080/workspace/1>. `make check` validates and inspects it. `make export` renders every view into `generated/`, which is gitignored.
-- [styles-shared.dsl](model/styles-shared.dsl) is copied unchanged from architecture-base. Hopin's layer mapping is in [styles.dsl](model/styles.dsl).
+- `make view` opens it at <http://localhost:8080/workspace/1>. `make check`
+  validates and inspects it. `make export` renders every view into `generated/`,
+  which is gitignored.
+- [styles-shared.dsl](model/styles-shared.dsl) is copied unchanged from
+  architecture-base. Hopin's layer mapping is in [styles.dsl](model/styles.dsl).
 
 ## Reading paths
 
@@ -29,7 +37,8 @@ Start with [the overview](overview/01-overview.md).
 
 ## View register
 
-Budgets come from the architecture-views skill. Visual check means the view was rendered with the pinned Structurizr image and inspected as a PNG on 2026-09-19.
+Budgets come from the architecture-views skill. Visual check means the view was
+rendered with the pinned Structurizr image and inspected as a PNG on 2026-09-19.
 
 | Key | Audience | Question | Scope and selection | Omitted on purpose | Update when | Visual check |
 |---|---|---|---|---|---|---|
@@ -62,9 +71,13 @@ Budgets come from the architecture-views skill. Visual check means the view was 
 | DisputeAssist | Stakeholder, CTO, engineer | How does a complaint become a draft reply that a human approves? | Seven numbered steps, happy path | The rejected-draft path (no draft, staff write it); the draft checks inside AI Assist | Draft checks or case-file rules change | Passed after switching to top-to-bottom |
 | AccountRecovery | CTO, operator | What runs on Azure after the AWS account is lost, and what is missing? | Recovery environment for the account scenario, including the identity gap | DNS; third-party key rotation | DR design changes ([RISK-017](risks/architecture-risks.md)) | Passed |
 
-Not modelled yet: CDN and web hosting, client devices, and mobile app delivery through EAS. The BKK feed, taxi meter and invoicing provider are modelled with their interfaces marked not yet known.
+Not modelled yet: CDN and web hosting, client devices, and mobile app delivery
+through EAS. The BKK feed, taxi meter and invoicing provider are modelled with
+their interfaces marked not yet known.
 
-Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes.md); the talk tracks are in [talks/talk-tracks.md](talks/talk-tracks.md).
+Speaker notes for every view are in
+[talks/speaker-notes.md](talks/speaker-notes.md); the talk tracks are in
+[talks/talk-tracks.md](talks/talk-tracks.md).
 
 ## Key decisions
 
@@ -76,15 +89,24 @@ Speaker notes for every view are in [talks/speaker-notes.md](talks/speaker-notes
 - [0006 Use Amazon Cognito with SMS codes](decisions/0006-cognito-phone-otp.md) (Proposed)
 - [0007 Use Stripe and Stripe Connect](decisions/0007-stripe-connect-payments.md) (Proposed)
 - [0008 Manage infrastructure with Terraform](decisions/0008-terraform-for-both-clouds.md) (Proposed)
-- [0009 Use a shared database with row-level security, with a dedicated database on demand](decisions/0009-hybrid-multi-tenancy.md) (Accepted)
+- [0009 Use a shared database with row-level security, with a dedicated database
+  on demand](decisions/0009-hybrid-multi-tenancy.md) (Accepted)
 - [0010 Ship one passenger app and one driver app for all partners](decisions/0010-one-app-for-all-partners.md) (Accepted)
-- [0011 Hopin and each partner are joint controllers for partner rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending lawyer)
-- [0012 Capture the meter amount with an outbox-started Step Functions workflow](decisions/0012-payment-capture-workflow.md) (Accepted)
-- [0013 The operator reads partner data only through time-boxed partner grants](decisions/0013-operator-access-by-partner-grant.md) (Accepted)
+- [0011 Hopin and each partner are joint controllers for partner
+  rides](decisions/0011-joint-controllers-with-partners.md) (Proposed, pending
+  lawyer)
+- [0012 Capture the meter amount with an outbox-started Step Functions
+  workflow](decisions/0012-payment-capture-workflow.md) (Accepted)
+- [0013 The operator reads partner data only through time-boxed partner
+  grants](decisions/0013-operator-access-by-partner-grant.md) (Accepted)
 - [0014 AI assists staff with read-and-draft tasks only](decisions/0014-ai-assists-staff-read-and-draft-only.md) (Accepted)
-- [0015 Real data goes only to Amazon Bedrock in the EU; OpenRouter is for synthetic evaluation only](decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) (Accepted)
+- [0015 Real data goes only to Amazon Bedrock in the EU; OpenRouter is for
+  synthetic evaluation
+  only](decisions/0015-bedrock-for-data-openrouter-for-evaluation.md) (Accepted)
 
-New ADR: copy [templates/adr.md](templates/adr.md) to `decisions/NNNN-short-title.md` and add it here. There is deliberately no README inside `decisions/`, because the ADR importer parses every `.md` file there.
+New ADR: copy [templates/adr.md](templates/adr.md) to
+`decisions/NNNN-short-title.md` and add it here. There is deliberately no README
+inside `decisions/`, because the ADR importer parses every `.md` file there.
 
 ## Written documentation
 
@@ -110,13 +132,20 @@ where the diagrams appear. They link outward with absolute GitHub URLs, because
 a relative repository path does not resolve inside Structurizr. The rest is plain
 Markdown linked from here.
 
-IDs are owned by one file each and cited everywhere else: `C-xx` constraints, `QA-xx` quality attributes, `A-xx` assumptions, `P-xx` principles, `RISK-xxx` risks, `T-xx` threats. `scripts/check_docs_consistency.py` fails when a cited ID is not defined.
+IDs are owned by one file each and cited everywhere else: `C-xx` constraints,
+`QA-xx` quality attributes, `A-xx` assumptions, `P-xx` principles, `RISK-xxx`
+risks, `T-xx` threats. `scripts/check_docs_consistency.py` fails when a cited ID
+is not defined.
 
-Deliberately absent: `data-ownership` (one operator owns every store; ownership is a column in data-architecture) and `technical-debt` (no code yet). Add them when they have content.
+Deliberately absent: `data-ownership` (one operator owns every store; ownership
+is a column in data-architecture) and `technical-debt` (no code yet). Add them
+when they have content.
 
 ## Current and target architecture
 
-[roadmap/current-state.md](roadmap/current-state.md) · [roadmap/target-state.md](roadmap/target-state.md) · [roadmap/transition-plan.md](roadmap/transition-plan.md)
+[roadmap/current-state.md](roadmap/current-state.md) ·
+[roadmap/target-state.md](roadmap/target-state.md) ·
+[roadmap/transition-plan.md](roadmap/transition-plan.md)
 
 ## Known risks
 
@@ -124,4 +153,6 @@ Deliberately absent: `data-ownership` (one operator owns every store; ownership 
 
 ## Not documented here
 
-API contracts go in `/api`, Terraform in `/infra`, code in `/apps` and `/packages`, and runbooks in `docs/runbooks`. This folder links to them and does not copy them.
+API contracts go in `/api`, Terraform in `/infra`, code in `/apps` and
+`/packages`, and runbooks in `docs/runbooks`. This folder links to them and does
+not copy them.

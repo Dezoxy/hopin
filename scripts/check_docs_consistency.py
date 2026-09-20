@@ -18,6 +18,7 @@ Run from anywhere: python3 scripts/check_docs_consistency.py
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -30,7 +31,9 @@ DOCS_INDEX = REPO / "docs" / "README.md"
 VIEWS_DSL = ARCH / "model" / "views.dsl"
 
 # Generated output and templates with example links are not documentation.
-SKIP_DIRS = {"generated", "templates", "node_modules", ".git"}
+# `worktrees` is where Claude Code puts session-local agent checkouts; it holds
+# whole copies of the repository, so scanning it double-reports the real tree.
+SKIP_DIRS = {"generated", "templates", "node_modules", ".git", "worktrees"}
 # Vendored rule sets (for example ECC's) keep upstream's relative links to
 # directories installed globally, not in this repo. They are not documentation.
 VENDORED = REPO / ".claude" / "rules"
@@ -49,6 +52,25 @@ ID_OWNERS = {
 ADR_NAME = re.compile(r"^(\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 ADR_STATUSES = {"Proposed", "Accepted", "Rejected", "Deprecated", "Superseded"}
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+# Documents imported into Structurizr's Documentation tab cannot use relative
+# links: the tab renders them outside the repository tree, so `../risks/x.md`
+# resolves to nothing for the reader. They link by absolute URL instead, which
+# check_links() skips along with every other http(s) link. Set this to the
+# repository's own "owner/name" and those links are checked on disk again.
+# Leave it None and the check is skipped.
+SELF_REPO: str | None = "Dezoxy/hopin"
+INLINE_CODE = re.compile(r"`[^`]*`")
+PROSE_WIDTH = 80
+# Copied skills stay byte-identical to their canonical source, so a consuming
+# repository does not get to rewrap them.
+SKILL_DIRS = (REPO / ".claude" / "skills", REPO / ".agents" / "skills")
+OVERVIEW = ARCH / "overview"
+# overview/ IS the imported folder, so its own files need no pointer. ADRs are
+# imported by `!adrs`, not `!docs`, and reach the document by their own route.
+# `talks/` and `presentation/` are presentation preparation, not part of the
+# handed-out document;
+# check_speaker_notes already governs it against the view register.
+NOT_SYMLINKED = {"overview", "decisions", "talks", "presentation"}
 FENCE = re.compile(r"^\s*(```|~~~)")
 
 
@@ -85,6 +107,10 @@ def markdown_files() -> list[Path]:
             for p in root.rglob("*.md")
             if not SKIP_DIRS.intersection(p.relative_to(REPO).parts)
             and VENDORED not in p.parents
+            # A symlink into overview/ is an alias for a document that already
+            # appears under its own folder. Counting it twice would demand its
+            # own index entry and report every finding in it twice.
+            and not p.is_symlink()
         ]
     return [p for p in files if p.exists()]
 
@@ -279,11 +305,109 @@ def check_ids(f: Failures) -> None:
                     )
 
 
+def check_self_links(f: Failures) -> None:
+    """Absolute links back into this repository resolve to a real file.
+
+    Inline code is stripped first: a URL inside backticks is an example of the
+    form to use, not a claim that a file exists. Writing the convention down
+    must not fail the check that enforces it.
+    """
+    if not SELF_REPO:
+        return  # this repository has not declared its own name
+    pattern = re.compile(
+        rf"https://github\.com/{re.escape(SELF_REPO)}/blob/[^/]+/([^)#\s]+)"
+    )
+    for src in markdown_files():
+        for path in pattern.findall(INLINE_CODE.sub("", prose(read(src)))):
+            if not (REPO / path).exists():
+                f.add(
+                    "self-links",
+                    f"{rel(src)}: a link to {path} does not resolve",
+                )
+
+
+def check_line_width(f: Failures) -> None:
+    """Prose wraps, so a one-word edit does not rewrite a whole paragraph's diff.
+
+    Only prose. A table row is as wide as its widest cell and a fenced block is
+    code; neither can wrap, and a formatter that pads them makes the problem
+    worse rather than better -- measured: aligning this repository's tables took
+    its longest line from 815 columns to 1015. A line held over the limit by a
+    single unbreakable token, such as an absolute URL, is left alone because
+    there is nowhere to break it. An image line is left alone because splitting
+    `![alt](embed:Key)` stops the PDF builder recognising the embed.
+    """
+    for src in markdown_files():
+        if any(d in src.parents for d in SKILL_DIRS):
+            continue
+        fenced = False
+        for number, line in enumerate(read(src).splitlines(), 1):
+            if FENCE.match(line):
+                fenced = not fenced
+                continue
+            if fenced or line.lstrip().startswith(("|", "#", "![")):
+                continue
+            if len(line) <= PROSE_WIDTH:
+                continue
+            if len(line) - max((len(w) for w in line.split()), default=0) <= PROSE_WIDTH:
+                continue
+            f.add(
+                "line-width",
+                f"{rel(src)}:{number}: prose line is {len(line)} columns, "
+                f"over {PROSE_WIDTH}; wrap it",
+            )
+
+
+def check_overview_complete(f: Failures) -> None:
+    """Every architecture document reaches the Documentation tab and the PDF.
+
+    Structurizr imports overview/ and does not recurse, so a document is in the
+    tab -- and therefore in the PDF, which is built from the same folder -- only
+    if a file in overview/ points at it. Registers stay in their own folders,
+    where their IDs are owned, and are symlinked in as NN-name.md; each is
+    authored once and the number fixes its order. A register nobody symlinked is
+    invisible in the artifact people are handed, while still looking present in
+    the repository.
+    """
+    if not OVERVIEW.is_dir():
+        return
+    linked = set()
+    for link in sorted(OVERVIEW.iterdir()):
+        if not (link.is_symlink() and link.suffix == ".md"):
+            continue
+        # Deleting a register the repository does not need is right; leaving
+        # its symlink behind is not. A dangling link is a section of the
+        # document that points at nothing.
+        if not link.exists():
+            f.add(
+                "overview-complete",
+                f"{rel(link)} points at {os.readlink(link)}, which does not "
+                f"exist; delete the symlink too",
+            )
+            continue
+        linked.add(link.resolve())
+    for doc in sorted(ARCH.rglob("*.md")):
+        parts = doc.relative_to(ARCH).parts
+        if len(parts) == 1 or parts[0] in NOT_SYMLINKED:
+            continue
+        if SKIP_DIRS.intersection(parts) or doc.is_symlink():
+            continue
+        if doc.resolve() not in linked:
+            f.add(
+                "overview-complete",
+                f"{rel(doc)} is in no reading path: symlink it into "
+                f"{rel(OVERVIEW)}/ as NN-name.md, or it stays out of the PDF",
+            )
+
+
 CHECKS = (
     check_twins,
     check_skill_mirror,
     check_links,
+    check_self_links,
+    check_line_width,
     check_docs_index,
+    check_overview_complete,
     check_adrs,
     check_view_register,
     check_speaker_notes,

@@ -4,9 +4,14 @@
 
 ## Description
 
-Hopin is a simple, friendly ride-hailing app for everyday city trips. Passengers can book a ride in a few taps, see the fare upfront, and track their driver live on the map. For peace of mind, every trip can be shared with friends or family in real time, and passengers rate their driver after each ride.
+Hopin is a simple, friendly ride-hailing app for everyday city trips. Passengers
+can book a ride in a few taps, see the fare upfront, and track their driver live
+on the map. For peace of mind, every trip can be shared with friends or family
+in real time, and passengers rate their driver after each ride.
 
-Hopin is built for short urban journeys where convenience matters most: getting to work, meeting friends, or heading home late at night, without waiting on the street or calling a dispatcher.
+Hopin is built for short urban journeys where convenience matters most: getting
+to work, meeting friends, or heading home late at night, without waiting on the
+street or calling a dispatcher.
 
 ## Core Idea
 

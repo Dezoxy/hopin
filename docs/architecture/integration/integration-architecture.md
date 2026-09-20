@@ -1,6 +1,8 @@
 # Integration Architecture
 
-How Hopin talks to its clients and to outside systems. Exact contracts live in `/api` (OpenAPI, plan step S006) and `packages/shared` (zod event schemas); this page explains the behaviour.
+How Hopin talks to its clients and to outside systems. Exact contracts live in
+`/api` (OpenAPI, plan step S006) and `packages/shared` (zod event schemas); this
+page explains the behaviour.
 
 ## Client interfaces
 

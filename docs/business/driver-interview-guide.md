@@ -1,8 +1,13 @@
 # Driver Interview Guide
 
-> **Scenario.** Since 2026-09-19 Hopin is a reference architecture case study, not a business being started. This interview guide is kept as the worked business scenario the architecture answers to; it will not be executed.
+> **Scenario.** Since 2026-09-19 Hopin is a reference architecture case study,
+  not a business being started. This interview guide is kept as the worked
+  business scenario the architecture answers to; it will not be executed.
 
-Plan step S117. Five interviews with licensed Budapest taxi drivers before any more engineering. The goal is to learn how drivers work today, not to sell Hopin. Record answers in a private note, **not in this public repository**: interviews contain personal data.
+Plan step S117. Five interviews with licensed Budapest taxi drivers before any
+more engineering. The goal is to learn how drivers work today, not to sell
+Hopin. Record answers in a private note, **not in this public repository**:
+interviews contain personal data.
 
 ## Before each interview
 
@@ -12,7 +17,8 @@ Plan step S117. Five interviews with licensed Budapest taxi drivers before any m
 
 ## 1. How they work today
 
-1. Which apps and dispatch companies do you take rides from? Roughly what share from each?
+1. Which apps and dispatch companies do you take rides from? Roughly what share
+   from each?
 2. On a typical day, how many rides do you do, and how many hours are you online?
 3. When two apps offer a ride at once, how do you choose?
 4. How many rides a day come from street hails or taxi stands?
@@ -28,19 +34,26 @@ Plan step S117. Five interviews with licensed Budapest taxi drivers before any m
 1. What is the most frustrating part of working with Bolt?
 2. And with your dispatch company, if you have one?
 3. Tell me about the last time a ride went badly. What happened?
-4. Have you had a situation where you needed help fast, for safety or an accident? What did you do?
+4. Have you had a situation where you needed help fast, for safety or an
+   accident? What did you do?
 
 ## 4. The new rules
 
 1. Have you installed TaxiTrack? How has it been?
-2. Has your dispatch company said anything about the new passenger app requirement from July 2026?
+2. Has your dispatch company said anything about the new passenger app
+   requirement from July 2026?
 
 ## 5. Hopin (last)
 
 1. If an app charged 15 % instead of 20 %, would you use it? Instead of Bolt or alongside?
 2. What would it need beyond a lower price for you to open it first?
-3. Do you know the owner or manager of a smaller dispatch company? Would you introduce me?
+3. Do you know the owner or manager of a smaller dispatch company? Would you
+   introduce me?
 
 ## After five interviews
 
-Summarise patterns, not individuals, in a short dated note under `docs/business/` with no names or identifying details. Update the [business case](business-case.md) numbers and the assumptions [A-08](../architecture/requirements/assumptions.md) and [A-09](../architecture/requirements/assumptions.md).
+Summarise patterns, not individuals, in a short dated note under
+`docs/business/` with no names or identifying details. Update the [business
+case](business-case.md) numbers and the assumptions
+[A-08](../architecture/requirements/assumptions.md) and
+[A-09](../architecture/requirements/assumptions.md).
