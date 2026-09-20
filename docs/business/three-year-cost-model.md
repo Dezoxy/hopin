@@ -1,15 +1,32 @@
 # Three-Year Cost Model
 
-> **Status:** plan step S120, 2026-09-19. Estimates, not quotes. Every number comes from `scripts/cost_model.py` and the assumptions below; change both together and rerun it. Figures are million HUF per year unless marked.
+> **Status:** plan step S120, 2026-09-19. Estimates, not quotes. Every number
+  comes from `scripts/cost_model.py` and the assumptions below; change both
+  together and rerun it. Figures are million HUF per year unless marked.
 >
-> **Owner:** founder. **Review when:** a price in the assumptions changes, the scenario changes, or real usage exists.
+> **Owner:** founder. **Review when:** a price in the assumptions changes, the
+  scenario changes, or real usage exists.
 
 ## What the model says
 
-1. **In the ambitious scenario the platform pays for itself and for you by year 3.** Cash costs of 87.5 M HUF against revenue of 195.1 M HUF. After paying yourself a market salary, the three years together are 81.7 M HUF positive. Year 1 is negative once your time is counted: 15.7 M HUF is the price of building it.
-2. **People, not cloud, are the cost.** AWS is 7.2 M HUF in year 3, about a third of one engineer. The two hires and your own time are almost 60 % of all three-year costs.
-3. **Mapbox is the largest technology cost, almost five times all of AWS by year 3.** Road-distance matching ([C-04](../architecture/requirements/constraints.md)) ranks ten candidate taxis per ride through the Matrix API, which alone is 24.6 M HUF in year 3. This is the first cost to engineer down; see [levers](#levers-and-decision-triggers).
-4. **The smaller scenarios do not reach your target.** The base scenario roughly breaks even over three years; the conservative one loses 59.6 M HUF. The ambitious base case depends on 20 partners, which is [A-09](../architecture/requirements/assumptions.md) multiplied by twenty.
+1. **In the ambitious scenario the platform pays for itself and for you by year
+   3.** Cash costs of 87.5 M HUF against revenue of 195.1 M HUF. After paying
+   yourself a market salary, the three years together are 81.7 M HUF positive.
+   Year 1 is negative once your time is counted: 15.7 M HUF is the price of
+   building it.
+2. **People, not cloud, are the cost.** AWS is 7.2 M HUF in year 3, about a
+   third of one engineer. The two hires and your own time are almost 60 % of all
+   three-year costs.
+3. **Mapbox is the largest technology cost, almost five times all of AWS by year
+   3.** Road-distance matching
+   ([C-04](../architecture/requirements/constraints.md)) ranks ten candidate
+   taxis per ride through the Matrix API, which alone is 24.6 M HUF in year 3.
+   This is the first cost to engineer down; see
+   [levers](#levers-and-decision-triggers).
+4. **The smaller scenarios do not reach your target.** The base scenario roughly
+   breaks even over three years; the conservative one loses 59.6 M HUF. The
+   ambitious base case depends on 20 partners, which is
+   [A-09](../architecture/requirements/assumptions.md) multiplied by twenty.
 
 ## Base case: ambitious
 
@@ -35,7 +52,10 @@
 | Founder at market rate (shown apart) | 24.4 | 24.4 | 24.4 | 73.2 |
 | **Result after founder** | -15.7 | 14.3 | 83.2 | 81.7 |
 
-**How precise this is.** The script prints one decimal, but the inputs are judgements: read the results as whole millions at best. Year 1 assumes paying cars from the first month, with no build period without revenue. A build period would lower year 1 and the three-year result; it is not modelled.
+**How precise this is.** The script prints one decimal, but the inputs are
+judgements: read the results as whole millions at best. Year 1 assumes paying
+cars from the first month, with no build period without revenue. A build period
+would lower year 1 and the three-year result; it is not modelled.
 
 ## Sensitivity
 
@@ -45,7 +65,10 @@
 | Base | 4,425 | 9.4 / 39.0 / 94.6 | 10.0 / 11.7 / 49.6 | -1.5 |
 | Conservative | 2,560 | 3.0 / 13.7 / 34.5 | 9.7 / 8.7 / 19.1 | -59.6 |
 
-The same prices and formulas apply to every scenario; only volume and hiring differ ([A-10](../architecture/requirements/assumptions.md)): ambitious hires an engineer in year 2 and partner support in year 3, base hires an engineer in year 3, conservative hires no one.
+The same prices and formulas apply to every scenario; only volume and hiring
+differ ([A-10](../architecture/requirements/assumptions.md)): ambitious hires an
+engineer in year 2 and partner support in year 3, base hires an engineer in year
+3, conservative hires no one.
 
 ## Assumptions
 
@@ -70,11 +93,18 @@ The same prices and formulas apply to every scenario; only volume and hiring dif
 | Company and accounting | Kft. setup 0.2; bookkeeping 60k then 120k HUF per month; audit 1.0 from year 3 | Estimate |
 | Stores, trademark, certification | Apple $99 per year, Google $25 once; EU trademark in three classes 1,050 EUR; BKK certification 0.5 (fee not published) | [EUIPO fees](https://www.euipo.europa.eu/en/trade-marks/before-applying/fees-payments); others estimates |
 
-Not included: the 3 M HUF minimum share capital of a Kft. (capital, not cost), office, marketing and passenger acquisition, VAT, corporate tax, and dedicated partner databases, which are passed through to the partner at cost ([ADR 9](../architecture/decisions/0009-hybrid-multi-tenancy.md)).
+Not included: the 3 M HUF minimum share capital of a Kft. (capital, not cost),
+office, marketing and passenger acquisition, VAT, corporate tax, and dedicated
+partner databases, which are passed through to the partner at cost ([ADR
+9](../architecture/decisions/0009-hybrid-multi-tenancy.md)).
 
 ## Your income target
 
-Your goal is 3 M HUF net per month, about 4.5 M HUF gross or 61 M HUF per year in employer cost. In the ambitious case, year 3 has 107.6 M HUF of cash result before paying you, so the target is affordable in year 3 with about 46 M HUF left. In years 1 and 2 it is not: the platform pays its own costs, but not you at that rate.
+Your goal is 3 M HUF net per month, about 4.5 M HUF gross or 61 M HUF per year
+in employer cost. In the ambitious case, year 3 has 107.6 M HUF of cash result
+before paying you, so the target is affordable in year 3 with about 46 M HUF
+left. In years 1 and 2 it is not: the platform pays its own costs, but not you
+at that rate.
 
 ## Levers and decision triggers
 

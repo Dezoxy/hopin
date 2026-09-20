@@ -1,0 +1,1 @@
+../integration/integration-architecture.md

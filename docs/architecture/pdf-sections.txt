@@ -1,4 +1,7 @@
 # Extra pages for the architecture PDF, after the ADRs and before the views.
 # One path per line, relative to this directory. See scripts/build_architecture_pdf_source.py.
-evidence/design-findings.md
-risks/architecture-risks.md
+#
+# NORMALLY EMPTY, and empty here. Structurizr imports overview/ and nothing
+# else, so a path listed here is a page the PDF has and the Documentation tab
+# does not. Registers reach both by being symlinked into overview/ as
+# NN-name.md instead, which check_overview_complete enforces.

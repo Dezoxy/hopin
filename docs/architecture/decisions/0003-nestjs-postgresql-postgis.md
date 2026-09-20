@@ -8,7 +8,9 @@ Accepted
 
 ## Context
 
-The backend must handle ride state, payments, service-area polygons and location history. Rides and payments need transactional integrity. Geography queries are core to quoting and matching.
+The backend must handle ride state, payments, service-area polygons and location
+history. Rides and payments need transactional integrity. Geography queries are
+core to quoting and matching.
 
 ## Decision drivers
 
@@ -24,7 +26,9 @@ The backend must handle ride state, payments, service-area polygons and location
 
 ## Decision
 
-We will write the API in TypeScript on NestJS and keep all durable state in PostgreSQL 16 with PostGIS, hosted on Amazon RDS. Every ride state change is appended to a ride-events table.
+We will write the API in TypeScript on NestJS and keep all durable state in
+PostgreSQL 16 with PostGIS, hosted on Amazon RDS. Every ride state change is
+appended to a ride-events table.
 
 ## Consequences
 

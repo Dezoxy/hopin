@@ -15,4 +15,5 @@
 | [compliance/s002-regulatory-memo.md](compliance/s002-regulatory-memo.md) | Hungarian taxi, tax and data-protection rules for Hopin (2026-09-19, not legal advice) |
 | [compliance/ai-act-classification.md](compliance/ai-act-classification.md) | EU AI Act risk class of the four AI use cases, and the boundaries that keep it (2026-09-19, not legal advice) |
 
-Every document under `docs/` must be reachable from this page or from the architecture README. `python3 scripts/check_docs_consistency.py` enforces it.
+Every document under `docs/` must be reachable from this page or from the
+architecture README. `python3 scripts/check_docs_consistency.py` enforces it.

@@ -15,4 +15,5 @@ Target: [QA-03](../requirements/quality-attributes.md), 99.5 % monthly for the A
 | Cognito outage | No new sign-ins | Error rate | Signed-in users continue until token expiry | AWS |
 | Platform down at night, operator asleep | Partners cannot dispatch through Hopin; the law still requires them to dispatch | Page to the operator, possibly unanswered | Partners fall back to phone dispatch, a contract requirement ([RISK-022](../risks/architecture-risks.md)) | Operator recovers in the morning |
 
-A replica is not proof of availability: every row above must be exercised once in a drill before launch (plan step S096).
+A replica is not proof of availability: every row above must be exercised once
+in a drill before launch (plan step S096).

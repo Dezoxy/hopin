@@ -1,6 +1,8 @@
 # Observability Architecture
 
-Target: [QA-10](../requirements/quality-attributes.md), page-worthy failures alert within 5 minutes. Alert definitions will live in Terraform (plan step S090); this page explains the strategy.
+Target: [QA-10](../requirements/quality-attributes.md), page-worthy failures
+alert within 5 minutes. Alert definitions will live in Terraform (plan step
+S090); this page explains the strategy.
 
 | Signal | Tool | Retention | Notes |
 |---|---|---|---|
@@ -12,7 +14,8 @@ Target: [QA-10](../requirements/quality-attributes.md), page-worthy failures ale
 
 ## Business metrics
 
-Reviewed weekly on one dashboard next to the technical signals. Targets come from the [business case](../../business/business-case.md).
+Reviewed weekly on one dashboard next to the technical signals. Targets come
+from the [business case](../../business/business-case.md).
 
 | Metric | Definition | Why it matters |
 |---|---|---|
@@ -35,7 +38,8 @@ Reviewed weekly on one dashboard next to the technical signals. Targets come fro
 | Stripe webhook failures | > 0 in 10 min |
 | Driver alarm | Any, immediately ([C-06](../requirements/constraints.md)) |
 
-Alerts go through SNS to phone and email. A static status page on CloudFront is updated by hand at MVP.
+Alerts go through SNS to phone and email. A static status page on CloudFront is
+updated by hand at MVP.
 
 ## Detection gaps
 

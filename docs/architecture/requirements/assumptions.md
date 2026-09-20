@@ -1,6 +1,8 @@
 # Assumptions
 
-Things we believe but have not confirmed. Each has an owner and a re-check point. When one turns out false, review what it affects. The owner is the founder for all of them today; there is no team yet.
+Things we believe but have not confirmed. Each has an owner and a re-check
+point. When one turns out false, review what it affects. The owner is the
+founder for all of them today; there is no team yet.
 
 | ID | Assumption | Impact if wrong | Affects | Owner | Re-check by |
 |---|---|---|---|---|---|

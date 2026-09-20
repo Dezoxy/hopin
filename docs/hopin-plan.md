@@ -1,9 +1,19 @@
 # Hopin — Master Plan
 
-> **Status:** reference architecture case study (since v0.7, 2026-09-19). Hopin will not be built or operated. The build steps in Phases 0–11 are **frozen** as the designed roadmap; **Phase 12, the portfolio track**, is complete except the recorded walkthrough (S124). History of the plan is in Part H.
+> **Status:** reference architecture case study (since v0.7, 2026-09-19). Hopin
+  will not be built or operated. The build steps in Phases 0–11 are **frozen**
+  as the designed roadmap; **Phase 12, the portfolio track**, is complete except
+  the recorded walkthrough (S124). History of the plan is in Part H.
 > **Source of vision:** [hopin-pre-plan.md](./hopin-pre-plan.md)
-> **How to use this file:** this is the single living plan. Every step in Part D has an ID (`S001`…). When we start a step, we add a `### S0xx` section under Part E with details, decisions and results, and flip its status in the table. Nothing gets deleted; superseded decisions are struck through with a note.
-> **Architecture:** requirements, security, data, integration, deployment, reliability, observability, risks and decisions live in [architecture/](./architecture/README.md). This plan owns the product scope, the domain model until S005, the step list, open decisions and its own changelog.
+> **How to use this file:** this is the single living plan. Every step in Part D
+  has an ID (`S001`…). When we start a step, we add a `### S0xx` section under
+  Part E with details, decisions and results, and flip its status in the table.
+  Nothing gets deleted; superseded decisions are struck through with a note.
+> **Architecture:** requirements, security, data, integration, deployment,
+  reliability, observability, risks and decisions live in
+  [architecture/](./architecture/README.md). This plan owns the product scope,
+  the domain model until S005, the step list, open decisions and its own
+  changelog.
 
 ---
 
@@ -11,7 +21,10 @@
 
 ### A1. Vision
 
-Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps, see a fare estimate before the ride, track the driver live, share the trip with someone they trust, pay in-app and rate the driver afterwards. Tagline: *Hop in. Get there.*
+Hopin is a ride-hailing app for short urban trips. Passengers book in a few
+taps, see a fare estimate before the ride, track the driver live, share the trip
+with someone they trust, pay in-app and rate the driver afterwards. Tagline:
+*Hop in. Get there.*
 
 ### A2. MVP scope (decided)
 
@@ -27,36 +40,49 @@ Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps
 
 - Phone-number login (OTP) for passengers and drivers.
 - Pickup and destination selection on a map with address search.
-- ~~Upfront fare quote~~ Fare **estimate** from the official tariff, valid for a short window. The charge is the taxi-meter amount ([S002 memo](./compliance/s002-regulatory-memo.md)).
+- ~~Upfront fare quote~~ Fare **estimate** from the official tariff, valid for a
+  short window. The charge is the taxi-meter amount ([S002
+  memo](./compliance/s002-regulatory-memo.md)).
 - Driver matching by proximity, with accept/decline and timeout fallback.
 - Live driver location to the passenger before and during the trip.
 - Ride lifecycle: requested → matched → arriving → in progress → completed / cancelled.
-- In-app card payment (Apple Pay / Google Pay / saved card) via Stripe; tips and ~~cancellation fees~~ waiting charges only where the lawyer confirms them ([S002 memo](./compliance/s002-regulatory-memo.md)).
+- In-app card payment (Apple Pay / Google Pay / saved card) via Stripe; tips and
+  ~~cancellation fees~~ waiting charges only where the lawyer confirms them
+  ([S002 memo](./compliance/s002-regulatory-memo.md)).
 - Driver payouts via Stripe Connect.
 - Trip sharing through a public tracking link.
 - Ratings both ways (passenger rates driver; driver rates passenger).
 - Driver onboarding with document upload and manual approval in admin.
-- Admin: live map, driver approval queue, ride lookup, refunds, fare parameters, service area.
+- Admin: live map, driver approval queue, ride lookup, refunds, fare parameters,
+  service area.
 - Push notifications for ride events.
 - Receipts by email.
 
 ### A4. Explicitly out of scope for MVP (v2 backlog)
 
 - Scheduled / advance rides, ride pooling, multi-stop rides.
-- Surge pricing. **Not allowed in Budapest**: unit rates are fixed official prices ([S002 memo](./compliance/s002-regulatory-memo.md)).
+- Surge pricing. **Not allowed in Budapest**: unit rates are fixed official
+  prices ([S002 memo](./compliance/s002-regulatory-memo.md)).
 - In-app turn-by-turn navigation for drivers (MVP deep-links to Google/Apple/Waze).
 - In-app chat (MVP: masked phone call only; chat is a v2 item).
-- Promo codes and discounts (**not allowed in Budapest**, fixed tariff), referral programs, corporate accounts, cash payment.
+- Promo codes and discounts (**not allowed in Budapest**, fixed tariff),
+  referral programs, corporate accounts, cash payment.
 - Multiple cities / multiple currencies. MVP is one city, HUF only.
 - A second running copy of production in Azure (see Part C4 for what Azure *does* do).
 
 ### A5. Actors and journeys
 
-**Passenger:** sign up → add payment method → set pickup/destination → see quote → request → wait for match → track driver → ride → pay automatically → rate → (optional) tip. Can cancel before pickup, can share trip at any time.
+**Passenger:** sign up → add payment method → set pickup/destination → see quote
+→ request → wait for match → track driver → ride → pay automatically → rate →
+(optional) tip. Can cancel before pickup, can share trip at any time.
 
-**Driver:** sign up → upload licence, taxi permit, ID, vehicle documents → wait for approval → go online → receive offer → accept → navigate to pickup → mark arrived → start trip → complete trip → see earnings → get weekly payout.
+**Driver:** sign up → upload licence, taxi permit, ID, vehicle documents → wait
+for approval → go online → receive offer → accept → navigate to pickup → mark
+arrived → start trip → complete trip → see earnings → get weekly payout.
 
-**Admin:** review driver documents → approve/reject → watch live operations → investigate a ride → issue refund → tune fare parameters and service area → block abusive accounts.
+**Admin:** review driver documents → approve/reject → watch live operations →
+investigate a ride → issue refund → tune fare parameters and service area →
+block abusive accounts.
 
 ### A6. Ride state machine
 
@@ -89,22 +115,37 @@ Hopin is a ride-hailing app for short urban trips. Passengers book in a few taps
    CANCELLED_BY_PASSENGER / CANCELLED_BY_DRIVER (terminal, fee rules apply)
 ```
 
-Every transition is written to `ride_events` (append-only) with actor, timestamp and GPS position. This is the audit trail for disputes and refunds.
+Every transition is written to `ride_events` (append-only) with actor, timestamp
+and GPS position. This is the audit trail for disputes and refunds.
 
 ### A7. Non-functional requirements
 
-Moved to [quality attributes](./architecture/requirements/quality-attributes.md) (QA-01 to QA-11), which now own the targets. Summary: offer in < 2 s, positions ≤ 3 s old, 99.5 % availability, RPO 5 min / RTO 4 h in-region, EU residency, PCI SAQ-A, WCAG 2.1 AA, idle cost ≤ ~150 EUR/month.
+Moved to [quality attributes](./architecture/requirements/quality-attributes.md)
+(QA-01 to QA-11), which now own the targets. Summary: offer in < 2 s, positions
+≤ 3 s old, 99.5 % availability, RPO 5 min / RTO 4 h in-region, EU residency, PCI
+SAQ-A, WCAG 2.1 AA, idle cost ≤ ~150 EUR/month.
 
 ### A8. Regulatory summary (from S002, 2026-09-19)
 
-Full research, sources and open questions: [S002 memo](./compliance/s002-regulatory-memo.md). Architecture constraints: [constraints.md](./architecture/requirements/constraints.md). Not yet confirmed by a lawyer.
+Full research, sources and open questions: [S002
+memo](./compliance/s002-regulatory-memo.md). Architecture constraints:
+[constraints.md](./architecture/requirements/constraints.md). Not yet confirmed
+by a lawyer.
 
-- Hopin is legally a taxi **dispatch service**. Only licensed taxis with a certified meter may drive. Private-car ride-sharing is not an option.
-- **Budapest dispatch needs 100 M HUF equity** and BKK-certified software. This makes launching Hopin as its own Budapest dispatch unrealistic for a solo founder; see Part F question 7.
-- The Budapest fare is the **meter amount only**, at fixed official rates (1,300 HUF base, 520 HUF/km, 130 HUF/min since 2026-08-01). No discounts, surge or passenger fees.
-- The taxi operator issues the passenger's receipt; Hopin invoices its fee to drivers and files DAC7 reports.
-- A DPIA is mandatory before launch. The Platform Work Directive applies to matching from its transposition (deadline 2026-12-02).
-- App stores: background location on the driver app needs a clear justification and in-app disclosure.
+- Hopin is legally a taxi **dispatch service**. Only licensed taxis with a
+  certified meter may drive. Private-car ride-sharing is not an option.
+- **Budapest dispatch needs 100 M HUF equity** and BKK-certified software. This
+  makes launching Hopin as its own Budapest dispatch unrealistic for a solo
+  founder; see Part F question 7.
+- The Budapest fare is the **meter amount only**, at fixed official rates (1,300
+  HUF base, 520 HUF/km, 130 HUF/min since 2026-08-01). No discounts, surge or
+  passenger fees.
+- The taxi operator issues the passenger's receipt; Hopin invoices its fee to
+  drivers and files DAC7 reports.
+- A DPIA is mandatory before launch. The Platform Work Directive applies to
+  matching from its transposition (deadline 2026-12-02).
+- App stores: background location on the driver app needs a clear justification
+  and in-app disclosure.
 
 ---
 
@@ -112,7 +153,9 @@ Full research, sources and open questions: [S002 memo](./compliance/s002-regulat
 
 ### B1. High-level diagram
 
-The maintained diagrams are the Structurizr views in [architecture/](./architecture/README.md). This sketch is a quick orientation only.
+The maintained diagrams are the Structurizr views in
+[architecture/](./architecture/README.md). This sketch is a quick orientation
+only.
 
 ```
   Passenger app (Expo: iOS/Android/Web)   Driver app (Expo: iOS/Android)   Admin (Next.js)
@@ -227,9 +270,14 @@ REST under `/v1`, OpenAPI-documented, JWT (Cognito) bearer auth. Full contract i
 
 - `auth/*` — token exchange helpers only; OTP itself is Cognito.
 - `me`, `me/devices`, `me/payment-methods`
-- `quotes` (POST), `rides` (POST from quote), `rides/:id`, `rides/:id/cancel`, `rides/:id/share`, `rides/:id/rating`, `rides/:id/tip`
-- `driver/onboarding/*`, `driver/status` (online/offline), `driver/offers/:id/accept|decline`, `driver/rides/:id/arrived|start|complete`, `driver/earnings`
-- `admin/drivers`, `admin/drivers/:id/approve|reject|suspend`, `admin/rides`, `admin/rides/:id/refund`, `admin/users/:id/block`, `admin/fare-configs`, `admin/service-areas`
+- `quotes` (POST), `rides` (POST from quote), `rides/:id`, `rides/:id/cancel`,
+  `rides/:id/share`, `rides/:id/rating`, `rides/:id/tip`
+- `driver/onboarding/*`, `driver/status` (online/offline),
+  `driver/offers/:id/accept|decline`, `driver/rides/:id/arrived|start|complete`,
+  `driver/earnings`
+- `admin/drivers`, `admin/drivers/:id/approve|reject|suspend`, `admin/rides`,
+  `admin/rides/:id/refund`, `admin/users/:id/block`, `admin/fare-configs`,
+  `admin/service-areas`
 - `share/:token` — public, returns minimal live position for the trip-share page
 - `webhooks/stripe`
 
@@ -239,7 +287,8 @@ Realtime events are owned by the [event catalog](./architecture/integration/even
 
 ## Part C — Platform, security, backup
 
-Each topic below is owned by a document in the architecture knowledge base. The headings stay so older links keep working.
+Each topic below is owned by a document in the architecture knowledge base. The
+headings stay so older links keep working.
 
 ### C1. Environments and accounts
 
@@ -247,19 +296,32 @@ Owned by [environments](./architecture/deployment/environments.md).
 
 ### C2. Security model
 
-Owned by [security architecture](./architecture/security/security-architecture.md), [trust boundaries](./architecture/security/trust-boundaries.md) and [data classification](./architecture/security/data-classification.md).
+Owned by [security
+architecture](./architecture/security/security-architecture.md), [trust
+boundaries](./architecture/security/trust-boundaries.md) and [data
+classification](./architecture/security/data-classification.md).
 
 ### C3. Data protection and GDPR
 
-Retention and handling rules are owned by [data classification](./architecture/security/data-classification.md); the DPIA outline is in the [S002 memo](./compliance/s002-regulatory-memo.md#dpia-outline-to-be-written-in-s100); the DPIA itself is plan step S100.
+Retention and handling rules are owned by [data
+classification](./architecture/security/data-classification.md); the DPIA
+outline is in the [S002
+memo](./compliance/s002-regulatory-memo.md#dpia-outline-to-be-written-in-s100);
+the DPIA itself is plan step S100.
 
 ### C4. Multi-cloud strategy (what Azure actually does)
 
-Owned by [ADR 1](./architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md), [backup strategy](./architecture/reliability/backup-strategy.md) and [disaster recovery](./architecture/reliability/disaster-recovery.md). Rule of thumb: AWS runs everything users touch; Azure holds immutable backups, escrowed keys and a cold-restore path, first drilled in S096.
+Owned by [ADR
+1](./architecture/decisions/0001-aws-primary-azure-for-off-provider-recovery.md),
+[backup strategy](./architecture/reliability/backup-strategy.md) and [disaster
+recovery](./architecture/reliability/disaster-recovery.md). Rule of thumb: AWS
+runs everything users touch; Azure holds immutable backups, escrowed keys and a
+cold-restore path, first drilled in S096.
 
 ### C5. Backup and restore
 
-Owned by [backup strategy](./architecture/reliability/backup-strategy.md) and [disaster recovery](./architecture/reliability/disaster-recovery.md).
+Owned by [backup strategy](./architecture/reliability/backup-strategy.md) and
+[disaster recovery](./architecture/reliability/disaster-recovery.md).
 
 ### C6. Observability
 
@@ -271,15 +333,20 @@ Owned by [deployment architecture, Delivery](./architecture/deployment/deploymen
 
 ### C8. Rough monthly cost (prod, idle-to-light traffic, EUR)
 
-Owned by [deployment architecture, Cost](./architecture/deployment/deployment-architecture.md#cost): about 190–220 EUR/month, above the QA-08 target; levers reviewed in S102.
+Owned by [deployment architecture,
+Cost](./architecture/deployment/deployment-architecture.md#cost): about 190–220
+EUR/month, above the QA-08 target; levers reviewed in S102.
 
 ---
 
 ## Part D — Roadmap and step list
 
-Status legend: `todo` · `doing` · `done` · `blocked` · `dropped` · `frozen` (designed, not executed: the build roadmap as a whole is frozen since v0.7 even where a row still says `todo`)
+Status legend: `todo` · `doing` · `done` · `blocked` · `dropped` · `frozen`
+(designed, not executed: the build roadmap as a whole is frozen since v0.7 even
+where a row still says `todo`)
 
-Each step is sized for roughly half a day to two days of solo work. Dependencies are the step IDs in the last column.
+Each step is sized for roughly half a day to two days of solo work. Dependencies
+are the step IDs in the last column.
 
 ### Phase 0 — Product definition and foundations
 
@@ -460,11 +527,13 @@ Each step is sized for roughly half a day to two days of solo work. Dependencies
 | S118 | First partner conversation | Meeting with one dispatch company owner; pricing tested against the business case; letter of intent signed or reasons recorded; A-09 re-checked | dropped | S117 |
 | S119 | Dedicated tenant database | A partner can be moved to its own database with the same schema and routed by configuration; tested once end to end. Start only when a partner contract requires it ([ADR 9](./architecture/decisions/0009-hybrid-multi-tenancy.md)) | todo | S025, S118 |
 
-S117 and S118 were dropped with the portfolio reframe: the business case stays as a worked scenario, not a plan to execute.
+S117 and S118 were dropped with the portfolio reframe: the business case stays
+as a worked scenario, not a plan to execute.
 
 ### Phase 12 — Portfolio track (complete; S124 recording open)
 
-Artifacts that make the design defensible in an architect interview. S099 moves here from Phase 8.
+Artifacts that make the design defensible in an architect interview. S099 moves
+here from Phase 8.
 
 | ID | Step | Done when | Status | Depends |
 |---|---|---|---|---|
@@ -502,13 +571,20 @@ Each step gets a section here when it starts. Template:
 
 ### S001 — Finalize scope, non-goals and NFRs
 **Status:** doing · **Started:** 2026-09-19 · **Finished:** —
-**Goal:** Turn the pre-plan into a buildable plan with committed stack, cloud strategy and step list.
+**Goal:** Turn the pre-plan into a buildable plan with committed stack, cloud
+strategy and step list.
 **Decisions:**
-- AWS primary, Azure secondary as "not-AWS safety net" (backups, escrow, DR target). Rejected: live Azure standby (doubles surface for a solo operator).
-- React Native + Expo for passenger (incl. web) and driver; Next.js for admin. Rejected: Flutter (second language), native (three codebases).
-- NestJS + PostgreSQL/PostGIS + Redis on ECS Fargate. Rejected: Lambda (long-lived WebSockets), EKS (operational weight).
+- AWS primary, Azure secondary as "not-AWS safety net" (backups, escrow, DR
+  target). Rejected: live Azure standby (doubles surface for a solo operator).
+- React Native + Expo for passenger (incl. web) and driver; Next.js for admin.
+  Rejected: Flutter (second language), native (three codebases).
+- NestJS + PostgreSQL/PostGIS + Redis on ECS Fargate. Rejected: Lambda
+  (long-lived WebSockets), EKS (operational weight).
 - Terraform for both clouds. Rejected: CDK (AWS-only).
-**Work log:** Wrote this document. Integrated architect-base (architecture skills, Structurizr model with 8 views, ADRs 0001–0008, PDF tooling) and the ECC language rules for this stack; see `CLAUDE.md`. Modelling surfaced two corrections, recorded in the changelog.
+**Work log:** Wrote this document. Integrated architect-base (architecture
+skills, Structurizr model with 8 views, ADRs 0001–0008, PDF tooling) and the ECC
+language rules for this stack; see `CLAUDE.md`. Modelling surfaced two
+corrections, recorded in the changelog.
 **Result / verification:** Pending your review of Part A and Part C4.
 **Follow-ups:** Part F items need your answers before S004 and S002 can close.
 
@@ -516,10 +592,17 @@ Each step gets a section here when it starts. Template:
 **Status:** doing · **Started:** 2026-09-19 · **Finished:** —
 **Goal:** Know what Hungarian law requires before any product code is written.
 **Decisions:**
-- Memo lives in `docs/compliance/`; architecture-relevant rules become constraints C-01 to C-09 in `docs/architecture/requirements/constraints.md`.
-- Invoicing provider is shortlisted (Számlázz.hu, Billingo), not chosen. Who issues invoices depends on the entry model, so the choice moves to S047.
-- Recommended entry model: technology provider to a licensed Budapest dispatch, keeping another city open. Your decision: Part F question 7.
-**Work log:** Read Government Decree 176/2015, Budapest decree 31/2013 as amended to 2026, NAV guidance, the NAIH DPIA list, DAC7 and the Platform Work Directive. Wrote [S002 memo](./compliance/s002-regulatory-memo.md). Updated A3, A4, A8, S004, S031, S043, S046, S047, S055, S067, ADR 5 and ADR 7; added S111–S116.
+- Memo lives in `docs/compliance/`; architecture-relevant rules become
+  constraints C-01 to C-09 in `docs/architecture/requirements/constraints.md`.
+- Invoicing provider is shortlisted (Számlázz.hu, Billingo), not chosen. Who
+  issues invoices depends on the entry model, so the choice moves to S047.
+- Recommended entry model: technology provider to a licensed Budapest dispatch,
+  keeping another city open. Your decision: Part F question 7.
+**Work log:** Read Government Decree 176/2015, Budapest decree 31/2013 as
+amended to 2026, NAV guidance, the NAIH DPIA list, DAC7 and the Platform Work
+Directive. Wrote [S002 memo](./compliance/s002-regulatory-memo.md). Updated A3,
+A4, A8, S004, S031, S043, S046, S047, S055, S067, ADR 5 and ADR 7; added
+S111–S116.
 **Result / verification:** Memo written with primary-law citations. Not confirmed by a lawyer.
 **Follow-ups:** S111 (entry decision and lawyer review) closes this step.
 
@@ -527,21 +610,38 @@ Each step gets a section here when it starts. Template:
 
 ## Part F — Decisions needed from you
 
-These shape business logic, so they are yours, not mine. Answer inline here and we'll fold them into the relevant step.
+These shape business logic, so they are yours, not mine. Answer inline here and
+we'll fold them into the relevant step.
 
-1. ~~**Fare formula (blocks S004, S030).**~~ Answered by S002: the official tariff is mandatory and fixed. Only the launch city (question 2) changes the numbers.
-2. **Launch city and service area (blocks S078, S108).** Which city, and roughly which districts for the soft launch?
-3. **Cancellation rules (blocks S046).** A passenger cancellation fee may be unlawful in Budapest (memo, open question 2). Wait for the lawyer before setting numbers.
-4. **Driver matching policy (S031).** Budapest requires automatic best-taxi selection by road distance and time. Do you also want a rating floor (e.g. ≥ 4.3), and how many offers before giving up?
-5. **Brand.** Colours/logo exist, or should S007 propose them? Name: "Hopin" has a trademark risk (RISK-014); backup name **Gurul**. Decide after the EU trademark search.
-6. **Azure region.** West Europe (Netherlands) vs Germany West Central. Default: Germany West Central for data-residency optics; West Europe if a required feature is missing there.
-7. ~~**Market-entry model.**~~ **Answered 2026-09-19: C, white-label dispatch platform for licensed dispatch companies first, Hopin consumer brand second.** Pilot UI English only. See the [business case](./business/business-case.md). The lawyer review in S111 still applies.
+1. ~~**Fare formula (blocks S004, S030).**~~ Answered by S002: the official
+   tariff is mandatory and fixed. Only the launch city (question 2) changes the
+   numbers.
+2. **Launch city and service area (blocks S078, S108).** Which city, and roughly
+   which districts for the soft launch?
+3. **Cancellation rules (blocks S046).** A passenger cancellation fee may be
+   unlawful in Budapest (memo, open question 2). Wait for the lawyer before
+   setting numbers.
+4. **Driver matching policy (S031).** Budapest requires automatic best-taxi
+   selection by road distance and time. Do you also want a rating floor (e.g. ≥
+   4.3), and how many offers before giving up?
+5. **Brand.** Colours/logo exist, or should S007 propose them? Name: "Hopin" has
+   a trademark risk (RISK-014); backup name **Gurul**. Decide after the EU
+   trademark search.
+6. **Azure region.** West Europe (Netherlands) vs Germany West Central. Default:
+   Germany West Central for data-residency optics; West Europe if a required
+   feature is missing there.
+7. ~~**Market-entry model.**~~ **Answered 2026-09-19: C, white-label dispatch
+   platform for licensed dispatch companies first, Hopin consumer brand
+   second.** Pilot UI English only. See the [business
+   case](./business/business-case.md). The lawyer review in S111 still applies.
 
 ---
 
 ## Part G — Risks
 
-Owned by the [risk register](./architecture/risks/architecture-risks.md) (RISK-001 to RISK-010). The top risk today is RISK-001: the Budapest dispatch rules block launching Hopin as its own operator; see Part F question 7.
+Owned by the [risk register](./architecture/risks/architecture-risks.md)
+(RISK-001 to RISK-010). The top risk today is RISK-001: the Budapest dispatch
+rules block launching Hopin as its own operator; see Part F question 7.
 
 ---
 

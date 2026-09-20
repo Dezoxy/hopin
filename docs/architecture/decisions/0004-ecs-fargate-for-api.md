@@ -8,7 +8,8 @@ Proposed
 
 ## Context
 
-The API holds long-lived WebSocket connections from drivers and passengers. It also runs background jobs and a nightly backup task.
+The API holds long-lived WebSocket connections from drivers and passengers. It
+also runs background jobs and a nightly backup task.
 
 ## Decision drivers
 
@@ -24,7 +25,8 @@ The API holds long-lived WebSocket connections from drivers and passengers. It a
 
 ## Decision
 
-We propose running the API as an ECS Fargate service behind an Application Load Balancer, and the backup exporter as a scheduled ECS task.
+We propose running the API as an ECS Fargate service behind an Application Load
+Balancer, and the backup exporter as a scheduled ECS task.
 
 ## Consequences
 

@@ -1,6 +1,9 @@
 # Constraints
 
-Constraints are rules the architecture must satisfy and cannot trade away. Each one links to its evidence. Source research: [S002 regulatory memo](../../compliance/s002-regulatory-memo.md), read 2026-09-19. **Not yet confirmed by a lawyer**; the memo lists the open questions.
+Constraints are rules the architecture must satisfy and cannot trade away. Each
+one links to its evidence. Source research: [S002 regulatory
+memo](../../compliance/s002-regulatory-memo.md), read 2026-09-19. **Not yet
+confirmed by a lawyer**; the memo lists the open questions.
 
 | ID | Constraint | Source | Affects |
 |---|---|---|---|

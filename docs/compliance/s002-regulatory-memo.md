@@ -1,18 +1,39 @@
 # S002 — Regulatory memo: running a taxi app in Hungary
 
-> **Status:** research memo, 2026-09-19. **Not legal advice.** Statute texts were read on this date from the consolidated versions linked in [Sources](#sources). A Hungarian lawyer must confirm the conclusions before money is committed (see [Open questions](#open-questions-for-a-lawyer)).
+> **Status:** research memo, 2026-09-19. **Not legal advice.** Statute texts
+  were read on this date from the consolidated versions linked in
+  [Sources](#sources). A Hungarian lawyer must confirm the conclusions before
+  money is committed (see [Open questions](#open-questions-for-a-lawyer)).
 >
-> **Owner:** founder. **Review when:** the Budapest taxi decree, Government Decree 176/2015 or the Act on passenger transport services changes; before choosing the launch model (plan Part F, question 7).
+> **Owner:** founder. **Review when:** the Budapest taxi decree, Government
+  Decree 176/2015 or the Act on passenger transport services changes; before
+  choosing the launch model (plan Part F, question 7).
 
 ## Bottom line
 
-1. **Hopin legally is a taxi dispatch service ("diszpécserszolgálat").** The national definition explicitly covers mediating rides "through computer applications". Only licensed taxis with a certified taxi meter may do the rides. Private-car ride-sharing like early Uber is not allowed.
-2. **In Budapest, a dispatch service needs at least 100 million HUF of equity**, plus 25,000 HUF per car above 400. Its dispatch software must also be certified by BKK, the Budapest transport authority. This is the single biggest finding: a solo founder cannot launch a Budapest dispatch service as planned.
-3. **The fare cannot be set by the app.** In Budapest the payable fare is only what the taxi meter computes, and the three unit rates are fixed official prices. Hopin can show an estimate before the ride, but it cannot offer a binding upfront price, discounts or surge.
-4. **The driver's business, not Hopin, issues the passenger's receipt or invoice.** Hopin invoices its own service fee to drivers, and those invoices are reported to NAV. From 1 September 2026, receipt data must also be reported to NAV within three days.
-5. **A data-protection impact assessment (DPIA) is mandatory.** Real-time location tracking of passengers and drivers is on the Hungarian data-protection authority's (NAIH) mandatory list.
+1. **Hopin legally is a taxi dispatch service ("diszpécserszolgálat").** The
+   national definition explicitly covers mediating rides "through computer
+   applications". Only licensed taxis with a certified taxi meter may do the
+   rides. Private-car ride-sharing like early Uber is not allowed.
+2. **In Budapest, a dispatch service needs at least 100 million HUF of equity**,
+   plus 25,000 HUF per car above 400. Its dispatch software must also be
+   certified by BKK, the Budapest transport authority. This is the single
+   biggest finding: a solo founder cannot launch a Budapest dispatch service as
+   planned.
+3. **The fare cannot be set by the app.** In Budapest the payable fare is only
+   what the taxi meter computes, and the three unit rates are fixed official
+   prices. Hopin can show an estimate before the ride, but it cannot offer a
+   binding upfront price, discounts or surge.
+4. **The driver's business, not Hopin, issues the passenger's receipt or
+   invoice.** Hopin invoices its own service fee to drivers, and those invoices
+   are reported to NAV. From 1 September 2026, receipt data must also be
+   reported to NAV within three days.
+5. **A data-protection impact assessment (DPIA) is mandatory.** Real-time
+   location tracking of passengers and drivers is on the Hungarian
+   data-protection authority's (NAIH) mandatory list.
 
-The plan's product vision still works. The **market-entry model** has to change. See [Options](#market-entry-options).
+The plan's product vision still works. The **market-entry model** has to change.
+See [Options](#market-entry-options).
 
 ## 1. Licensing
 
@@ -30,7 +51,9 @@ The plan's product vision still works. The **market-entry model** has to change.
 | Taxi car | Certified receipt-issuing taxi meter, fare table in the car, TAXI roof sign, yellow plates | Annex, point 2 |
 | Ride-sharing | "Személygépkocsis személyszállító szolgáltatás" (white plates, no meter) is allowed only as part of another service such as a hotel, event or airport contract. It is not usable for on-demand city rides. | § 22 (2) |
 
-The Act on passenger transport services (Act XLI of 2012, "Sztv.") lets the transport authority order unlicensed dispatch apps to be made **temporarily inaccessible**. This is the 2016 rule that pushed Uber out of Hungary.
+The Act on passenger transport services (Act XLI of 2012, "Sztv.") lets the
+transport authority order unlicensed dispatch apps to be made **temporarily
+inaccessible**. This is the 2016 rule that pushed Uber out of Hungary.
 
 ### Budapest rules — Budapest Assembly Decree 31/2013 (IV. 18.), as amended (latest by 24/2025 (X. 6.))
 
@@ -71,10 +94,15 @@ The Act on passenger transport services (Act XLI of 2012, "Sztv.") lets the tran
 
 Consequences for Hopin:
 
-- **Upfront fare is an estimate only.** It is useful and allowed as information, but the charged amount must equal the meter amount.
-- **No discounts, promo codes or surge in Budapest.** Fixed prices rule out both directions.
-- **No passenger booking or service fee.** Only the three tariff items may be charged. Hopin earns from drivers.
-- **A passenger cancellation fee is doubtful.** It is not a tariff item. For booked rides, the meter-start rule in § 15 (6) is the lawful way to charge waiting. A lawyer should confirm.
+- **Upfront fare is an estimate only.** It is useful and allowed as information,
+  but the charged amount must equal the meter amount.
+- **No discounts, promo codes or surge in Budapest.** Fixed prices rule out both
+  directions.
+- **No passenger booking or service fee.** Only the three tariff items may be
+  charged. Hopin earns from drivers.
+- **A passenger cancellation fee is doubtful.** It is not a tariff item. For
+  booked rides, the meter-start rule in § 15 (6) is the lawful way to charge
+  waiting. A lawyer should confirm.
 - **Tips** are not a fare element. Voluntary tips appear possible but need confirmation.
 
 ## 3. Receipts, invoices and NAV
@@ -90,28 +118,48 @@ Consequences for Hopin:
 
 ### Invoicing provider
 
-Hopin needs an invoicing API for **its own** fee invoices to drivers, and possibly self-billing on drivers' behalf, which requires a written agreement with each driver.
+Hopin needs an invoicing API for **its own** fee invoices to drivers, and
+possibly self-billing on drivers' behalf, which requires a written agreement
+with each driver.
 
 | Candidate | Why it is on the list |
 |---|---|
 | Számlázz.hu | Market leader; API; Online Számla reporting; publishes receipt-reporting guidance |
 | Billingo | API; Online Számla reporting; publishes e-receipt guidance |
 
-**Recommendation:** decide in plan step S047, after the entry model (Part F, question 7). Who issues invoices depends on it. Selection criteria are an API that can issue invoices on behalf of many drivers, e-receipt and receipt-data support, and an EU data location.
+**Recommendation:** decide in plan step S047, after the entry model (Part F,
+question 7). Who issues invoices depends on it. Selection criteria are an API
+that can issue invoices on behalf of many drivers, e-receipt and receipt-data
+support, and an EU data location.
 
 ## 4. Data protection
 
-- **A DPIA is mandatory before launch.** NAIH's Article 35(4) list includes location data used for systematic monitoring. Hopin tracks drivers continuously and passengers during rides.
-- **Location is also collected by law.** Budapest requires 5-second positions and real-time reporting to BKK. The DPIA must separate legally required processing from Hopin's own purposes.
-- **Retention:** dispatch order records must be kept for the period the Sztv. sets. The exact period was not confirmed in this research; the lawyer must confirm it before plan step S100 fixes retention jobs.
-- **Algorithmic management:** automatic matching is algorithmic management of drivers. The EU Platform Work Directive (2024/2831) must be transposed by **2026-12-02**, but Hungary had not started as of May 2026. Expect transparency and human-review duties for matching and account suspension.
+- **A DPIA is mandatory before launch.** NAIH's Article 35(4) list includes
+  location data used for systematic monitoring. Hopin tracks drivers
+  continuously and passengers during rides.
+- **Location is also collected by law.** Budapest requires 5-second positions
+  and real-time reporting to BKK. The DPIA must separate legally required
+  processing from Hopin's own purposes.
+- **Retention:** dispatch order records must be kept for the period the Sztv.
+  sets. The exact period was not confirmed in this research; the lawyer must
+  confirm it before plan step S100 fixes retention jobs.
+- **Algorithmic management:** automatic matching is algorithmic management of
+  drivers. The EU Platform Work Directive (2024/2831) must be transposed by
+  **2026-12-02**, but Hungary had not started as of May 2026. Expect
+  transparency and human-review duties for matching and account suspension.
 
 ### DPIA outline (to be written in S100)
 
-1. Processing description: data subjects (passengers, drivers, trip-share viewers, operator), data categories, purposes, legal bases, recipients (BKK, NAV, Stripe, Mapbox, Expo, AWS, Azure, Sentry).
-2. Necessity and proportionality: minimum location precision and frequency beyond legal duties, retention per category, trip-share expiry.
-3. Risks: stalking through trip-share links, profiling of drivers, location leaks, cross-border transfers, account takeover.
-4. Measures: tokenised expiring share links, encryption, access logging, EU-only storage, data processing agreements, driver transparency notice, human review of suspensions.
+1. Processing description: data subjects (passengers, drivers, trip-share
+   viewers, operator), data categories, purposes, legal bases, recipients (BKK,
+   NAV, Stripe, Mapbox, Expo, AWS, Azure, Sentry).
+2. Necessity and proportionality: minimum location precision and frequency
+   beyond legal duties, retention per category, trip-share expiry.
+3. Risks: stalking through trip-share links, profiling of drivers, location
+   leaks, cross-border transfers, account takeover.
+4. Measures: tokenised expiring share links, encryption, access logging, EU-only
+   storage, data processing agreements, driver transparency notice, human review
+   of suspensions.
 5. Residual risk and whether NAIH must be consulted in advance.
 6. Sign-off and review triggers.
 
@@ -124,7 +172,10 @@ Hopin needs an invoicing API for **its own** fee invoices to drivers, and possib
 | C. Technology provider to a licensed Budapest dispatch | Hopin builds and runs the software; an existing licensed dispatch is the legal operator | Revenue share, partner dependency, their brand may lead | Good; smallest regulatory load |
 | D. Launch outside Hungary | Another EU market with lighter rules | Different law, language and market; loses home advantage | Out of the plan's scope |
 
-**Recommendation: C to start, keeping B open.** C gets a real product in front of Budapest drivers without 100 M HUF equity, and every Budapest software rule becomes a product requirement either way. B is the path if no partner fits. This is a business decision for you, so it is question 7 in plan Part F.
+**Recommendation: C to start, keeping B open.** C gets a real product in front
+of Budapest drivers without 100 M HUF equity, and every Budapest software rule
+becomes a product requirement either way. B is the path if no partner fits. This
+is a business decision for you, so it is question 7 in plan Part F.
 
 ## Impact on the plan and architecture
 
@@ -142,16 +193,23 @@ Hopin needs an invoicing API for **its own** fee invoices to drivers, and possib
 | S058 / S057 | Add a **fare check** screen for the passenger (meter data versus official tariff) |
 | New | BKK real-time data feed (position, meter start/stop); phone-order intake; DAC7 yearly report |
 
-Architecture constraints C-01 to C-09 in [constraints.md](../architecture/requirements/constraints.md) carry these facts into the architecture.
+Architecture constraints C-01 to C-09 in
+[constraints.md](../architecture/requirements/constraints.md) carry these facts
+into the architecture.
 
 ## Open questions for a lawyer
 
-1. Can Hopin run as software provider to a licensed dispatch (option C) without its own dispatch licence, and who must hold the BKK software certificate?
-2. Is a passenger cancellation or no-show fee lawful for Budapest taxi dispatch? Are voluntary in-app tips lawful?
-3. May a dispatch service collect card payments on its own account (Stripe platform account) and pay drivers out? § 3 (10b) suggests yes. What does that mean for who issues the receipt?
+1. Can Hopin run as software provider to a licensed dispatch (option C) without
+   its own dispatch licence, and who must hold the BKK software certificate?
+2. Is a passenger cancellation or no-show fee lawful for Budapest taxi dispatch?
+   Are voluntary in-app tips lawful?
+3. May a dispatch service collect card payments on its own account (Stripe
+   platform account) and pay drivers out? § 3 (10b) suggests yes. What does that
+   mean for who issues the receipt?
 4. What is the retention period for dispatch order records under the Sztv.?
 5. Which city decrees apply in candidate cities for option B?
-6. Does Hopin's per-ride fee to drivers trigger any price-regulation issue under the fixed-tariff regime?
+6. Does Hopin's per-ride fee to drivers trigger any price-regulation issue under
+   the fixed-tariff regime?
 
 ## Sources
 

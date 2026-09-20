@@ -1,6 +1,10 @@
 # Design findings
 
-What the design process caught before any production code existed, how it was caught, and what changed as a result. Each finding links to where the change is recorded. Hopin is a case study, so these are findings from legal reading, modelling, costing, a thin running slice, review and checks against vendor documentation. None came from production.
+What the design process caught before any production code existed, how it was
+caught, and what changed as a result. Each finding links to where the change is
+recorded. Hopin is a case study, so these are findings from legal reading,
+modelling, costing, a thin running slice, review and checks against vendor
+documentation. None came from production.
 
 ## By method
 
@@ -33,9 +37,13 @@ What the design process caught before any production code existed, how it was ca
 
 ## What the pattern shows
 
-- **Cheap methods found the expensive problems.** Reading the law and costing the design changed the business model and the matching design before any code existed.
-- **Running code found what design could not.** The shutdown race and the cross-partner offer bug only appeared once the slice ran and was reviewed.
-- **Written claims need a source check.** The outbox guarantee and the EU-only claim both read well and were both wrong until they were checked.
+- **Cheap methods found the expensive problems.** Reading the law and costing
+  the design changed the business model and the matching design before any code
+  existed.
+- **Running code found what design could not.** The shutdown race and the
+  cross-partner offer bug only appeared once the slice ran and was reviewed.
+- **Written claims need a source check.** The outbox guarantee and the EU-only
+  claim both read well and were both wrong until they were checked.
 
 ## Not found yet
 

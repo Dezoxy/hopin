@@ -114,7 +114,16 @@ LANDSCAPE_MACROS = r"""```{=latex}
   \KOMAoptions{headwidth=text,footwidth=text}}
 \newcommand{\landscapepage}{\hl@setpage{297mm}{210mm}}
 \newcommand{\portraitpage}{\hl@setpage{210mm}{297mm}}
+% Pandoc caps an image's WIDTH at the text block but never its height, so a
+% tall view -- a dynamic or a deep container view -- renders taller than the
+% page. LaTeX then cannot place it where it falls, pushes it to a page of its
+% own and leaves the remainder of the previous page empty: a sheet carrying
+% nothing but the running header and footer. Capping the height as well, with
+% the aspect ratio kept, makes a tall view shrink to fit instead.
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>0.92\textheight 0.92\textheight\else\Gin@nat@height\fi}
 \makeatother
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 ```"""
 
 

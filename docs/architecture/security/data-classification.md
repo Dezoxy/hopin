@@ -1,6 +1,7 @@
 # Data Classification
 
-Retention periods are targets; the retention for dispatch order records waits on the lawyer ([A-02](../requirements/assumptions.md), memo open question 4).
+Retention periods are targets; the retention for dispatch order records waits on
+the lawyer ([A-02](../requirements/assumptions.md), memo open question 4).
 
 | Data | Classification | Where it lives | Retention | Notes |
 |---|---|---|---|---|
@@ -27,5 +28,6 @@ Retention periods are targets; the retention for dispatch order records waits on
 
 - Personal data at rest only in EU regions ([QA-05](../requirements/quality-attributes.md)).
 - Logs carry ride and user IDs, never names, phone numbers or coordinates.
-- Account deletion: soft delete, personal data scrubbed after 30 days; financial and ride records kept pseudonymised for their legal retention.
+- Account deletion: soft delete, personal data scrubbed after 30 days; financial
+  and ride records kept pseudonymised for their legal retention.
 - Data export: asynchronous job, presigned link valid 24 h.

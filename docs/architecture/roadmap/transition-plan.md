@@ -1,6 +1,9 @@
 # Transition Plan
 
-From [current-state.md](current-state.md) to [target-state.md](target-state.md). The detailed steps, statuses and dependencies are in [plan Part D](../../hopin-plan.md#part-d--roadmap-and-step-list); this page records the stage logic and exit criteria.
+From [current-state.md](current-state.md) to [target-state.md](target-state.md).
+The detailed steps, statuses and dependencies are in [plan Part
+D](../../hopin-plan.md#part-d--roadmap-and-step-list); this page records the
+stage logic and exit criteria.
 
 | # | Stage | Plan phase | Exit criterion | Closes |
 |---|---|---|---|---|
@@ -14,6 +17,9 @@ From [current-state.md](current-state.md) to [target-state.md](target-state.md).
 
 ## Sequencing logic
 
-Stage 1 comes first because the entry model changes who operates the service, which certification applies and who issues receipts. Building before it would risk rework in payments and dispatch.
+Stage 1 comes first because the entry model changes who operates the service,
+which certification applies and who issues receipts. Building before it would
+risk rework in payments and dispatch.
 
-Stage 6 comes before launch: a backup that has never been restored does not count as recovery ([QA-04](../requirements/quality-attributes.md)).
+Stage 6 comes before launch: a backup that has never been restored does not
+count as recovery ([QA-04](../requirements/quality-attributes.md)).

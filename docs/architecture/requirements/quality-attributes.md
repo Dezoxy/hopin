@@ -1,6 +1,10 @@
 # Quality Attributes
 
-Each attribute is measurable and has an architectural consequence. Decisions and risks refer to these IDs. All are **targets**. A thin running slice measured QA-01, QA-02, QA-09 and QA-12 locally on 2026-09-19 ([evidence](../evidence/s123-slice-results.md)); nothing has been measured in a deployed environment.
+Each attribute is measurable and has an architectural consequence. Decisions and
+risks refer to these IDs. All are **targets**. A thin running slice measured
+QA-01, QA-02, QA-09 and QA-12 locally on 2026-09-19
+([evidence](../evidence/s123-slice-results.md)); nothing has been measured in a
+deployed environment.
 
 | ID | Attribute | Target | Architectural consequence | Validated by |
 |---|---|---|---|---|

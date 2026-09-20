@@ -1,6 +1,9 @@
 # Backup Strategy
 
-Why two providers: [ADR 1](../decisions/0001-aws-primary-azure-for-off-provider-recovery.md). A successful backup is not a restore test; restore evidence is recorded in [disaster-recovery.md](disaster-recovery.md).
+Why two providers: [ADR
+1](../decisions/0001-aws-primary-azure-for-off-provider-recovery.md). A
+successful backup is not a restore test; restore evidence is recorded in
+[disaster-recovery.md](disaster-recovery.md).
 
 | What | Method | Frequency | Retention | Where |
 |---|---|---|---|---|
@@ -11,4 +14,5 @@ Why two providers: [ADR 1](../decisions/0001-aws-primary-azure-for-off-provider-
 | Terraform state | S3 versioning; state KMS key escrowed | On change | 1 year of versions | S3, key in Azure Key Vault |
 | Secrets | Secrets Manager versions + escrow of break-glass items | On change | — | AWS and Azure |
 
-Monitoring: CloudWatch alarm if the nightly job fails; Azure Monitor alert if no new blob arrives in 26 hours.
+Monitoring: CloudWatch alarm if the nightly job fails; Azure Monitor alert if no
+new blob arrives in 26 hours.
