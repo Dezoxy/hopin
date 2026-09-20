@@ -118,10 +118,16 @@ def check_skill_mirror(f: Failures) -> None:
 
 
 def check_links(f: Failures) -> None:
-    """Every relative markdown link resolves to something on disk."""
+    """Every relative markdown link resolves to something on disk.
+
+    `embed:` is Structurizr's scheme for showing a view inside a documentation
+    page. It names a view key, not a file, so it has nothing to resolve. Only
+    an embed carrying alt text reaches here at all, because the link pattern
+    needs a non-empty label.
+    """
     for src in markdown_files():
         for text, link in LINK_RE.findall(prose(read(src))):
-            if link.startswith(("http://", "https://", "#", "mailto:")):
+            if link.startswith(("http://", "https://", "#", "mailto:", "embed:")):
                 continue
             if not (src.parent / link.split("#")[0]).exists():
                 f.add("links", f"{rel(src)}: [{text}]({link}) does not resolve")
