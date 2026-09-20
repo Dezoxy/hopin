@@ -38,7 +38,7 @@ Hopin specifics:
 - Everything in the model is planned, not deployed. Keep "(planned)" in view titles until real infrastructure exists, then check each claim against code and Terraform.
 - ADRs use architecture-base's template (`docs/architecture/templates/adr.md`), not ECC's `architecture-decision-records` skill format. A new recommendation starts as Proposed. Only list alternatives that were actually considered.
 - When a plan step produces real content for a concern (security, reliability, data), move it from the plan into `docs/architecture/<concern>/` and link back. Do not create empty concern files.
-- `styles-shared.dsl`, `scripts/architecture-pdf.sh` and `scripts/build_architecture_pdf_source.py` are copied unchanged from `~/Documents/architecture-base`. Improve them there first, then re-copy.
+- `styles-shared.dsl`, `scripts/architecture-pdf.sh` and `scripts/build_architecture_pdf_source.py` are copied unchanged from `~/Documents/development-base/architecture-base`. Improve them there first, then re-copy.
 - `.github/workflows/architecture-pdf.yml` is architecture-base's workflow with one Hopin change: it runs only when started by hand (no pull-request trigger). Re-apply that change after re-copying. Test PDF tooling changes locally with `make pdf`.
 
 ## Pull requests and documentation
@@ -53,7 +53,7 @@ Hopin specifics:
 
 ## ECC rules, agents and skills for this stack
 
-ECC is installed globally. Its common rules load from the user's global config. This repo adds the language rules that match Hopin's stack, under `.claude/rules/ecc/`:
+ECC is installed globally as the `ecc` plugin marketplace, and its local checkout is `~/Documents/development-base/agent-base`. Its common rules load from the user's global config, through a symlink to that checkout. This repo adds the language rules that match Hopin's stack, under `.claude/rules/ecc/`:
 
 | Rule set | Loads for | Note |
 |---|---|---|
@@ -62,7 +62,7 @@ ECC is installed globally. Its common rules load from the user's global config. 
 | web | `.tsx`, CSS, HTML | Upstream, unchanged |
 | react-native | `apps/passenger`, `apps/driver`, `packages/ui` only | Paths narrowed from upstream so API and admin code do not get mobile guidance |
 
-When updating from `~/Documents/agents-repo/ECC/rules`, re-apply the narrowed `paths:` block in `react-native/`.
+When updating from `~/Documents/development-base/agent-base/rules` (the ECC fork; the plugin id stays `ecc`), re-apply the narrowed `paths:` block in `react-native/`.
 
 Use these ECC agents and skills for Hopin work:
 
