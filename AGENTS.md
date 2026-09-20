@@ -48,7 +48,7 @@ Hopin specifics:
 - The counted half of that audit is `make docs` (`scripts/check_docs_consistency.py`). It runs in CI with `make check`, Markdown lint (`.markdownlint.json`, from ECC) and gitleaks secret scanning in `.github/workflows/docs-consistency.yml`. A green run is a floor, not the audit: it cannot read prose.
 - Run the lint gates locally before pushing: `npx markdownlint-cli2` and `gitleaks git --no-banner`.
 - Required checks on `main`: docs consistency, architecture model, markdown lint, secret scan and slice tests. The slice tests run on every pull request and skip the work when `slice/` is unchanged.
-- docs-sync is adapted from `~/Developer/homelab/.claude/skills/docs-sync/`. Keep `.claude/skills/` and `.agents/skills/` byte-identical.
+- docs-sync came from homelab and is now canonical in architect-base; this repo's copy keeps a Hopin-specific doc-surface table. `scripts/check_docs_consistency.py` is architect-base's: improve it there, then re-copy. Keep `.claude/skills/` and `.agents/skills/` byte-identical.
 - Each fact has one owning document. Requirements, security, data, reliability, observability and risks live under `docs/architecture/`; the plan links to them and keeps scope, steps and decisions.
 
 ## ECC rules, agents and skills for this stack
