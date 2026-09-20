@@ -302,9 +302,13 @@ def decisions(
         for record in workspace.get("documentation", {}).get("decisions", [])
         if isinstance(record, dict) and record.get("content")
     ]
-    markdown = [record for record in records if record.get("format", "Markdown") == "Markdown"]
+    markdown = [
+        record for record in records if record.get("format", "Markdown") == "Markdown"
+    ]
     if len(markdown) < len(records):
-        print(f"skipped {len(records) - len(markdown)} non-Markdown ADRs", file=sys.stderr)
+        print(
+            f"skipped {len(records) - len(markdown)} non-Markdown ADRs", file=sys.stderr
+        )
     if not markdown:
         return "", set()
     ids = {str(record.get("id")) for record in markdown}
@@ -313,7 +317,13 @@ def decisions(
         target = match.group(1)
         return f"](#adr-{target})" if target in ids else match.group(0)
 
-    parts = ["", "# Decisions", "", "Architecture decision records, in number order.", ""]
+    parts = [
+        "",
+        "# Decisions",
+        "",
+        "Architecture decision records, in number order.",
+        "",
+    ]
     embedded: set[str] = set()
     for record in sorted(markdown, key=decision_order):
         content = ADR_LINK.sub(to_adr, record["content"])
