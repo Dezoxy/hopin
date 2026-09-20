@@ -1,6 +1,6 @@
 # Presentation ledger
 
-Communication diagrams are accepted views redrawn for one audience, following architect-base's `presentation.md`. The Structurizr model stays the truth. A row here says which view and model commit a redraw was checked against. A row goes stale when its source view changes; re-check it by hand and re-date it, or remove it.
+Communication diagrams are accepted views redrawn for one audience, following architecture-base's `presentation.md`. The Structurizr model stays the truth. A row here says which view and model commit a redraw was checked against. A row goes stale when its source view changes; re-check it by hand and re-date it, or remove it.
 
 | Artefact | Source view | Model commit | Audience | Checked | Used in |
 |---|---|---|---|---|---|

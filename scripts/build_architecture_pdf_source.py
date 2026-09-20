@@ -35,7 +35,7 @@ PNG export (`export -format png`) and the JSON export (`export -format json`,
 workspace.json) of the same workspace. Image paths in the output are relative
 to the architecture directory, so run Pandoc from there.
 
-The canonical copy lives in architect-base (scripts/); repositories copy it
+The canonical copy lives in architecture-base (scripts/); repositories copy it
 unchanged and wrap it in their own command.
 
 Usage:
