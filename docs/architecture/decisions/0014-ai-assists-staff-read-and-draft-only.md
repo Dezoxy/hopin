@@ -40,6 +40,19 @@ The model gets no tools that write. Its single tool returns the draft to our cod
 
 AI is excluded from matching, pricing, driver scoring, account blocking and refunds.
 
+## What this is not: an agent
+
+Agent platforms split the work into a model that reasons, a harness that manages context, tools and delegation over long sessions, and an execution environment where the agent acts. A sound design can say what belongs to each and where the trust boundaries sit. Hopin's answers:
+
+| Part | In Hopin |
+|---|---|
+| Model | Claude on Amazon Bedrock, replaceable behind the model gateway ([ADR 15](0015-bedrock-for-data-openrouter-for-evaluation.md)) |
+| Harness | None. Each use case is one model call with one tool that returns the draft. There is no loop, no context to compact, no tool search and no subagent. |
+| Execution environment | None. The model has no tool that acts, so there is nowhere for it to act. |
+| Trust boundary | TB-7: the minimised case file going out, the checked draft coming back ([threat model](../security/threat-model.md#tb-7-hopin-to-model-providers)) |
+
+This is deliberate. No task in Hopin needs the model to act, and a human in every loop is what keeps the AI Act classification. The three design-only use cases stay single calls too. Operations triage is the one that would tempt an agent with tools over logs and alarms; if that is ever wanted, it needs a new ADR that names the harness, the execution environment, a capability gateway with scoped identities, and the audit trail, before any tool is granted.
+
 ## Consequences
 
 Positive:
