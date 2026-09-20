@@ -81,7 +81,8 @@ def markdown_files() -> list[Path]:
     files = [REPO / p for p in ("README.md", "AGENTS.md", "CLAUDE.md")]
     for root in roots:
         files += [
-            p for p in root.rglob("*.md")
+            p
+            for p in root.rglob("*.md")
             if not SKIP_DIRS.intersection(p.relative_to(REPO).parts)
             and VENDORED not in p.parents
         ]
@@ -91,7 +92,10 @@ def markdown_files() -> list[Path]:
 def check_twins(f: Failures) -> None:
     """AGENTS.md and CLAUDE.md carry the same instructions, byte for byte."""
     if read(REPO / "AGENTS.md") != read(REPO / "CLAUDE.md"):
-        f.add("twins", "AGENTS.md and CLAUDE.md differ; edit CLAUDE.md, then cp CLAUDE.md AGENTS.md")
+        f.add(
+            "twins",
+            "AGENTS.md and CLAUDE.md differ; edit CLAUDE.md, then cp CLAUDE.md AGENTS.md",
+        )
 
 
 def check_skill_mirror(f: Failures) -> None:
@@ -102,10 +106,15 @@ def check_skill_mirror(f: Failures) -> None:
         if not mirror.exists():
             f.add("skill-mirror", f"{rel(src)} has no mirror at {rel(mirror)}")
         elif mirror.read_bytes() != src.read_bytes():
-            f.add("skill-mirror", f"{rel(mirror)} differs from {rel(src)} (the .claude/ copy is the source)")
+            f.add(
+                "skill-mirror",
+                f"{rel(mirror)} differs from {rel(src)} (the .claude/ copy is the source)",
+            )
     for mirror in sorted(agents.glob("*/SKILL.md")):
         if not (claude / mirror.parent.name / "SKILL.md").exists():
-            f.add("skill-mirror", f"{rel(mirror)} mirrors a skill that no longer exists")
+            f.add(
+                "skill-mirror", f"{rel(mirror)} mirrors a skill that no longer exists"
+            )
 
 
 def check_links(f: Failures) -> None:
@@ -134,7 +143,10 @@ def check_docs_index(f: Failures) -> None:
             if not link.startswith(("http://", "https://", "#"))
         )
         if not linked:
-            f.add("docs-index", f"{rel(doc)} is not linked from docs/README.md or {rel(ARCH_INDEX)}")
+            f.add(
+                "docs-index",
+                f"{rel(doc)} is not linked from docs/README.md or {rel(ARCH_INDEX)}",
+            )
 
 
 def check_adrs(f: Failures) -> None:
@@ -146,7 +158,10 @@ def check_adrs(f: Failures) -> None:
     for path in sorted(ADR_DIR.iterdir()):
         match = ADR_NAME.match(path.name)
         if not path.is_file() or not match:
-            f.add("adrs", f"{rel(path)}: only NNNN-kebab-title.md files belong in decisions/")
+            f.add(
+                "adrs",
+                f"{rel(path)}: only NNNN-kebab-title.md files belong in decisions/",
+            )
             continue
         number = int(match.group(1))
         numbers.append(number)
@@ -159,13 +174,19 @@ def check_adrs(f: Failures) -> None:
             f.add("adrs", f"{rel(path)}: needs '## Status' followed by '## Context'")
         else:
             start, end = lines.index("## Status"), lines.index("## Context")
-            status = next((ln for ln in lines[start + 1:end] if ln.strip()), "")
+            status = next((ln for ln in lines[start + 1 : end] if ln.strip()), "")
             if status.split(" ")[0] not in ADR_STATUSES:
-                f.add("adrs", f"{rel(path)}: status must start with one of {sorted(ADR_STATUSES)}")
+                f.add(
+                    "adrs",
+                    f"{rel(path)}: status must start with one of {sorted(ADR_STATUSES)}",
+                )
         if f"(decisions/{path.name})" not in index:
             f.add("adrs", f"{rel(path)} is not listed in {rel(ARCH_INDEX)}")
     if numbers and sorted(numbers) != list(range(1, len(numbers) + 1)):
-        f.add("adrs", f"ADR numbers must run 1..{len(numbers)} without gaps: {sorted(numbers)}")
+        f.add(
+            "adrs",
+            f"ADR numbers must run 1..{len(numbers)} without gaps: {sorted(numbers)}",
+        )
 
 
 def check_view_register(f: Failures) -> None:
@@ -173,15 +194,37 @@ def check_view_register(f: Failures) -> None:
     if not VIEWS_DSL.exists() or "## View register" not in read(ARCH_INDEX):
         return  # no register to reconcile yet
     dsl = read(VIEWS_DSL)
-    defined = set(re.findall(
-        r'^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|'
-        r'dynamic\s+\S+|deployment\s+\S+\s+\S+)\s+"([^"]+)"', dsl, re.MULTILINE))
+    defined = set(
+        re.findall(
+            r"^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|"
+            r'dynamic\s+\S+|deployment\s+\S+\s+\S+)\s+"([^"]+)"',
+            dsl,
+            re.MULTILINE,
+        )
+    )
     section = read(ARCH_INDEX).split("## View register", 1)
-    registered = set(re.findall(r"^\|\s*([A-Za-z][A-Za-z0-9]+)\s*\|", section[1].split("\n## ", 1)[0], re.MULTILINE)) - {"Key"} if len(section) == 2 else set()
+    registered = (
+        set(
+            re.findall(
+                r"^\|\s*([A-Za-z][A-Za-z0-9]+)\s*\|",
+                section[1].split("\n## ", 1)[0],
+                re.MULTILINE,
+            )
+        )
+        - {"Key"}
+        if len(section) == 2
+        else set()
+    )
     for key in sorted(defined - registered):
-        f.add("view-register", f"view '{key}' is in views.dsl but not in the README view register")
+        f.add(
+            "view-register",
+            f"view '{key}' is in views.dsl but not in the README view register",
+        )
     for key in sorted(registered - defined):
-        f.add("view-register", f"view '{key}' is in the README view register but not in views.dsl")
+        f.add(
+            "view-register",
+            f"view '{key}' is in the README view register but not in views.dsl",
+        )
 
 
 def check_speaker_notes(f: Failures) -> None:
@@ -190,13 +233,21 @@ def check_speaker_notes(f: Failures) -> None:
     if not notes_path.exists() or not VIEWS_DSL.exists():
         return  # speaker notes are optional; enforce them once they exist
     notes = set(re.findall(r"^### (\S+)\s*$", read(notes_path), re.MULTILINE))
-    defined = set(re.findall(
-        r'^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|'
-        r'dynamic\s+\S+|deployment\s+\S+\s+\S+)\s+"([^"]+)"', read(VIEWS_DSL), re.MULTILINE))
+    defined = set(
+        re.findall(
+            r"^(?:systemLandscape|systemContext\s+\S+|container\s+\S+|component\s+\S+|"
+            r'dynamic\s+\S+|deployment\s+\S+\s+\S+)\s+"([^"]+)"',
+            read(VIEWS_DSL),
+            re.MULTILINE,
+        )
+    )
     for key in sorted(defined - notes):
         f.add("speaker-notes", f"view '{key}' has no section in {rel(notes_path)}")
     for key in sorted(notes - defined):
-        f.add("speaker-notes", f"{rel(notes_path)} has a section for '{key}', which is not a view")
+        f.add(
+            "speaker-notes",
+            f"{rel(notes_path)} has a section for '{key}', which is not a view",
+        )
 
 
 def check_ids(f: Failures) -> None:
@@ -206,15 +257,32 @@ def check_ids(f: Failures) -> None:
         if not owner.exists():
             continue  # this repository does not keep that ID family
         owner_text = read(owner)
-        defined = set(re.findall(r"^(?:\|\s*|#+\s*)(" + pattern.strip(r"\b") + r")\b", owner_text, re.MULTILINE))
+        defined = set(
+            re.findall(
+                r"^(?:\|\s*|#+\s*)(" + pattern.strip(r"\b") + r")\b",
+                owner_text,
+                re.MULTILINE,
+            )
+        )
         for src in sources:
             for cited in sorted(set(re.findall(pattern, prose(read(src))))):
                 if cited not in defined:
-                    f.add("ids", f"{rel(src)} cites {cited}, which {rel(owner)} does not define")
+                    f.add(
+                        "ids",
+                        f"{rel(src)} cites {cited}, which {rel(owner)} does not define",
+                    )
 
 
-CHECKS = (check_twins, check_skill_mirror, check_links, check_docs_index,
-          check_adrs, check_view_register, check_speaker_notes, check_ids)
+CHECKS = (
+    check_twins,
+    check_skill_mirror,
+    check_links,
+    check_docs_index,
+    check_adrs,
+    check_view_register,
+    check_speaker_notes,
+    check_ids,
+)
 
 
 def main() -> int:
@@ -227,7 +295,10 @@ def main() -> int:
     print("docs consistency: documentation contradicts the tree\n", file=sys.stderr)
     for name, detail in failures:
         print(f"  [{name}] {detail}", file=sys.stderr)
-    print("\nFix the docs in this branch. See .claude/skills/docs-sync/SKILL.md.", file=sys.stderr)
+    print(
+        "\nFix the docs in this branch. See .claude/skills/docs-sync/SKILL.md.",
+        file=sys.stderr,
+    )
     return 1
 
 
