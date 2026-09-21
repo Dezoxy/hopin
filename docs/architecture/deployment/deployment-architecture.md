@@ -1,10 +1,10 @@
-# Deployment Architecture
+## Deployment Architecture
 
 Planned; nothing is deployed. See the **ProductionCore**, **AwsBackups** and
 **AzureRecovery** views. Terraform in `/infra` will be the source of truth for
 every setting once it exists (plan steps S013–S016).
 
-## Placement
+### Placement
 
 | Component | Runs on | Instances (prod) | Failure domain |
 |---|---|---|---|
@@ -21,7 +21,7 @@ Shared failure domain: everything live is in **eu-central-1**. A regional outage
 stops the service; recovery follows
 [disaster-recovery.md](../reliability/disaster-recovery.md).
 
-## Delivery
+### Delivery
 
 | Trigger | What happens |
 |---|---|
@@ -31,7 +31,7 @@ stops the service; recovery follows
 | Tag `v*` | Manual approval, rolling deploy to `prod` with ECS circuit breaker; EAS Submit; EAS Update to production channel only after the store build is live |
 | Rollback | Previous ECS task definition; republish previous EAS Update |
 
-## Cost
+### Cost
 
 Rough monthly production cost at idle to light traffic, EUR. Target is [QA-08](../requirements/quality-attributes.md).
 

@@ -1,4 +1,4 @@
-# Transition Plan
+## Transition Plan
 
 From [current-state.md](current-state.md) to [target-state.md](target-state.md).
 The detailed steps, statuses and dependencies are in [plan Part
@@ -15,7 +15,7 @@ stage logic and exit criteria.
 | 6 | Recovery and compliance | 8 | First restore drill recorded; DPIA signed off | [RISK-009](../risks/architecture-risks.md) |
 | 7 | Launch | 9 | Store approval; soft launch in one district | [RISK-003](../risks/architecture-risks.md) |
 
-## Sequencing logic
+### Sequencing logic
 
 Stage 1 comes first because the entry model changes who operates the service,
 which certification applies and who issues receipts. Building before it would

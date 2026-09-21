@@ -1,4 +1,4 @@
-# Disaster Recovery
+## Disaster Recovery
 
 Objectives: [QA-04](../requirements/quality-attributes.md). **No restore has
 been performed yet**; every objective below is a target without evidence until
@@ -12,7 +12,7 @@ Views: **RegionRecovery** and **AccountRecovery**.
 | eu-central-1 lost | 24 h (last copied snapshot) | 4 h | Restore snapshot copy in eu-west-1; apply Terraform for eu-west-1 |
 | AWS account lost (compromise, lock-out) | 24 h | 24 h | Restore nightly dump into Azure Database for PostgreSQL; run the API image on Azure Container Apps (plan step S097) |
 
-## Outline for the AWS-account-loss path
+### Outline for the AWS-account-loss path
 
 1. Declare the incident; freeze all remaining AWS access.
 2. Retrieve break-glass credentials and the dump key from Azure Key Vault.
@@ -32,7 +32,7 @@ Views: **RegionRecovery** and **AccountRecovery**.
 
 Step-by-step commands belong in `docs/runbooks/restore.md` (plan step S096), not here.
 
-## Evidence
+### Evidence
 
 | Date | Scenario | Measured RPO | Measured RTO | Notes |
 |---|---|---|---|---|

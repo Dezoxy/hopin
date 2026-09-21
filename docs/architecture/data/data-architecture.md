@@ -1,11 +1,11 @@
-# Data Architecture
+## Data Architecture
 
 Hopin is one system with one operator, so ownership is by store, not by team.
 The domain model is in [plan Part B4](../../hopin-plan.md#b4-domain-model-v1)
 until plan step S005 moves the ERD here. Classification and retention per data
 type are in [data-classification.md](../security/data-classification.md).
 
-## Stores and systems of record
+### Stores and systems of record
 
 | Store | System of record for | Consistency | Backed up | Residency |
 |---|---|---|---|---|
@@ -16,7 +16,7 @@ type are in [data-classification.md](../security/data-classification.md).
 | Stripe | Card tokens, charges, payouts | External | Stripe's responsibility; Hopin keeps references | Stripe EU entity (confirm in S041) |
 | Invoicing provider (planned) | Hopin's fee invoices to drivers | External | Provider's responsibility | To be confirmed in S047 |
 
-## Rules
+### Rules
 
 - **One writer per fact.** The Hopin API is the only writer to the database. The
   backup exporter only reads.

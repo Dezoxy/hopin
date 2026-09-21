@@ -1,4 +1,4 @@
-# Availability
+## Availability
 
 Target: [QA-03](../requirements/quality-attributes.md), 99.5 % monthly for the API. Nothing is measured yet.
 

@@ -1,4 +1,4 @@
-# Constraints
+## Constraints
 
 Constraints are rules the architecture must satisfy and cannot trade away. Each
 one links to its evidence. Source research: [S002 regulatory

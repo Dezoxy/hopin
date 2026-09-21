@@ -1,4 +1,4 @@
-# Trust Boundaries
+## Trust Boundaries
 
 Threats per boundary and their controls: [threat-model.md](threat-model.md). The
 **Security** view in `workspace.dsl` shows the modelled version: the `Client

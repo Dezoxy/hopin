@@ -1,4 +1,4 @@
-# Engineering Standards
+## Engineering Standards
 
 Standards that every change follows. The ECC rules in `.claude/rules/ecc/` and
 the user-level ECC common rules carry the detail; this page records what is

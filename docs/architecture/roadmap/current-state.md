@@ -1,4 +1,4 @@
-# Current State
+## Current State
 
 As of 2026-09-19 Hopin is a **reference architecture case study**, not a product
 in development. Nothing is built, deployed or measured. The only code is a thin

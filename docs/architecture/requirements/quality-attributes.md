@@ -1,4 +1,4 @@
-# Quality Attributes
+## Quality Attributes
 
 Each attribute is measurable and has an architectural consequence. Decisions and
 risks refer to these IDs. All are **targets**. A thin running slice measured
@@ -22,7 +22,7 @@ deployed environment.
 | QA-12 | Tenant isolation | 0 reads or writes across partners | Row-level security on every partner-owned table; tenant set per transaction ([ADR 9](../decisions/0009-hybrid-multi-tenancy.md)) | Automated cross-tenant tests in CI on every schema change |
 | QA-13 | Draft safety | 0 drafts reach staff that cite an unknown ride event or promise money; every candidate model passes all evaluation cases before use | Draft checks in code, not only in the prompt; evaluation harness with the same checks ([ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md)) | Slice tests in CI; evaluation run per model change (`pnpm eval`) |
 
-## Scenario example
+### Scenario example
 
 ```text
 Source:        Passenger app

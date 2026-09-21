@@ -1,4 +1,4 @@
-# Threat Model
+## Threat Model
 
 STRIDE analysis of the planned design, plan step S099, 2026-09-19. It covers the
 trust boundaries in [trust-boundaries.md](trust-boundaries.md) and the flows in
@@ -9,7 +9,7 @@ each names the plan step that builds it or the risk that tracks what is left.
 **STRIDE:** Spoofing, Tampering, Repudiation, Information disclosure, Denial of
 service, Elevation of privilege.
 
-## Founder decisions
+### Founder decisions
 
 Four threats had a real trade-off. The founder chose:
 
@@ -20,7 +20,7 @@ Four threats had a real trade-off. The founder chose:
 | [T-18](#tb-5-operator-privileged-access) operator reads partner data | Aggregates by default; reading a partner's data needs a time-boxed grant from that partner, fully audited ([ADR 13](../decisions/0013-operator-access-by-partner-grant.md)) | Full audited access; break-glass only |
 | [T-05](#tb-1-internet-to-edge) forwarded trip-share link | Keep as designed: random token, 2-hour expiry after the ride, revocable, rate-limited, current position only | Viewer code; position only after pickup |
 
-## TB-1 Internet to edge
+### TB-1 Internet to edge
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
@@ -31,7 +31,7 @@ Four threats had a real trade-off. The founder chose:
 | T-05 | I | Forwarded trip-share link reveals a passenger's live position | Random token, expiry, revocation, rate limit, current position only (founder decision) | Planned, S035; residual accepted |
 | T-06 | T | Tampered app sends forged API calls | Server validates every input with zod; the app is never trusted for state or price | Planned, S038 |
 
-## TB-2 Edge to private network
+### TB-2 Edge to private network
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
@@ -41,7 +41,7 @@ Four threats had a real trade-off. The founder chose:
 | T-10 | R | Driver or passenger denies an action (cancellation, arrival, alarm) | Append-only ride events with actor, time and position ([QA-11](../requirements/quality-attributes.md)) | Planned, S032 |
 | T-11 | D | Socket flood from a compromised client exhausts API tasks | Per-connection rate limits; connection caps per user; autoscaling | Planned, S033 |
 
-## TB-3 API to data stores
+### TB-3 API to data stores
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
@@ -50,14 +50,14 @@ Four threats had a real trade-off. The founder chose:
 | T-14 | T | SQL injection | Parameterised queries through the ORM; no string-built SQL | Planned, S024 |
 | T-15 | I | Personal data in logs or traces | Redaction at the logger; IDs only ([data classification](data-classification.md)) | Planned, S023 |
 
-## TB-4 AWS to Azure
+### TB-4 AWS to Azure
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
 | T-16 | T | Attacker in AWS overwrites or deletes the off-provider backups | Write-only credential; immutability policy | Planned, S094; [RISK-010](../risks/architecture-risks.md) |
 | T-17 | I | Attacker in AWS reads the backups | Dumps encrypted with a key held only in Azure Key Vault | Planned, S094 |
 
-## TB-5 Operator privileged access
+### TB-5 Operator privileged access
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
@@ -66,14 +66,14 @@ Four threats had a real trade-off. The founder chose:
 | T-20 | R | Admin action without trace (refund, block, approval) | Audit log of every admin action with actor and reason | Planned, S037 |
 | T-21 | S | Cloud console takeover | Identity Center and Entra ID with MFA; no IAM users; break-glass escrowed in Azure | Planned, S011, S095 |
 
-## TB-6 Hopin to regulators and partners
+### TB-6 Hopin to regulators and partners
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
 | T-22 | I | Data sent to BKK or the invoicing provider beyond what the law requires | Adapter sends only the fields the rule names; reviewed in the DPIA | Planned, S112, S100 |
 | T-23 | S | Forged meter data if the meter integration trusts the phone | Decide with the meter vendor in S113; until then T-09 applies | Open, S113 |
 
-## TB-7 Hopin to model providers
+### TB-7 Hopin to model providers
 
 Added with [ADR 14](../decisions/0014-ai-assists-staff-read-and-draft-only.md)
 and [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md).
@@ -88,7 +88,7 @@ design only.
 | T-30 | T | The model invents facts, or promises money in words the runtime check does not know | Citations must match real event IDs; English and Hungarian promise patterns at runtime; the same cases in the evaluation set; human approval | In place in the slice; residual: unusual phrasing relies on the reviewer |
 | T-31 | I | More personal data sent to the model provider than the task needs | Case file carries roles instead of IDs, no ride ID, no contact details, positions rounded to about 1 km; logs hold metadata only, never text | In place in the slice; unit test. Residual: contact details are removed by pattern, so a disguised one gets through |
 
-## Delivery and supply chain
+### Delivery and supply chain
 
 | ID | STRIDE | Threat | Control | Status |
 |---|---|---|---|---|
@@ -96,7 +96,7 @@ design only.
 | T-25 | E | Stolen CI credentials deploy to production | OIDC roles only; production role only from `main` with approval; required checks | Planned, S015; in place for the docs repo |
 | T-26 | I | Secret committed to this public repository | Gitleaks in CI on full history; GitHub push protection | In place |
 
-## What this model does not cover
+### What this model does not cover
 
 - Physical safety of passengers and drivers beyond the alarm flow.
 - Fraud patterns that need data: collusion between drivers and passengers, card

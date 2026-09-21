@@ -1,4 +1,4 @@
-# Backup Strategy
+## Backup Strategy
 
 Why two providers: [ADR
 1](../decisions/0001-aws-primary-azure-for-off-provider-recovery.md). A

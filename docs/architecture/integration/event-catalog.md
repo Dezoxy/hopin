@@ -1,4 +1,4 @@
-# Event Catalog
+## Event Catalog
 
 Realtime events on Socket.IO. Schemas will live in `packages/shared` as zod
 definitions (plan step S006). Delivery is **at most once**: a client that
@@ -21,7 +21,7 @@ reconnects re-reads ride state over REST, so no event is the only copy of a fact
 Stripe webhook events consumed (`payment_intent.*`, `charge.refunded`,
 `payout.*`, `account.updated`) are handled idempotently by event ID.
 
-## Outbox events
+### Outbox events
 
 Written in the same transaction as the state change they describe, then relayed
 at least once: `ride.completed` starts a payment workflow, the rest become jobs
