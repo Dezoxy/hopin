@@ -1,4 +1,4 @@
-# Observability Architecture
+## Observability Architecture
 
 Target: [QA-10](../requirements/quality-attributes.md), page-worthy failures
 alert within 5 minutes. Alert definitions will live in Terraform (plan step
@@ -12,7 +12,7 @@ S090); this page explains the strategy.
 | App crashes | Sentry, EU region | 90 days | EAS Update rollouts watched against crash-free rate |
 | Audit | `ride_events`, `audit_log` in PostgreSQL | 2 years | [QA-11](../requirements/quality-attributes.md) |
 
-## Business metrics
+### Business metrics
 
 Reviewed weekly on one dashboard next to the technical signals. Targets come
 from the [business case](../../business/business-case.md).
@@ -26,7 +26,7 @@ from the [business case](../../business/business-case.md).
 | Active cars per partner | Cars with at least one ride in the month | White-label billing basis |
 | Revenue per ride | Hopin's share after Stripe fees | Unit economics ([QA-08](../requirements/quality-attributes.md)) |
 
-## Page-worthy alerts
+### Page-worthy alerts
 
 | Alert | Threshold |
 |---|---|
@@ -41,7 +41,7 @@ from the [business case](../../business/business-case.md).
 Alerts go through SNS to phone and email. A static status page on CloudFront is
 updated by hand at MVP.
 
-## Detection gaps
+### Detection gaps
 
 - No synthetic monitoring of the ride flow yet; add with the first staging deploy.
 - The solo operator is the only responder ([RISK-004](../risks/architecture-risks.md)).

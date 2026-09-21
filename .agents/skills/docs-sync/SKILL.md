@@ -72,8 +72,10 @@ renamed.
 
    The script checks the `AGENTS.md`/`CLAUDE.md` twins, the `.agents/` skill
    mirror, relative links, the docs index, the ADR format and index, the view
-   register against `views.dsl`, and that every cited requirement ID is defined
-   in its owning document. It runs in `.github/workflows/docs-consistency.yml`.
+   register against `views.dsl`, that every cited requirement ID is defined in
+   its owning document, and that every document the Documentation tab imports
+   has a visible `##` title — Structurizr hides a level-1 heading, so a
+   `#`-titled document renders with no title while its PDF looks fine. It runs in `.github/workflows/docs-consistency.yml`.
 
    **A green run means "nothing provably false", not "docs are good."** The
    script cannot read prose. Everything below is still yours:
@@ -82,6 +84,9 @@ renamed.
    - a command a doc gives → run it, or `--help` / dry-run it if it mutates
    - a legal or tariff fact → the source it cites, not memory
    - a rendered view → `make export` and look at the PNG
+   - an imported document → `make view`, open the Documentation tab, and
+     confirm its title appears in both the page and the navigation. The PDF
+     cannot tell you this: it normalises heading levels.
    - a step's status → does the work it names actually exist?
 
    If you add a doc claim that *could* be checked mechanically, add it to the

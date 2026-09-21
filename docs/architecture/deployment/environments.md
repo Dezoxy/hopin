@@ -1,4 +1,4 @@
-# Environments
+## Environments
 
 | Environment | AWS account | Purpose | Data | Shape |
 |---|---|---|---|---|

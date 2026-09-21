@@ -1,11 +1,11 @@
-# S123 Evidence: Thin Slice and Load Test
+## S123 Evidence: Thin Slice and Load Test
 
 > **Status:** two measurements, 2026-09-19. Local machine, not production. Raw
   results: [run 1, 3 s reporting](s123-load-2026-09-19.json) and [run 2, 2.5 s
   reporting](s123-load-2026-09-19-run2.json). Code:
   [slice/](../../../slice/README.md).
 
-## What was built
+### What was built
 
 A running cut of the Hopin API: request a ride, pre-filter free taxis in Redis
 GEO, rank them, offer the ride, match it exactly once, publish MATCHED through
@@ -18,7 +18,7 @@ Deliberately stubbed: Cognito (identity headers instead of tokens), Mapbox
 memory, one instance), payments. The [slice README](../../../slice/README.md)
 lists each.
 
-## Results
+### Results
 
 Setup: API as one Node.js process, PostgreSQL 16 and Redis 7 in Docker, load
 generator as a separate process, all on one Apple M1 Pro (8 cores, 16 GB). 200
@@ -40,7 +40,7 @@ minute for 3 minutes.
 | API CPU, average and maximum | 6.9 % / 13.6 % of one core |
 | API memory, maximum | 200 MB |
 
-## What the numbers mean
+### What the numbers mean
 
 1. **Matching is far inside its budget, but the real cost is missing.** 23 ms at
    p95 leaves almost the whole 2 s for the step the slice stubs: a road-ETA call
@@ -63,7 +63,7 @@ minute for 3 minutes.
    used 14 % of one core at most. Scale limits will come from Redis fan-out and
    the Matrix API, not from the API process.
 
-## Run 2: reporting every 2.5 s
+### Run 2: reporting every 2.5 s
 
 Same setup, after the founder's decision on QA-02.
 
@@ -80,7 +80,7 @@ location messages cost no visible CPU at this load. The different no-driver
 count comes from random pickups and driver positions in each run, not from the
 interval.
 
-## Quality of the slice itself
+### Quality of the slice itself
 
 - 29 tests: 20 unit, 6 integration against real PostgreSQL and Redis, 3
   end-to-end with real sockets. Coverage 92 % of statements, 94 % of lines, 66 %
@@ -103,7 +103,7 @@ interval.
   to clients, which Socket.IO cannot give; it now states the real guarantee: at
   least once to the Redis adapter, at most once to the client.
 
-## Follow-ups
+### Follow-ups
 
 - Put a real road-ETA call in the matching path and measure QA-01 again.
 - ~~Decide the QA-02 interval~~ Decided: 2.5 s reporting (run 2).

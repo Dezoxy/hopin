@@ -1,4 +1,4 @@
-# Target State
+## Target State
 
 The MVP described by this knowledge base: one city, a passenger app on iOS,
 Android and web, a driver app, an admin web and a backend in AWS eu-central-1,

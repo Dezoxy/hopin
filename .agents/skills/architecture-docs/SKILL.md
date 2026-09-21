@@ -125,6 +125,15 @@ ordinary Markdown links and stable IDs; no traceability database is needed.
   directory. Use a curated folder for the Documentation tab; do not assume it
   imports all nested concern folders. Preserve the target version's supported
   links and verify navigation/imports when changing them.
+- **Title every document the Documentation tab imports with `##`, not `#`**,
+  and use `###` for its subsections. Structurizr hides a level-1 heading: it
+  appears neither in the rendered page nor in the navigation. The PDF builder
+  normalises heading levels, so a `#`-titled document still looks right in
+  print — the failure is invisible unless you look at the tab itself. The only
+  `#` allowed is the workspace name as the first heading of the first document,
+  which the PDF builder uses as its cover line. Symlinked registers are imported
+  too, so the rule applies at their real path. Verify by opening the tab, not by
+  reading the PDF.
 
 ## Maintenance and review
 

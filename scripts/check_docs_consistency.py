@@ -400,6 +400,106 @@ def check_overview_complete(f: Failures) -> None:
             )
 
 
+ATX_HEADING = re.compile(r"^(#{1,6})[ \t]+(.*?)[ \t]*#*[ \t]*$")
+WORKSPACE_NAME = re.compile(r'^\s*workspace\s+"([^"]+)"', re.MULTILINE)
+
+
+def workspace_name() -> str | None:
+    """The name declared in workspace.dsl -- the one level-1 heading allowed."""
+    dsl = ARCH / "workspace.dsl"
+    if not dsl.exists():
+        return None
+    match = WORKSPACE_NAME.search(read(dsl))
+    return match.group(1) if match else None
+
+
+def headings(text: str) -> list[tuple[int, int, str]]:
+    """(line number, level, title) for every ATX heading outside fenced code.
+
+    A `#` inside a fence is a shell comment or a sample document, not a heading.
+    """
+    found, fenced = [], False
+    for number, line in enumerate(text.splitlines(), 1):
+        if FENCE.match(line):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        match = ATX_HEADING.match(line)
+        if match:
+            found.append((number, len(match.group(1)), match.group(2)))
+    return found
+
+
+def check_heading_visibility(f: Failures) -> None:
+    """Every imported document shows its section title in the page and the nav.
+
+    Structurizr's Documentation tab HIDES a level-1 (`#`) heading: it appears
+    neither in the rendered page nor in the navigation. The PDF builder
+    normalises heading levels, so the same document looks correct in print --
+    which is how a template teaching "every section is an `#` heading" shipped
+    to five repositories with every section title missing, past a checker that
+    confirmed each document was included but never looked at how it rendered.
+
+    So, for each document overview/ imports (following symlinks, reported at
+    the real path where the fix belongs):
+
+    - a level-1 heading is an error, except one: the workspace name as the very
+      first heading of the first document, which the PDF builder uses as the
+      cover line;
+    - the document must have a level-2 heading, or it has no entry in the nav;
+    - heading levels must not skip (`##` straight to `####`).
+
+    ADRs are imported by `!adrs` and rendered separately, so they are out of
+    scope; so is anything inside a fenced block.
+    """
+    if not OVERVIEW.is_dir():
+        return  # nothing imported yet
+    name = workspace_name()
+    documents = sorted(
+        p for p in OVERVIEW.iterdir() if p.suffix == ".md" and p.exists()
+    )
+    seen = set()
+    for index, doc in enumerate(documents):
+        real = doc.resolve()
+        if real in seen:
+            continue  # the same register symlinked twice is one document
+        seen.add(real)
+        where = rel(real)
+        found = headings(read(doc))
+        has_section = hidden = False
+        previous = None
+        for position, (number, level, title) in enumerate(found):
+            if level == 1:
+                opening = index == 0 and position == 0 and title == name
+                if not opening:
+                    hidden = True
+                    f.add(
+                        "headings",
+                        f"{where}:{number}: '# {title}' is hidden -- Structurizr "
+                        f"drops a level-1 heading from both the page and the "
+                        f"navigation. Use '## {title}' and demote the rest of the "
+                        f"document by one level.",
+                    )
+            elif level == 2:
+                has_section = True
+            if previous is not None and level > previous + 1:
+                f.add(
+                    "headings",
+                    f"{where}:{number}: heading level skips from {previous} to "
+                    f"{level} ('{'#' * level} {title}'); use level {previous + 1}.",
+                )
+            previous = level
+        # A hidden title already tells the reader what to change; saying the
+        # document ALSO lacks a visible section would report one fault twice.
+        if not has_section and not hidden:
+            f.add(
+                "headings",
+                f"{where}: no visible section heading -- open the document with "
+                f"'## <title>' so it appears in the navigation.",
+            )
+
+
 CHECKS = (
     check_twins,
     check_skill_mirror,
@@ -408,6 +508,7 @@ CHECKS = (
     check_line_width,
     check_docs_index,
     check_overview_complete,
+    check_heading_visibility,
     check_adrs,
     check_view_register,
     check_speaker_notes,

@@ -1,4 +1,4 @@
-# Design findings
+## Design findings
 
 What the design process caught before any production code existed, how it was
 caught, and what changed as a result. Each finding links to where the change is
@@ -6,7 +6,7 @@ recorded. Hopin is a case study, so these are findings from legal reading,
 modelling, costing, a thin running slice, review and checks against vendor
 documentation. None came from production.
 
-## By method
+### By method
 
 | Method | Findings |
 |---|---|
@@ -18,7 +18,7 @@ documentation. None came from production.
 | Code review | 3 |
 | Checking vendor documentation | 1 |
 
-## Findings
+### Findings
 
 | # | Found | How | What changed | Record |
 |-|--------|----|--------|-----|
@@ -35,7 +35,7 @@ documentation. None came from production.
 | 11 | The AI draft check caught refund promises only in English, although the model replies in Hungarian. The real ride ID also reached the model. | Code review of the AI assistant | Hungarian promise patterns were added and the ride ID was removed, each after a failing test. Disguised contact details remain a stated residual risk. | [T-30](../security/threat-model.md#tb-7-hopin-to-model-providers), [T-31](../security/threat-model.md#tb-7-hopin-to-model-providers) |
 | 12 | The "EU region" check accepted any region named "eu-", including London and Zurich. The default, Frankfurt, cannot run Claude Opus 5 on the Bedrock endpoint the slice uses. | Checking AWS's documentation before accepting ADR 15 | Only EU member-state regions with that endpoint are allowed, and the default moved to Ireland. The documentation also confirmed there is no cross-region routing on that endpoint, so ADR 15 was accepted. | [ADR 15](../decisions/0015-bedrock-for-data-openrouter-for-evaluation.md), [RISK-020](../risks/architecture-risks.md) |
 
-## What the pattern shows
+### What the pattern shows
 
 - **Cheap methods found the expensive problems.** Reading the law and costing
   the design changed the business model and the matching design before any code
@@ -45,7 +45,7 @@ documentation. None came from production.
 - **Written claims need a source check.** The outbox guarantee and the EU-only
   claim both read well and were both wrong until they were checked.
 
-## Not found yet
+### Not found yet
 
 Some problems only a real deployment would surface. These are open, not solved:
 

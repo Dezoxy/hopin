@@ -1,4 +1,4 @@
-# Security Architecture
+## Security Architecture
 
 Planned controls for the MVP. Nothing is deployed; each control names the plan
 step that builds it. Boundaries are in
@@ -6,7 +6,7 @@ step that builds it. Boundaries are in
 [data-classification.md](data-classification.md). See the **Security** view in
 the model.
 
-## Authentication and authorisation
+### Authentication and authorisation
 
 | Who | Authenticates with | Authorised by | Step |
 |---|---|---|---|
@@ -24,7 +24,7 @@ the model.
 Resource ownership is checked in the API, not only the role: a passenger can
 read only their own rides, a driver only rides offered to or assigned to them.
 
-## Secrets
+### Secrets
 
 - **Runtime source:** AWS Secrets Manager holds database credentials, Stripe
   keys, Mapbox server token, Cognito app secrets and the Azure credential. Tasks
@@ -40,14 +40,14 @@ read only their own rides, a driver only rides offered to or assigned to them.
 - **Client-side tokens:** the Mapbox public token is URL-restricted; no other
   secret ships in an app bundle.
 
-## Encryption
+### Encryption
 
 - In transit: TLS 1.2+ everywhere, ACM certificates, TLS to RDS and Redis.
 - At rest: KMS customer-managed keys for RDS, S3, Secrets Manager, CloudWatch
   Logs; Azure storage encryption plus client-side encryption of dumps with the
   escrowed key.
 
-## Network
+### Network
 
 - Private subnets for ECS tasks, RDS and Redis. Only the load balancer and NAT
   sit in public subnets.
@@ -55,32 +55,32 @@ read only their own rides, a driver only rides offered to or assigned to them.
   APIs without NAT.
 - Security groups allow only load balancer → API, API → database and cache.
 
-## Edge
+### Edge
 
 - AWS WAF managed core rule set on CloudFront, the API load balancer and the
   Cognito user pool.
 - Rate limits on quote and ride creation at the load balancer and on sign-in at Cognito.
 - Shield Standard.
 
-## Application
+### Application
 
 - zod validation on every input ([engineering-standards.md](../principles/engineering-standards.md)).
 - Driver documents uploaded through presigned S3 URLs with type and size limits;
   never public.
 - Idempotency keys on ride and payment creation ([QA-09](../requirements/quality-attributes.md)).
 
-## Supply chain
+### Supply chain
 
 - Dependabot, `pnpm audit` and Trivy image scans in CI; ECR scan on push; GitHub
   secret scanning and push protection on this public repository.
 
-## Detection
+### Detection
 
 - CloudTrail organisation trail, GuardDuty, Security Hub CIS benchmark, AWS
   Config rules (no public S3, encrypted RDS, no open SSH).
 - Microsoft Defender for Storage and Key Vault on the Azure side.
 
-## Open items
+### Open items
 
 - Threat model: done in [threat-model.md](threat-model.md) (plan step S099); 31
   threats, each mapped to a planned control or a tracked risk.

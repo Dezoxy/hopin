@@ -1,10 +1,10 @@
-# Integration Architecture
+## Integration Architecture
 
 How Hopin talks to its clients and to outside systems. Exact contracts live in
 `/api` (OpenAPI, plan step S006) and `packages/shared` (zod event schemas); this
 page explains the behaviour.
 
-## Client interfaces
+### Client interfaces
 
 | Interface | Style | Auth | Failure handling |
 |---|---|---|---|
@@ -12,7 +12,7 @@ page explains the behaviour.
 | Realtime | Socket.IO over WSS, Redis adapter | Cognito JWT on connect | At-most-once delivery; on reconnect, clients re-read state over REST. See [event-catalog.md](event-catalog.md) |
 | Trip share | HTTPS polling of `share/:token` | Share token | Expired or revoked token returns 404 |
 
-## External systems
+### External systems
 
 | System | Direction | Contract | Auth | Failure handling |
 |---|---|---|---|---|

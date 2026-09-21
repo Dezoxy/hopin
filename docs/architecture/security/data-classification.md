@@ -1,4 +1,4 @@
-# Data Classification
+## Data Classification
 
 Retention periods are targets; the retention for dispatch order records waits on
 the lawyer ([A-02](../requirements/assumptions.md), memo open question 4).
@@ -24,7 +24,7 @@ the lawyer ([A-02](../requirements/assumptions.md), memo open question 4).
 | Traces | Internal | X-Ray | 30 days | Ride and user IDs only as attributes |
 | Crash reports | Internal | Sentry (EU region) | 90 days | Scrub phone numbers and locations |
 
-## Rules
+### Rules
 
 - Personal data at rest only in EU regions ([QA-05](../requirements/quality-attributes.md)).
 - Logs carry ride and user IDs, never names, phone numbers or coordinates.
